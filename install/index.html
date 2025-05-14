@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reldens CMS - Installation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/install-assets/css/installer.css">
+    <script src="/install-assets/js/installer.js"></script>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <h1 class="title">
+            <strong>Reldens CMS</strong> - Installation
+        </h1>
+    </div>
+    <div class="content">
+        <div class="forms-container">
+            <div class="row">
+                <form name="install-form" id="install-form" class="install-form" action="/install" method="post">
+                    <h3 class="form-title">- Server Configuration -</h3>
+                    <div class="input-box app-host">
+                        <label for="app-host">Host</label>
+                        <input type="text" name="app-host" id="app-host" value="{{app-host}}" class="required" required/>
+                    </div>
+                    <div class="input-box app-port">
+                        <label for="app-port">Port</label>
+                        <input type="text" name="app-port" id="app-port" value="{{app-port}}" class="required" required/>
+                    </div>
+                    <div class="input-box app-admin-path">
+                        <label for="app-admin-path">Admin Panel Path</label>
+                        <input type="text" name="app-admin-path" id="app-admin-path" value="{{app-admin-path}}"/>
+                    </div>
+                    <div class="input-box app-error">
+                        <p class="error installation-process-failed">There was an error during the installation process.</p>
+                    </div>
+                    <h3 class="form-title">- Database Configuration -</h3>
+                    <div class="db-basic-config-notice">
+                        <span>
+                            Default configuration:
+                            <ul>
+                                <li>Client: mysql2 - Port: 3306</li>
+                                <li>Database Driver: prisma</li>
+                            </ul>
+                        </span>
+                    </div>
+                    <div class="input-box db-storage-driver">
+                        <label for="db-storage-driver">Storage Driver</label>
+                        <select name="db-storage-driver" id="db-storage-driver" class="required" required>
+                            <option value="prisma" selected>Prisma</option>
+                            <option value="objection-js">Objection JS</option>
+                        </select>
+                    </div>
+                    <div class="input-box db-client">
+                        <label for="db-client">Client</label>
+                        <input type="text" name="db-client" id="db-client" value="{{db-client}}" class="required" required/>
+                    </div>
+                    <div class="input-box db-host">
+                        <label for="db-host">Host</label>
+                        <input type="text" name="db-host" id="db-host" value="{{db-host}}" class="required" required/>
+                    </div>
+                    <div class="input-box db-port">
+                        <label for="db-port">Port</label>
+                        <input type="text" name="db-port" id="db-port" value="{{db-port}}" class="required" required/>
+                    </div>
+                    <div class="input-box db-name">
+                        <label for="db-name">Database Name</label>
+                        <input type="text" name="db-name" id="db-name" value="{{db-name}}" class="required" required/>
+                    </div>
+                    <div class="input-box db-username">
+                        <label for="db-username">Username</label>
+                        <input type="text" name="db-username" id="db-username" value="{{db-username}}" class="required" required/>
+                    </div>
+                    <div class="input-box db-password">
+                        <label for="db-password">Password</label>
+                        <input type="password" name="db-password" id="db-password" value="{{db-password}}" class="required" required autocomplete="off"/>
+                    </div>
+                    <div class="input-box db-error">
+                        <p class="error connection-failed">Connection failed, please check the database configuration.</p>
+                        <p class="error invalid-driver">Invalid storage driver.</p>
+                        <p class="error raw-query-not-found">Method "rawQuery" not found in the specified storage driver.</p>
+                        <p class="error sql-file-not-found">SQL installation file not found.</p>
+                        <p class="error db-installation-process-failed">There was an error during the installation process.</p>
+                    </div>
+                    <div class="input-box submit-container">
+                        <img class="install-loading hidden" src="/install-assets/img/loading.gif"/>
+                        <input id="install-submit-button" type="submit" value="Install"/>
+                    </div>
+                    <div class="input-box response-error"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="copyright">
+            &copy; 2025 Reldens CMS
+        </div>
+    </div>
+</div>
+</body>
+</html>
