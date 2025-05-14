@@ -1,7 +1,7 @@
 {
     "name": "@reldens/cms",
     "scope": "@reldens",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Reldens - CMS",
     "author": "Damian A. Pastorini",
     "license": "MIT",
@@ -12,7 +12,7 @@
     },
     "main": "index.js",
     "bin": {
-        "reldens-cms": "./bin/reldens-cms"
+        "reldens-cms": "bin/reldens-cms.js"
     },
     "repository": {
         "type": "git",
