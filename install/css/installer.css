@@ -103,8 +103,7 @@ input[type="submit"]:hover {
 }
 
 .install-loading {
-    width: 24px;
-    height: 24px;
+    width: 32px;
     margin-right: 10px;
     vertical-align: middle;
 }
