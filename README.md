@@ -13,7 +13,7 @@ It provides both an administration panel for content management and a frontend f
 - Administration panel for content management
 - Support for multiple database drivers (Prisma, Objection.js)
 - Template-based content rendering
-- SEO-friendly routes and meta data
+- SEO-friendly routes and meta-data
 - Modular architecture
 
 ## Installation

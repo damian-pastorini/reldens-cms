@@ -6,10 +6,10 @@
 
 const { Manager } = require('./lib/manager');
 const { Installer } = require('./lib/installer');
-const { Storefront } = require('./lib/storefront');
+const { Frontend } = require('./lib/frontend');
 
 module.exports = {
     Manager,
     Installer,
-    Storefront
+    Frontend
 };

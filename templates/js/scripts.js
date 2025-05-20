@@ -1,4 +1,4 @@
-// Storefront JavaScript
+// Frontend JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     // Add active class to current navigation item
     const currentPath = window.location.pathname;
