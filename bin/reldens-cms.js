@@ -23,7 +23,7 @@ let started =  manager.start().then((result) => {
     Logger.info('Reldens CMS started by command.');
     return true;
 }).catch((error) => {
-    Logger.error('Failed to start CMS:', error);
+    Logger.critical('Failed to start CMS:', error);
     process.exit();
 });
 

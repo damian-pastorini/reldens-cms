@@ -13,7 +13,7 @@ let projectRoot = args[0] || process.cwd();
 
 let manager = new Manager({
     projectRoot,
-    entities: rawRegisteredEntities,
+    rawRegisteredEntities,
     entitiesConfig,
     entitiesTranslations
 });
@@ -27,6 +27,6 @@ manager.start().then((result) => {
     Logger.info('Reldens CMS started by command.');
     return true;
 }).catch((error) => {
-    Logger.error('Failed to start CMS: '+error.message);
+    Logger.critical('Failed to start CMS: '+error.message);
     process.exit();
 });
