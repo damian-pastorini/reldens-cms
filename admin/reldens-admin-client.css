@@ -86,7 +86,6 @@
     }
 
     & .button {
-
         padding: 0.5rem 1rem;
         border: none;
         border-radius: 4px;
@@ -94,44 +93,44 @@
         cursor: pointer;
         text-decoration: none;
 
-        &-primary {
-            color: var(--white);
-            background-color: var(--lightBlue);
-
-            &:hover {
-                background-color: var(--lightBlue);
-            }
-        }
-
-        &-secondary {
-            color: var(--white);
-            background-color: var(--grey);
-
-            &:hover {
-                background-color: var(--grey);
-            }
-        }
-
-        &-warning {
-            color: var(--white);
-            background-color: var(--orange);
-
-            &:hover {
-                background-color: var(--orange);
-            }
-        }
-
-        &-danger {
-            color: var(--white);
-            background-color: var(--red);
-
-            &:hover {
-                background-color: var(--red);
-            }
-        }
-
         &:disabled {
             background-color: var(--grey) !important;
+        }
+    }
+
+    & .button-primary {
+        color: var(--white);
+        background-color: var(--lightBlue);
+
+        &:hover {
+            background-color: var(--lightBlue);
+        }
+    }
+
+    & .button-secondary {
+        color: var(--white);
+        background-color: var(--grey);
+
+        &:hover {
+            background-color: var(--grey);
+        }
+    }
+
+    & .button-warning {
+        color: var(--white);
+        background-color: var(--orange);
+
+        &:hover {
+            background-color: var(--orange);
+        }
+    }
+
+    & .button-danger {
+        color: var(--white);
+        background-color: var(--red);
+
+        &:hover {
+            background-color: var(--red);
         }
     }
 
@@ -556,7 +555,7 @@
                     padding: 0.5rem;
                     border: 1px solid #ccc;
                     border-radius: 4px;
-                    min-width: 150px; /* Minimum width for input fields */
+                    min-width: 150px;
                 }
             }
 

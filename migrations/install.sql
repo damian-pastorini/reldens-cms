@@ -1,19 +1,5 @@
 
--- Install SQL for Reldens CMS
-
-CREATE TABLE IF NOT EXISTS `users` (
-    `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `email` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-    `username` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-    `password` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-    `role_id` INT(10) UNSIGNED NOT NULL,
-    `status` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-    `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
-    `updated_at` TIMESTAMP NOT NULL DEFAULT (NOW()) ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE KEY `email` (`email`) USING BTREE,
-    UNIQUE KEY `username` (`username`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Install Reldens CMS
 
 CREATE TABLE IF NOT EXISTS `routes` (
     `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -74,11 +60,3 @@ CREATE TABLE IF NOT EXISTS `entities_meta` (
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE KEY `entity_meta` (`entity_name`, `entity_id`, `meta_key`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Create a default homepage route if not exists
-INSERT IGNORE INTO `cms_pages` (`id`, `title`, `content`, `template`, `created_at`) VALUES
-(1, 'Home', '<h1>Welcome to Reldens CMS</h1><p>This is your homepage. Edit this content in the admin panel.</p>', 'page', NOW());
-
--- Create a default route to the homepage
-INSERT IGNORE INTO `routes` (`path`, `router`, `content_id`, `title`, `meta_description`, `status`, `created_at`) VALUES
-('/home', 'cms_pages', 1, 'Home', 'Welcome to Reldens CMS', 'published', NOW());
