@@ -1,0 +1,32 @@
+/**
+ *
+ * Reldens - CMS
+ *
+ */
+
+const { Manager } = require('@reldens/cms');
+const { Logger } = require('@reldens/utils');
+const { rawRegisteredEntities, entitiesConfig, entitiesTranslations } = require('./generated-entities/models/{{driverKey}}/registered-models-{{driverKey}}');
+
+let args = process.argv.slice(2);
+let projectRoot = args[0] || process.cwd();
+
+let manager = new Manager({
+    projectRoot,
+    rawRegisteredEntities,
+    entitiesConfig,
+    entitiesTranslations
+});
+Logger.debug('Reldens CMS Manager instance created.', {configuration: manager.config});
+
+manager.start().then((result) => {
+    if(!result){
+        Logger.info('Reldens CMS started by command failed.');
+        return false;
+    }
+    Logger.info('Reldens CMS started by command.');
+    return true;
+}).catch((error) => {
+    Logger.critical('Failed to start CMS: '+error.message);
+    process.exit();
+});
