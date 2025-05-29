@@ -93,9 +93,17 @@
                         <input type="checkbox" name="install-default-homepage" id="install-default-homepage" checked/>
                         <label for="install-default-homepage">Install default homepage</label>
                     </div>
-                    <div class="input-box input-checkbox submit-container">
-                        <img class="install-loading hidden" src="/install-assets/img/loading.gif"/>
+                    <div class="input-box input-checkbox install-default-blocks">
+                        <input type="checkbox" name="install-default-blocks" id="install-default-blocks" checked/>
+                        <label for="install-default-blocks">Install default content blocks</label>
+                    </div>
+                    <div class="input-box input-checkbox install-entity-access">
+                        <input type="checkbox" name="install-entity-access" id="install-entity-access" checked/>
+                        <label for="install-entity-access">Install entity access control rules</label>
+                    </div>
+                    <div class="input-box submit-container">
                         <input id="install-submit-button" type="submit" value="Install"/>
+                        <img class="install-loading hidden" src="/install-assets/img/loading.gif"/>
                     </div>
                     <div class="input-box response-error"></div>
                 </form>

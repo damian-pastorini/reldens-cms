@@ -11,16 +11,10 @@
     <link href="/css/styles.css" rel="stylesheet"/>
 </head>
 <body class="{{siteHandle}}{{#elementClassName}} {{elementClassName}}{{/elementClassName}}"{{#backgroundImage}} style="background-image: url('{{backgroundImage}}');"{{/backgroundImage}}>
-    <header id="header" class="fixed-top">
-        {{>header}}
-    </header>
-    <main id="main">
-        {{{content}}}
-    </main>
-    <footer id="footer">
-        {{>footer}}
-    </footer>
-    <a href="#" class="back-to-top"><i class="ri-arrow-up-line"></i></a>
-    <script src="/js/scripts.js"></script>
+    {{{content}}}
+    <script type="text/javascript" defer src="/js/scripts.js"></script>
+    <script type="text/javascript">
+        const currentYear = {{currentYear}};
+    </script>
 </body>
 </html>
