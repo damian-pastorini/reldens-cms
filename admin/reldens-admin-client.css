@@ -313,6 +313,11 @@
         }
     }
 
+    & textarea {
+        resize: vertical;
+        min-height: 300px;
+    }
+
     & .table-container {
         width: 96%;
         margin: auto;
