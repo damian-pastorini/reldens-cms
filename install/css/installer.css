@@ -40,6 +40,14 @@ body {
     margin-bottom: 15px;
 }
 
+.input-checkbox {
+    display: flex;
+
+    label {
+        margin-bottom: 0;
+    }
+}
+
 label {
     display: block;
     margin-bottom: 5px;

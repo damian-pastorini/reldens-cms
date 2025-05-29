@@ -1,7 +1,7 @@
 {
     "name": "@reldens/cms",
     "scope": "@reldens",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "description": "Reldens - CMS",
     "author": "Damian A. Pastorini",
     "license": "MIT",
@@ -32,9 +32,9 @@
         "url": "https://github.com/damian-pastorini/reldens-cms/issues"
     },
     "dependencies": {
-        "@reldens/server-utils": "^0.17.0",
-        "@reldens/storage": "^0.45.0",
-        "@reldens/utils": "^0.47.0",
+        "@reldens/server-utils": "^0.18.0",
+        "@reldens/storage": "^0.46.0",
+        "@reldens/utils": "^0.49.0",
         "dotenv": "^16.5.0",
         "mustache": "^4.2.0"
     }

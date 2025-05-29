@@ -27,10 +27,8 @@ CREATE TABLE IF NOT EXISTS `routes` (
 CREATE TABLE IF NOT EXISTS `cms_pages_meta` (
     `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
     `page_id` INT(10) UNSIGNED NOT NULL,
-    `layout` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
     `publish_date` TIMESTAMP NULL,
     `expire_date` TIMESTAMP NULL,
-    `author_id` INT(10) UNSIGNED NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
     `updated_at` TIMESTAMP NOT NULL DEFAULT (NOW()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE,
