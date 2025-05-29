@@ -1,12 +1,14 @@
-// Frontend JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    // Add active class to current navigation item
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('nav a');
+/**
+ * Reldens - CMS - Scripts
+ */
 
-    navLinks.forEach(link => {
-        if (link.getAttribute('href') === currentPath) {
+document.addEventListener('DOMContentLoaded', function() {
+    let currentPath = window.location.pathname;
+
+    let navLinks = document.querySelectorAll('nav a');
+    for(let link of navLinks){
+        if(link.getAttribute('href') === currentPath){
             link.classList.add('active');
         }
-    });
+    }
 });

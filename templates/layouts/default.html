@@ -1,0 +1,21 @@
+
+{{>header}}
+
+{{ entity('cmsBlocks', 'header-main') }}
+
+<main id="main" class="main-container">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                {{ entity('cmsBlocks', 'sidebar-left') }}
+            </div>
+            <div class="col-md-9">
+                {{{content}}}
+            </div>
+        </div>
+    </div>
+</main>
+
+{{ entity('cmsBlocks', 'footer-main') }}
+
+{{>footer}}
