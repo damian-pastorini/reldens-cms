@@ -19,6 +19,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Template fallback system** (domain → default → base)
 - **Layout system** with body content layouts and page wrappers
 - **Reusable content blocks** with `{{ entity() }}` template functions
+- **Collection rendering** with filtering and loop support
 - **Entity access control** for public/private content
 - **Static asset serving** with Express integration as default
 - **Template engine** with Mustache integration as default
@@ -44,7 +45,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 
 ### - Configuration & Architecture
 - **Environment-based configuration** (.env file)
-- **Modular service architecture** (Frontend, AdminManager, DataServer)
+- **Modular service architecture** (Frontend, AdminManager, DataServer, TemplateEngine)
 - **Event-driven system** with hooks for customization
 - **Extensible authentication** (database users or custom callbacks)
 - **File security** with path validation and dangerous key filtering
@@ -127,15 +128,43 @@ const cms = new Manager({
 ## Enhanced Templating System
 
 ### Template Functions
-Templates now support dynamic content blocks and entity rendering:
-```html
-<!-- Render content blocks -->
-{{ entity('cmsBlocks', 'header-main') }}
-{{ entity('cmsBlocks', 'sidebar-left') }}
+Templates support dynamic content blocks, entity rendering, and collections:
 
-<!-- Render other entities -->
+**Single Entity Rendering:**
+```html
+<!-- Render by any identifier field (like 'name' for content blocks) -->
+{{ entity('cmsBlocks', 'header-main', 'name') }}
+{{ entity('cmsBlocks', 'sidebar-left', 'name') }}
+
+<!-- Render by ID (default identifier) -->
 {{ entity('products', '123') }}
 {{ entity('cmsPages', '1') }}
+```
+
+**Single Field Collections:**
+```html
+<!-- Extract and concatenate a single field from multiple records -->
+{{ collection('cmsBlocks', {"status": "active", "category": "navigation"}, 'content') }}
+{{ collection('products', {"featured": true}, 'title') }}
+```
+
+**Loop Collections:**
+```html
+<!-- Loop through records with full template rendering -->
+{{ #collection('cmsBlocks', {"status": "active"}) }}
+  <div class="block">
+    <h3>{{row.title}}</h3>
+    <div class="content">{{row.content}}</div>
+  </div>
+{{ /collection('cmsBlocks') }}
+
+{{ #collection('products', {"category": "electronics"}) }}
+  <div class="product">
+    <h4>{{row.name}}</h4>
+    <p>Price: ${{row.price}}</p>
+    <img src="{{row.image}}" alt="{{row.name}}">
+  </div>
+{{ /collection('products') }}
 ```
 
 ### Layout System
@@ -159,13 +188,13 @@ The CMS uses a two-tier layout system:
 
 **layouts/default.html** - Body content only:
 ```html
-{{ entity('cmsBlocks', 'header-main') }}
+{{ entity('cmsBlocks', 'header-main', 'name') }}
 
 <main id="main" class="main-container">
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                {{ entity('cmsBlocks', 'sidebar-left') }}
+                {{ entity('cmsBlocks', 'sidebar-left', 'name') }}
             </div>
             <div class="col-md-9">
                 {{{content}}}
@@ -174,7 +203,7 @@ The CMS uses a two-tier layout system:
     </div>
 </main>
 
-{{ entity('cmsBlocks', 'footer-main') }}
+{{ entity('cmsBlocks', 'footer-main', 'name') }}
 ```
 
 Pages can use different layouts by setting the `layout` field in `cms_pages`:
@@ -306,7 +335,14 @@ The installer provides checkboxes for:
 - `handleRequest(req, res)` - Main request handler
 - `findRouteByPath(path)` - Database route lookup
 - `findEntityByPath(path)` - Entity-based URL handling
-- `processCustomTemplateFunctions(template)` - Process {{ entity() }} functions
+
+### TemplateEngine Class
+- `render(template, data, partials)` - Main template rendering with enhanced functions
+- `processEntityFunctions(template)` - Process {{ entity() }} functions
+- `processSingleFieldCollections(template)` - Process single field collections
+- `processLoopCollections(template)` - Process loop collections
+- `fetchEntityForTemplate(tableName, identifier, identifierField)` - Load single entity
+- `fetchCollectionForTemplate(tableName, filtersJson)` - Load entity collections
 
 ### AdminManager Class
 - `setupAdmin()` - Initialize admin panel

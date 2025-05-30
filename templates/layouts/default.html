@@ -1,13 +1,10 @@
-
-{{>header}}
-
-{{ entity('cmsBlocks', 'header-main') }}
+{{ entity('cmsBlocks', 'header-main', 'name') }}
 
 <main id="main" class="main-container">
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                {{ entity('cmsBlocks', 'sidebar-left') }}
+                {{ entity('cmsBlocks', 'sidebar-left', 'name') }}
             </div>
             <div class="col-md-9">
                 {{{content}}}
@@ -16,6 +13,4 @@
     </div>
 </main>
 
-{{ entity('cmsBlocks', 'footer-main') }}
-
-{{>footer}}
+{{ entity('cmsBlocks', 'footer-main', 'name') }}
