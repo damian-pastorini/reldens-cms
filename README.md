@@ -130,12 +130,12 @@ const cms = new Manager({
 Templates now support dynamic content blocks and entity rendering:
 ```html
 <!-- Render content blocks -->
-{{ entity('cms_blocks', 'header-main') }}
-{{ entity('cms_blocks', 'sidebar-left') }}
+{{ entity('cmsBlocks', 'header-main') }}
+{{ entity('cmsBlocks', 'sidebar-left') }}
 
 <!-- Render other entities -->
 {{ entity('products', '123') }}
-{{ entity('cms_pages', '1') }}
+{{ entity('cmsPages', '1') }}
 ```
 
 ### Layout System
@@ -159,13 +159,13 @@ The CMS uses a two-tier layout system:
 
 **layouts/default.html** - Body content only:
 ```html
-{{ entity('cms_blocks', 'header-main') }}
+{{ entity('cmsBlocks', 'header-main') }}
 
 <main id="main" class="main-container">
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                {{ entity('cms_blocks', 'sidebar-left') }}
+                {{ entity('cmsBlocks', 'sidebar-left') }}
             </div>
             <div class="col-md-9">
                 {{{content}}}
@@ -174,7 +174,7 @@ The CMS uses a two-tier layout system:
     </div>
 </main>
 
-{{ entity('cms_blocks', 'footer-main') }}
+{{ entity('cmsBlocks', 'footer-main') }}
 ```
 
 Pages can use different layouts by setting the `layout` field in `cms_pages`:
