@@ -19,7 +19,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Template fallback system** (domain → default → base)
 - **Layout system** with body content layouts and page wrappers
 - **Reusable content blocks** with `{{ entity() }}` template functions
-- **Collection rendering** with filtering and loop support
+- **Collection rendering** with filtering, sorting, pagination and loop support
 - **Entity access control** for public/private content
 - **Static asset serving** with Express integration as default
 - **Template engine** with Mustache integration as default
@@ -66,7 +66,7 @@ const cms = new Manager({
     projectRoot: process.cwd(),
     entityAccess: {
         cmsPages: { public: true, operations: ['read'] },
-        products: { public: true, operations: ['read'] },
+        articles: { public: true, operations: ['read'] },
         users: { public: false }
     }
 });
@@ -128,7 +128,7 @@ const cms = new Manager({
 ## Enhanced Templating System
 
 ### Template Functions
-Templates support dynamic content blocks, entity rendering, and collections:
+Templates support dynamic content blocks, entity rendering, and collections with advanced query options:
 
 **Single Entity Rendering:**
 ```html
@@ -137,7 +137,7 @@ Templates support dynamic content blocks, entity rendering, and collections:
 {{ entity('cmsBlocks', 'sidebar-left', 'name') }}
 
 <!-- Render by ID (default identifier) -->
-{{ entity('products', '123') }}
+{{ entity('articles', '123') }}
 {{ entity('cmsPages', '1') }}
 ```
 
@@ -145,26 +145,62 @@ Templates support dynamic content blocks, entity rendering, and collections:
 ```html
 <!-- Extract and concatenate a single field from multiple records -->
 {{ collection('cmsBlocks', {"status": "active", "category": "navigation"}, 'content') }}
-{{ collection('products', {"featured": true}, 'title') }}
+{{ collection('articles', {"featured": true}, 'title') }}
+
+<!-- With query options for sorting and limiting -->
+{{ collection('articles', {"featured": true}, 'title', {"limit": 5, "sortBy": "created_at", "sortDirection": "desc"}) }}
+{{ collection('cmsBlocks', {"status": "active"}, 'content', {"limit": 3, "offset": 10, "sortBy": "priority"}) }}
 ```
 
 **Loop Collections:**
 ```html
 <!-- Loop through records with full template rendering -->
-{{ #collection('cmsBlocks', {"status": "active"}) }}
+<!--<collection "cmsBlocks", {"status": "active"}, {}>-->
   <div class="block">
     <h3>{{row.title}}</h3>
     <div class="content">{{row.content}}</div>
   </div>
-{{ /collection('cmsBlocks') }}
+<!--</collection "cmsBlocks">-->
 
-{{ #collection('products', {"category": "electronics"}) }}
-  <div class="product">
-    <h4>{{row.name}}</h4>
-    <p>Price: ${{row.price}}</p>
-    <img src="{{row.image}}" alt="{{row.name}}">
+<!--<collection "articles", {"category": "technology"}, {}>-->
+  <div class="article">
+    <h4>{{row.title}}</h4>
+    <p>{{row.summary}}</p>
+    <img src="{{row.featured_image}}" alt="{{row.title}}">
   </div>
-{{ /collection('products') }}
+<!--</collection "articles">-->
+
+<!-- With pagination and sorting -->
+<!--<collection "articles", {"featured": true}, {"limit": 10, "offset": 0, "sortBy": "created_at", "sortDirection": "asc"}>-->
+  <div class="article-card">
+    <h4>{{row.title}}</h4>
+    <p>{{row.summary}}</p>
+  </div>
+<!--</collection "articles">-->
+```
+
+### Collection Query Options
+Collections support advanced query parameters for pagination and sorting:
+
+- **limit** - Maximum number of records to return
+- **offset** - Number of records to skip (for pagination)
+- **sortBy** - Field name to sort by
+- **sortDirection** - Sort direction ('asc' or 'desc')
+
+**Examples:**
+```html
+<!-- Get first 5 articles sorted by title -->
+{{ collection('articles', {}, 'title', {"limit": 5, "sortBy": "title"}) }}
+
+<!-- Paginated results: skip first 20, get next 10 -->
+<!--<collection "articles", {"published": true}, {"limit": 10, "offset": 20, "sortBy": "created_at", "sortDirection": "desc"}>-->
+  <article>{{row.title}}</article>
+<!--</collection "articles">-->
+
+<!-- Latest 3 featured articles by creation date -->
+<!--<collection "articles", {"featured": true}, {"limit": 3, "sortBy": "created_at", "sortDirection": "desc"}>-->
+  <div class="featured-article">{{row.title}}</div>
+<!--</collection "articles">-->
 ```
 
 ### Layout System
@@ -216,8 +252,8 @@ Create reusable content blocks in the `cms_blocks` table via admin panel:
 ```sql
 INSERT INTO cms_blocks (name, title, content) VALUES 
 ('contact-info', 'Contact Information', '<p>Email: info@example.com</p>'),
-('product-sidebar', 'Product Categories', 
-'<div class="categories"><h3>Categories</h3><ul><li><a href="/products/electronics">Electronics</a></li></ul></div>');
+('article-sidebar', 'Article Categories', 
+'<div class="categories"><h3>Categories</h3><ul><li><a href="/articles/technology">Technology</a></li></ul></div>');
 ```
 
 ### Entity Access Control
@@ -225,7 +261,7 @@ Control which entities are publicly accessible:
 ```javascript
 const cms = new Manager({
     entityAccess: {
-        products: { public: true, operations: ['read'] },
+        articles: { public: true, operations: ['read'] },
         cmsPages: { public: true, operations: ['read'] },
         users: { public: false }
     }
@@ -339,10 +375,10 @@ The installer provides checkboxes for:
 ### TemplateEngine Class
 - `render(template, data, partials)` - Main template rendering with enhanced functions
 - `processEntityFunctions(template)` - Process {{ entity() }} functions
-- `processSingleFieldCollections(template)` - Process single field collections
-- `processLoopCollections(template)` - Process loop collections
+- `processSingleFieldCollections(template)` - Process single field collections with query options
+- `processLoopCollections(template)` - Process loop collections with query options
 - `fetchEntityForTemplate(tableName, identifier, identifierField)` - Load single entity
-- `fetchCollectionForTemplate(tableName, filtersJson)` - Load entity collections
+- `fetchCollectionForTemplate(tableName, filtersJson, queryOptionsJson)` - Load entity collections with pagination and sorting
 
 ### AdminManager Class
 - `setupAdmin()` - Initialize admin panel

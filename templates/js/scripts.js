@@ -11,4 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
             link.classList.add('active');
         }
     }
+
+    let copyRightYear = document.querySelector('.copyright-year');
+    if(copyRightYear){
+        copyRightYear.innerHTML = String((new Date()).getFullYear());
+    }
 });

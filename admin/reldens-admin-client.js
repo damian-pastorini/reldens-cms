@@ -59,6 +59,12 @@ window.addEventListener('DOMContentLoaded', () => {
         errorId: 'Missing entity ID on POST.'
     };
 
+    // copyright year:
+    let copyRightYear = document.querySelector('.copyright-year');
+    if(copyRightYear){
+        copyRightYear.innerHTML = String((new Date()).getFullYear());
+    }
+
     // activate expand/collapse elements
     let expandCollapseButtons = document.querySelectorAll('[data-expand-collapse]');
     if(expandCollapseButtons){
