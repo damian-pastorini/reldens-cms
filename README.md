@@ -18,8 +18,9 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Entity-based URLs** (e.g., `/articles/123`)
 - **Template fallback system** (domain → default → base)
 - **Layout system** with body content layouts and page wrappers
-- **Reusable content blocks** with `{{ entity() }}` template functions
-- **Collection rendering** with filtering, sorting, pagination and loop support
+- **Reusable content blocks** with `<entity>` template functions
+- **Collection rendering** with filtering, sorting, pagination, and loop support
+- **Custom partial tags** with HTML-style syntax for complex partials
 - **Entity access control** for public/private content
 - **Static asset serving** with Express integration as default
 - **Template engine** with Mustache integration as default
@@ -133,50 +134,128 @@ Templates support dynamic content blocks, entity rendering, and collections with
 **Single Entity Rendering:**
 ```html
 <!-- Render by any identifier field (like 'name' for content blocks) -->
-{{ entity('cmsBlocks', 'header-main', 'name') }}
-{{ entity('cmsBlocks', 'sidebar-left', 'name') }}
+<entity name="cmsBlocks" field="name" value="header-main"/>
+<entity name="cmsBlocks" field="name" value="sidebar-left"/>
 
 <!-- Render by ID (default identifier) -->
-{{ entity('articles', '123') }}
-{{ entity('cmsPages', '1') }}
+<entity name="articles" id="123"/>
+<entity name="cmsPages" id="1"/>
 ```
 
 **Single Field Collections:**
 ```html
 <!-- Extract and concatenate a single field from multiple records -->
-{{ collection('cmsBlocks', {"status": "active", "category": "navigation"}, 'content') }}
-{{ collection('articles', {"featured": true}, 'title') }}
+<collection name="cmsBlocks" filters="{status: 'active', category: 'navigation'}" field="content"/>
+<collection name="articles" filters="{featured: true}" field="title"/>
 
 <!-- With query options for sorting and limiting -->
-{{ collection('articles', {"featured": true}, 'title', {"limit": 5, "sortBy": "created_at", "sortDirection": "desc"}) }}
-{{ collection('cmsBlocks', {"status": "active"}, 'content', {"limit": 3, "offset": 10, "sortBy": "priority"}) }}
+<collection name="articles" filters="{featured: true}" field="title" data="{limit: 5, sortBy: 'created_at', sortDirection: 'desc'}"/>
+<collection name="cmsBlocks" filters="{status: 'active'}" field="content" data="{limit: 3, offset: 10, sortBy: 'priority'}"/>
 ```
 
 **Loop Collections:**
 ```html
 <!-- Loop through records with full template rendering -->
-<!--<collection "cmsBlocks", {"status": "active"}, {}>-->
+<collection name="cmsBlocks" filters="{status: 'active'}">
   <div class="block">
     <h3>{{row.title}}</h3>
     <div class="content">{{row.content}}</div>
   </div>
-<!--</collection "cmsBlocks">-->
+</collection>
 
-<!--<collection "articles", {"category": "technology"}, {}>-->
+<collection name="articles" filters="{category: 'technology'}">
   <div class="article">
     <h4>{{row.title}}</h4>
     <p>{{row.summary}}</p>
     <img src="{{row.featured_image}}" alt="{{row.title}}">
   </div>
-<!--</collection "articles">-->
+</collection>
 
 <!-- With pagination and sorting -->
-<!--<collection "articles", {"featured": true}, {"limit": 10, "offset": 0, "sortBy": "created_at", "sortDirection": "asc"}>-->
+<collection name="articles" filters="{featured: true}" data="{limit: 10, offset: 0, sortBy: 'created_at', sortDirection: 'asc'}">
   <div class="article-card">
     <h4>{{row.title}}</h4>
     <p>{{row.summary}}</p>
   </div>
-<!--</collection "articles">-->
+</collection>
+```
+
+**Custom Partials with Variables:**
+
+*New HTML-style partial tags:*
+```html
+<!-- Clean HTML-style syntax for complex partials -->
+<partial name="hero" 
+    sectionStyle=" bg-black"
+    bigTextHtml="A free open-source platform to create multiplayer games!"
+    mediumTextHtml="Build with Node.js, MySQL, Colyseus, and Phaser 3"
+    htmlContentWrapper='<div class="d-lg-flex"><a href="/documentation" target="_blank" class="btn-get-started">Get Started!</a><a href="https://demo.reldens.com/" target="_blank" class="btn-watch-video"> Demo </a></div>'
+    imageUrl="/assets/web/reldens-check.png"
+    imageAlt="Reldens - MMORPG Platform" />
+
+<!-- Self-closing and open/close syntax both supported -->
+<partial name="productCard" 
+    title="Premium Package"
+    price="$99"
+    highlighted="true">
+</partial>
+```
+
+*Traditional Mustache syntax is still supported:*
+```html
+<!-- Call a partial with an inline JSON object -->
+{{>hero -{
+    bigTextHtml: "A free open-source platform to create multiplayer games!",
+    mediumTextHtml: "Build with Node.js, MySQL, Colyseus, and Phaser 3",
+    imageUrl: "https://example.com/hero.jpg",
+    ctaText: "Get Started",
+    ctaLink: "/documentation"
+}-}}
+
+<!-- Call a partial within collections using row data -->
+<collection name="cmsPages" filters="{featured: true}" data="{limit: 3}">
+    {{>cardView -{row}-}}
+</collection>
+
+<!-- Call a partial with mixed data -->
+{{>productCard -{
+    title: "Premium Package",
+    price: "$99",
+    features: ["Advanced Analytics", "Priority Support", "Custom Themes"],
+    highlighted: true
+}-}}
+```
+
+**Example Partial Templates:**
+
+**partials/hero.mustache:**
+```html
+<section class="hero{{#sectionStyle}}{{sectionStyle}}{{/sectionStyle}}">
+    <div class="hero-content">
+        <h1>{{{bigTextHtml}}}</h1>
+        <p>{{{mediumTextHtml}}}</p>
+        {{#htmlContentWrapper}}
+        {{{htmlContentWrapper}}}
+        {{/htmlContentWrapper}}
+        {{#imageUrl}}
+        <img src="{{imageUrl}}" alt="{{imageAlt}}" class="hero-image">
+        {{/imageUrl}}
+    </div>
+</section>
+```
+
+**partials/cardView.mustache:**
+```html
+<div class="card">
+    <h3>{{title}}</h3>
+    <p>{{json_data.excerpt}}</p>
+    {{#json_data.featured_image}}
+    <img src="{{json_data.featured_image}}" alt="{{title}}">
+    {{/json_data.featured_image}}
+    {{#json_data.cta_text}}
+    <a href="{{json_data.cta_link}}" class="btn">{{json_data.cta_text}}</a>
+    {{/json_data.cta_text}}
+</div>
 ```
 
 ### Collection Query Options
@@ -189,18 +268,18 @@ Collections support advanced query parameters for pagination and sorting:
 
 **Examples:**
 ```html
-<!-- Get first 5 articles sorted by title -->
-{{ collection('articles', {}, 'title', {"limit": 5, "sortBy": "title"}) }}
+<!-- Get the first 5 articles sorted by title -->
+<collection name="articles" filters="{}" field="title" data="{limit: 5, sortBy: 'title'}"/>
 
 <!-- Paginated results: skip first 20, get next 10 -->
-<!--<collection "articles", {"published": true}, {"limit": 10, "offset": 20, "sortBy": "created_at", "sortDirection": "desc"}>-->
+<collection name="articles" filters="{published: true}" data="{limit: 10, offset: 20, sortBy: 'created_at', sortDirection: 'desc'}">
   <article>{{row.title}}</article>
-<!--</collection "articles">-->
+</collection>
 
-<!-- Latest 3 featured articles by creation date -->
-<!--<collection "articles", {"featured": true}, {"limit": 3, "sortBy": "created_at", "sortDirection": "desc"}>-->
+<!-- The latest 3 featured articles by creation date -->
+<collection name="articles" filters="{featured: true}" data="{limit: 3, sortBy: 'created_at', sortDirection: 'desc'}">
   <div class="featured-article">{{row.title}}</div>
-<!--</collection "articles">-->
+</collection>
 ```
 
 ### Layout System
@@ -224,13 +303,13 @@ The CMS uses a two-tier layout system:
 
 **layouts/default.html** - Body content only:
 ```html
-{{ entity('cmsBlocks', 'header-main', 'name') }}
+<entity name="cmsBlocks" field="name" value="header-main"/>
 
 <main id="main" class="main-container">
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                {{ entity('cmsBlocks', 'sidebar-left', 'name') }}
+                <entity name="cmsBlocks" field="name" value="sidebar-left"/>
             </div>
             <div class="col-md-9">
                 {{{content}}}
@@ -239,7 +318,7 @@ The CMS uses a two-tier layout system:
     </div>
 </main>
 
-{{ entity('cmsBlocks', 'footer-main', 'name') }}
+<entity name="cmsBlocks" field="name" value="footer-main"/>
 ```
 
 Pages can use different layouts by setting the `layout` field in `cms_pages`:
@@ -248,7 +327,7 @@ Pages can use different layouts by setting the `layout` field in `cms_pages`:
 - `minimal` - Basic layout with minimal styling
 
 ### Content Blocks
-Create reusable content blocks in the `cms_blocks` table via admin panel:
+Create reusable content blocks in the `cms_blocks` table via the admin panel:
 ```sql
 INSERT INTO cms_blocks (name, title, content) VALUES 
 ('contact-info', 'Contact Information', '<p>Email: info@example.com</p>'),
@@ -367,16 +446,17 @@ The installer provides checkboxes for:
 - `initializeServices()` - Initialize all services
 
 ### Frontend Class
-- `initialize()` - Setup frontend routes and templates
+- `initialize()` - Set up frontend routes and templates
 - `handleRequest(req, res)` - Main request handler
 - `findRouteByPath(path)` - Database route lookup
 - `findEntityByPath(path)` - Entity-based URL handling
 
 ### TemplateEngine Class
 - `render(template, data, partials)` - Main template rendering with enhanced functions
-- `processEntityFunctions(template)` - Process {{ entity() }} functions
+- `processEntityFunctions(template)` - Process `<entity>` functions
 - `processSingleFieldCollections(template)` - Process single field collections with query options
 - `processLoopCollections(template)` - Process loop collections with query options
+- `processCustomPartials(template)` - Process `<partial>` tags with attribute parsing
 - `fetchEntityForTemplate(tableName, identifier, identifierField)` - Load single entity
 - `fetchCollectionForTemplate(tableName, filtersJson, queryOptionsJson)` - Load entity collections with pagination and sorting
 
