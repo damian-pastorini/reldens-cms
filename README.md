@@ -232,10 +232,10 @@ Templates support dynamic content blocks, entity rendering, and collections with
 ```html
 <section class="hero{{#sectionStyle}}{{sectionStyle}}{{/sectionStyle}}">
     <div class="hero-content">
-        <h1>{{{bigTextHtml}}}</h1>
-        <p>{{{mediumTextHtml}}}</p>
+        <h1>{{&bigTextHtml}}</h1>
+        <p>{{&mediumTextHtml}}</p>
         {{#htmlContentWrapper}}
-        {{{htmlContentWrapper}}}
+        {{&htmlContentWrapper}}
         {{/htmlContentWrapper}}
         {{#imageUrl}}
         <img src="{{imageUrl}}" alt="{{imageAlt}}" class="hero-image">
@@ -295,7 +295,7 @@ The CMS uses a two-tier layout system:
     <link href="/css/styles.css" rel="stylesheet"/>
 </head>
 <body class="{{siteHandle}}">
-    {{{content}}}
+    {{&content}}
     <script src="/js/scripts.js"></script>
 </body>
 </html>
@@ -312,7 +312,7 @@ The CMS uses a two-tier layout system:
                 <entity name="cmsBlocks" field="name" value="sidebar-left"/>
             </div>
             <div class="col-md-9">
-                {{{content}}}
+                {{&content}}
             </div>
         </div>
     </div>

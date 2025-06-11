@@ -2,29 +2,8 @@
     <div class="container top-border">
         <div class="row">
             <div class="col-lg-4 col-md-6 footer-contact">
-                <h3>{{site_name}}</h3>
-                <p><strong>E-mail:</strong> <a href="mailto:{{contact_email}}">{{contact_email}}</a></p>
+                <h3>Your Site Name Here</h3>
             </div>
-            <div class="col-lg-4 col-md-6 footer-links">
-                {{#footer_menu}}
-                <h4>Useful Links</h4>
-                <ul>
-                    {{#items}}
-                    <li><a href="{{url}}">{{title}}</a></li>
-                    {{/items}}
-                </ul>
-                {{/footer_menu}}
-            </div>
-            {{#social_links}}
-            <div class="col-lg-4 col-md-12 footer-links text-right">
-                <h4>Networks</h4>
-                <div class="social-links mt-3">
-                    {{#links}}
-                    <a href="{{url}}" target="_blank"><i class="bx {{icon}}"></i></a>
-                    {{/links}}
-                </div>
-            </div>
-            {{/social_links}}
         </div>
     </div>
 </div>

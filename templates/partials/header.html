@@ -1,36 +1,3 @@
-<div class="container d-flex align-items-center">
-    <div class="logo{{#is_reldens}} reldens-logo{{/is_reldens}}">
-        {{#logo_image}}
-        <a href="{{home_url}}">
-            <img src="{{logo_image}}" alt="{{site_name}}">
-        </a>
-        {{/logo_image}}
-        {{^logo_image}}
-        <a href="{{home_url}}">{{site_name}}</a>
-        {{/logo_image}}
-    </div>
-    {{#menu_items}}
-    <nav class="nav-menu d-none d-lg-block">
-        <ul>
-            {{#items}}
-            <li{{#has_children}} class="drop-down"{{/has_children}}>
-            <a href="{{url}}"{{#is_external}} target="_blank"{{/is_external}}>{{title}}</a>
-            {{#has_children}}
-            <ul>
-                {{#children}}
-                <li>
-                    <a href="{{url}}"{{#is_external}} target="_blank"{{/is_external}}>{{title}}</a>
-                </li>
-                {{/children}}
-            </ul>
-            {{/has_children}}
-            </li>
-            {{/items}}
-        </ul>
-    </nav>
-    {{/menu_items}}
-    <form class="search" action="/search" method="get">
-        <input type="search" class="quicksearch" name="q" value="{{search_query}}" placeholder="Search..."/>
-        <button type="submit"><i class="bx bx-search"></i></button>
-    </form>
+<div class="container">
+    <a href="/">Your Site Name Here</a>
 </div>
