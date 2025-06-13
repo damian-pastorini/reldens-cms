@@ -59,7 +59,6 @@ class CmsEntitiesGenerator
             });
         });
     }
-
 }
 
 let generator = new CmsEntitiesGenerator();
