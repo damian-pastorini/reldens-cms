@@ -18,10 +18,24 @@ CREATE TABLE IF NOT EXISTS `routes` (
     `publish_at` TIMESTAMP NULL,
     `locale` VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'en',
     `cache_ttl_seconds` INT UNSIGNED NULL DEFAULT 3600,
+    `enabled` TINYINT UNSIGNED NULL DEFAULT '1',
     `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
     `updated_at` TIMESTAMP NOT NULL DEFAULT (NOW()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE KEY `path` (`path`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `cms_categories` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_unicode_ci',
+    `title` VARCHAR(255) NOT NULL COLLATE 'utf8mb4_unicode_ci',
+    `enabled` TINYINT UNSIGNED NULL DEFAULT '1',
+    `parent_id` INT UNSIGNED NULL DEFAULT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
+    `updated_at` TIMESTAMP NOT NULL DEFAULT (NOW()) ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `FK_cms_categories_cms_categories` (`parent_id`) USING BTREE,
+    CONSTRAINT `FK_cms_categories_cms_categories` FOREIGN KEY (`parent_id`) REFERENCES `cms_categories` (`id`) ON UPDATE CASCADE ON DELETE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cms_pages_meta` (
@@ -43,9 +57,13 @@ CREATE TABLE IF NOT EXISTS `cms_pages` (
     `json_data` JSON NULL,
     `template` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
     `layout` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'default',
+    `category_id` INT UNSIGNED NULL DEFAULT NULL,
+    `enabled` TINYINT UNSIGNED NULL DEFAULT '1',
     `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
     `updated_at` TIMESTAMP NOT NULL DEFAULT (NOW()) ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`) USING BTREE
+    PRIMARY KEY (`id`) USING BTREE,
+    INDEX `FK_cms_pages_cms_categories` (`category_id`) USING BTREE,
+    CONSTRAINT `FK_cms_pages_cms_categories` FOREIGN KEY (`category_id`) REFERENCES `cms_categories` (`id`) ON UPDATE CASCADE ON DELETE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `entities_meta` (
@@ -65,19 +83,17 @@ CREATE TABLE IF NOT EXISTS `cms_blocks` (
     `name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
     `title` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
     `content` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-    `template_file` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-    `variables` JSON NULL,
-    `is_active` BOOLEAN NOT NULL DEFAULT TRUE,
+    `enabled` TINYINT UNSIGNED NULL DEFAULT '1',
     `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
     `updated_at` TIMESTAMP NOT NULL DEFAULT (NOW()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE KEY `name` (`name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `cms_entity_access` (
+CREATE TABLE IF NOT EXISTS `entity_access` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `entity_name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-    `is_public` BOOLEAN NOT NULL DEFAULT FALSE,
+    `is_public` TINYINT UNSIGNED NULL DEFAULT '1',
     `allowed_operations` JSON NULL DEFAULT ('["read"]'),
     `access_rules` JSON NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
