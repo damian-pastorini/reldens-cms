@@ -34,7 +34,7 @@
     },
     "dependencies": {
         "@reldens/server-utils": "^0.19.0",
-        "@reldens/storage": "^0.53.0",
+        "@reldens/storage": "^0.55.0",
         "@reldens/utils": "^0.50.0",
         "dotenv": "^16.5.0",
         "mustache": "^4.2.0"

@@ -1,7 +1,6 @@
 /*
- * Reldens - CMS
+ * Reldens - CMS - Administration Panel
  */
-
 
 :root {
     --normalFont: Verdana, Geneva, sans-serif;
@@ -163,7 +162,7 @@
         padding: 1rem;
         overflow: auto;
         cursor: pointer;
-        background-color: #fff;
+        background-color: var(--white);
         border-radius: 8px;
 
         & canvas {
@@ -241,7 +240,7 @@
             text-decoration: none;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 400;
+            font-weight: var(--font-semi-bold);
             border-bottom: 1px solid var(--darkBlue);
 
             &:hover {
@@ -401,30 +400,30 @@
                 padding: 0 1rem;
                 color: var(--black);
             }
+        }
 
-            &-edit, &-delete {
-                & span {
-                    display: block;
-                    text-align: center;
-                    cursor: pointer;
+        & .field-edit, & .field-delete {
+            & span {
+                display: block;
+                text-align: center;
+                cursor: pointer;
+            }
+        }
+
+        & .field-edit {
+            & span {
+                & svg, path {
+                    width: 24px;
+                    color: var(--lightBlue);
                 }
             }
+        }
 
-            &-edit {
-                & span {
-                    & svg, path {
-                        width: 24px;
-                        color: var(--lightBlue);
-                    }
-                }
-            }
-
-            &-delete {
-                & span {
-                    & svg, path {
-                        width: 24px;
-                        fill: var(--lightBlue);
-                    }
+        & .field-delete {
+            & span {
+                & svg, path {
+                    width: 24px;
+                    fill: var(--lightBlue);
                 }
             }
         }
@@ -784,7 +783,7 @@
                         &:not([disabled]) {
                             margin: 0;
                             border: 1px solid #7f8c8d;
-                            background: #fff;
+                            background: var(--white);
 
                             &[type="checkbox"] {
                                 max-width: max-content;
