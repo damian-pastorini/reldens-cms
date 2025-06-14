@@ -437,6 +437,7 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: flex-start;
+        margin-top: 1rem;
 
         &.hidden {
             display: none;
@@ -531,6 +532,8 @@
                 color: var(--darkGrey);
 
                 &.filters-toggle {
+                    margin-bottom: 0;
+
                     & img {
                         max-width: 30px;
                         margin-right: 1rem;

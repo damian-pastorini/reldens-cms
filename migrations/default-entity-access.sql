@@ -1,9 +1,9 @@
 
 -- Default entity access rules:
 
-REPLACE INTO `entity_access` (`entity_name`, `is_public`, `allowed_operations`) VALUES
+REPLACE INTO `entities_access` (`entity_name`, `is_public`, `allowed_operations`) VALUES
     ('cms_pages', TRUE, '["read"]'),
     ('routes', FALSE, '[]'),
     ('users', FALSE, '[]'),
     ('cms_blocks', FALSE, '[]'),
-    ('entity_access', FALSE, '[]');
+    ('entities_access', FALSE, '[]');

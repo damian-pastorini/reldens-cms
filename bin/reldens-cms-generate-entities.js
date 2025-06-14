@@ -36,7 +36,7 @@ class CmsEntitiesGenerator
         }
         Logger.debug('Reldens CMS Manager instance created for entities generation.');
         await manager.initializeDataServer();
-        let success = await manager.installer.generateEntities(manager.dataServer, this.isOverride);
+        let success = await manager.installer.generateEntities(manager.dataServer, this.isOverride, false);
         if(!success){
             Logger.error('Entities generation failed.');
             return false;

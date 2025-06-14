@@ -176,6 +176,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let filtersToggleContent = document.querySelector('.filters-toggle-content');
     if(filtersToggle && filtersToggleContent){
         filtersToggle.addEventListener('click', () => {
+            filtersToggle.classList.toggle('active');
             filtersToggleContent.classList.toggle('hidden');
         });
         let allFilters = document.querySelectorAll('.filters-toggle-content .filter input');

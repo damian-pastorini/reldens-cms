@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html lang="{{locale}}">
 <head>
-    <title>{{title}}</title>
+    <title>{{meta_title}}</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"/>
-    <meta name="theme-color" content="#000000"/>
-    <meta name="description" content="{{description}}"/>
-    <meta property="og:title" content="{{title}}"/>
-    <meta property="og:description" content="{{description}}"/>
+    <meta name="description" content="{{meta_description}}">
+    <meta name="robots" content="{{meta_robots}}">
+    <meta name="theme-color" content="{{meta_theme_color}}"/>
+    <meta property="og:title" content="{{meta_og_title}}"/>
+    <meta property="og:description" content="{{meta_og_description}}"/>
+    <meta property="og:image" content="{{meta_og_image}}"/>
+    <meta name="twitter:card" content="{{meta_twitter_card_type}}"/>
+    <meta name="language" content="{{locale}}"/>
+    <meta name="publish-date" content="{{publish_date}}"/>
+    <meta name="expire-date" content="{{expire_date}}"/>
+    <link rel="canonical" href="{{canonical_url}}"/>
     <link href="/css/styles.css" rel="stylesheet"/>
 </head>
 <body class="{{siteHandle}}">

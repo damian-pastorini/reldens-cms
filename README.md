@@ -42,7 +42,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Custom entity configuration** with validation rules
 - **Translation support** for entity labels and properties
 - **Content blocks management** via cms_blocks table
-- **Entity access control** via entity_access table
+- **Entity access control** via entities_access table
 
 ### - Configuration & Architecture
 - **Environment-based configuration** (.env file)
@@ -425,7 +425,7 @@ cms.events.on('adminEntityExtraData', ({entitySerializedData, entity}) => {
 - `routes` - URL routing and SEO metadata
 - `cms_pages` - Page content with layout assignments
 - `cms_blocks` - Reusable content blocks
-- `entity_access` - Entity access control rules
+- `entities_access` - Entity access control rules
 - `entities_meta` - Generic metadata storage
 - `cms_pages_meta` - Page-specific metadata
 
