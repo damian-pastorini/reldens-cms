@@ -8,6 +8,7 @@
 
 const { Manager } = require('../index');
 const { Logger } = require('@reldens/utils');
+const { FileHandler } = require('@reldens/server-utils');
 const readline = require('readline');
 
 class CmsEntitiesGenerator
@@ -18,6 +19,17 @@ class CmsEntitiesGenerator
         this.args = process.argv.slice(2);
         this.projectRoot = process.cwd();
         this.isOverride = this.args.includes('--override');
+        this.prismaClientPath = this.extractArgument('--prisma-client');
+        this.driver = this.extractArgument('--driver') || process.env.RELDENS_STORAGE_DRIVER || 'prisma';
+    }
+
+    extractArgument(argumentName)
+    {
+        let argIndex = this.args.indexOf(argumentName);
+        if(-1 === argIndex || argIndex + 1 >= this.args.length){
+            return null;
+        }
+        return this.args[argIndex + 1];
     }
 
     async run()
@@ -29,7 +41,14 @@ class CmsEntitiesGenerator
                 return false;
             }
         }
-        let manager = new Manager({projectRoot: this.projectRoot});
+        let managerConfig = {projectRoot: this.projectRoot};
+        if('prisma' === this.driver){
+            let prismaClient = await this.loadPrismaClient();
+            if(prismaClient){
+                managerConfig.prismaClient = prismaClient;
+            }
+        }
+        let manager = new Manager(managerConfig);
         if(!manager.isInstalled()){
             Logger.error('CMS is not installed. Please run installation first.');
             return false;
@@ -43,6 +62,32 @@ class CmsEntitiesGenerator
         }
         Logger.info('Entities generation completed successfully!');
         return true;
+    }
+
+    async loadPrismaClient()
+    {
+        let clientPath = this.prismaClientPath;
+        if(!clientPath){
+            clientPath = FileHandler.joinPaths(process.cwd(), 'generated-entities', 'prisma');
+        }
+        if(!FileHandler.exists(clientPath)){
+            Logger.error('Prisma client not found at: '+clientPath);
+            Logger.error('Please ensure the client exists or specify a custom path with --prisma-client');
+            return false;
+        }
+        try {
+            let PrismaClientModule = require(clientPath);
+            let PrismaClient = PrismaClientModule.PrismaClient || PrismaClientModule.default?.PrismaClient;
+            if(!PrismaClient){
+                Logger.error('PrismaClient not found in module: '+clientPath);
+                return false;
+            }
+            Logger.debug('Prisma client loaded from: '+clientPath);
+            return new PrismaClient();
+        } catch (error) {
+            Logger.error('Failed to load Prisma client from '+clientPath+': '+error.message);
+            return false;
+        }
     }
 
     async confirmOverride()
