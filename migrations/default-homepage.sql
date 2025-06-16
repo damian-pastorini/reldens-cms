@@ -27,4 +27,4 @@ REPLACE INTO `cms_pages` (
 );
 
 -- Create a default route to the homepage
-REPLACE INTO `routes` (`id`, `path`, `router`, `content_id`, `cache_ttl_seconds`, `enabled`, `created_at`) VALUES (1, '/home', 'cmsPages', 1, 3600, 1, NOW());
+REPLACE INTO `routes` (`id`, `path`, `router`, `cms_page_id`, `cache_ttl_seconds`, `enabled`, `created_at`) VALUES (1, '/home', 'cmsPages', 1, 3600, 1, NOW());

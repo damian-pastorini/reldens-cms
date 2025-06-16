@@ -5,13 +5,14 @@ CREATE TABLE IF NOT EXISTS `routes` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `path` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
     `router` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-    `content_id` INT UNSIGNED NOT NULL,
+    `cms_page_id` INT UNSIGNED NOT NULL,
     `cache_ttl_seconds` INT UNSIGNED NULL DEFAULT 3600,
     `enabled` TINYINT UNSIGNED NOT NULL DEFAULT '1',
+    `domain` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
     `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
     `updated_at` TIMESTAMP NOT NULL DEFAULT (NOW()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE KEY `path` (`path`) USING BTREE
+    UNIQUE KEY `path_domain` (`path`, `domain`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cms_categories` (

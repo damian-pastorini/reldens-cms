@@ -313,6 +313,9 @@
     }
 
     & textarea {
+        width: 98%;
+        margin: 0;
+        padding: 1%;
         resize: vertical;
         min-height: 300px;
     }
