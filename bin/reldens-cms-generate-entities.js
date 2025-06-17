@@ -7,7 +7,7 @@
  */
 
 const { Manager } = require('../index');
-const { Logger } = require('@reldens/utils');
+const { Logger, sc } = require('@reldens/utils');
 const { FileHandler } = require('@reldens/server-utils');
 const readline = require('readline');
 
@@ -18,28 +18,93 @@ class CmsEntitiesGenerator
     {
         this.args = process.argv.slice(2);
         this.projectRoot = process.cwd();
-        this.isOverride = this.args.includes('--override');
-        this.prismaClientPath = this.extractArgument('--prisma-client');
-        this.driver = this.extractArgument('--driver') || process.env.RELDENS_STORAGE_DRIVER || 'prisma';
+        this.config = {};
+        this.parseArguments();
     }
 
-    extractArgument(argumentName)
+    parseArguments()
     {
-        let argIndex = this.args.indexOf(argumentName);
-        if(-1 === argIndex || argIndex + 1 >= this.args.length){
-            return null;
+        for(let i = 0; i < this.args.length; i++){
+            let arg = this.args[i];
+            if(!arg.startsWith('--')){
+                continue;
+            }
+            let equalIndex = arg.indexOf('=');
+            if(-1 === equalIndex){
+                let flag = arg.substring(2);
+                if('override' === flag || 'dry-prisma' === flag || 'help' === flag || 'h' === flag){
+                    this.config[flag] = true;
+                }
+                continue;
+            }
+            let key = arg.substring(2, equalIndex);
+            let value = arg.substring(equalIndex + 1);
+            this.config[key] = value;
         }
-        return this.args[argIndex + 1];
+    }
+
+    shouldShowHelp()
+    {
+        return 0 === this.args.length || sc.get(this.config, 'help', false) || sc.get(this.config, 'h', false);
+    }
+
+    showHelp()
+    {
+        Logger.info('');
+        Logger.info('Reldens CMS Entities Generator');
+        Logger.info('==============================');
+        Logger.info('');
+        Logger.info('Usage: npx reldens-cms-generate-entities [options]');
+        Logger.info('');
+        Logger.info('Options:');
+        Logger.info('  --prisma-client=[path]           Path to Prisma client (e.g., ./prisma/client)');
+        Logger.info('  --driver=[driver]                Storage driver (default: prisma)');
+        Logger.info('  --override                       Force regeneration and overwrite existing files');
+        Logger.info('  --dry-prisma                     Skip Prisma schema generation');
+        Logger.info('  --help, -h                       Show this help message');
+        Logger.info('');
+        Logger.info('Examples:');
+        Logger.info('  npx reldens-cms-generate-entities --prisma-client=./prisma/client --driver=prisma');
+        Logger.info('  npx reldens-cms-generate-entities --override --dry-prisma');
+        Logger.info('  npx reldens-cms-generate-entities --help');
+        Logger.info('');
+    }
+
+    get isOverride()
+    {
+        return sc.get(this.config, 'override', false);
+    }
+
+    get isDryPrisma()
+    {
+        return sc.get(this.config, 'dry-prisma', false);
+    }
+
+    get prismaClientPath()
+    {
+        return sc.get(this.config, 'prisma-client', null);
+    }
+
+    get driver()
+    {
+        return sc.get(this.config, 'driver', process.env.RELDENS_STORAGE_DRIVER || 'prisma');
     }
 
     async run()
     {
+        if(this.shouldShowHelp()){
+            this.showHelp();
+            return true;
+        }
         if(this.isOverride){
             let confirmed = await this.confirmOverride();
             if(!confirmed){
                 Logger.info('Operation cancelled by user.');
                 return false;
             }
+        }
+        if(this.isDryPrisma){
+            Logger.info('Running in dry-prisma mode - skipping Prisma schema generation.');
         }
         let managerConfig = {projectRoot: this.projectRoot};
         if('prisma' === this.driver){
@@ -55,7 +120,7 @@ class CmsEntitiesGenerator
         }
         Logger.debug('Reldens CMS Manager instance created for entities generation.');
         await manager.initializeDataServer();
-        let success = await manager.installer.generateEntities(manager.dataServer, this.isOverride, false);
+        let success = await manager.installer.generateEntities(manager.dataServer, this.isOverride, false, this.isDryPrisma);
         if(!success){
             Logger.error('Entities generation failed.');
             return false;
@@ -68,24 +133,26 @@ class CmsEntitiesGenerator
     {
         let clientPath = this.prismaClientPath;
         if(!clientPath){
-            clientPath = FileHandler.joinPaths(process.cwd(), 'generated-entities', 'prisma');
+            return false;
         }
-        if(!FileHandler.exists(clientPath)){
-            Logger.error('Prisma client not found at: '+clientPath);
-            Logger.error('Please ensure the client exists or specify a custom path with --prisma-client');
+        let resolvedPath = clientPath.startsWith('./') 
+            ? FileHandler.joinPaths(process.cwd(), clientPath.substring(2))
+            : clientPath;
+        if(!FileHandler.exists(resolvedPath)){
+            Logger.error('Prisma client not found at: '+resolvedPath);
             return false;
         }
         try {
-            let PrismaClientModule = require(clientPath);
+            let PrismaClientModule = require(resolvedPath);
             let PrismaClient = PrismaClientModule.PrismaClient || PrismaClientModule.default?.PrismaClient;
             if(!PrismaClient){
-                Logger.error('PrismaClient not found in module: '+clientPath);
+                Logger.error('PrismaClient not found in module: '+resolvedPath);
                 return false;
             }
-            Logger.debug('Prisma client loaded from: '+clientPath);
+            Logger.debug('Prisma client loaded from: '+resolvedPath);
             return new PrismaClient();
         } catch (error) {
-            Logger.error('Failed to load Prisma client from '+clientPath+': '+error.message);
+            Logger.error('Failed to load Prisma client from '+resolvedPath+': '+error.message);
             return false;
         }
     }

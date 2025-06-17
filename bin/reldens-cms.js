@@ -2,7 +2,7 @@
 
 /**
  *
- * Reldens - CMS - CLI Installer
+ * Reldens - CMS - CLI
  *
  */
 
@@ -21,10 +21,10 @@ if(FileHandler.exists(indexPath)){
 
 let managerConfig = {projectRoot};
 let entitiesPath = FileHandler.joinPaths(
-    projectRoot, 
-    'generated-entities', 
-    'models', 
-    'prisma', 
+    projectRoot,
+    'generated-entities',
+    'models',
+    'prisma',
     'registered-models-prisma.js'
 );
 
