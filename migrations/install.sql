@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS `routes` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `path` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
     `router` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-    `cms_page_id` INT UNSIGNED NOT NULL,
     `cache_ttl_seconds` INT UNSIGNED NULL DEFAULT 3600,
     `enabled` TINYINT UNSIGNED NOT NULL DEFAULT '1',
     `domain` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
@@ -36,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `cms_pages` (
     `template` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
     `layout` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'default',
     `category_id` INT UNSIGNED NULL DEFAULT NULL,
+    `route_id` INT UNSIGNED NULL DEFAULT NULL,
     `enabled` TINYINT UNSIGNED NOT NULL DEFAULT '1',
     `meta_title` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
     `meta_description` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
@@ -54,7 +54,9 @@ CREATE TABLE IF NOT EXISTS `cms_pages` (
     `updated_at` TIMESTAMP NOT NULL DEFAULT (NOW()) ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `FK_cms_pages_cms_categories` (`category_id`) USING BTREE,
-    CONSTRAINT `FK_cms_pages_cms_categories` FOREIGN KEY (`category_id`) REFERENCES `cms_categories` (`id`) ON UPDATE CASCADE ON DELETE NO ACTION
+    INDEX `FK_cms_pages_routes` (`route_id`) USING BTREE,
+    CONSTRAINT `FK_cms_pages_cms_categories` FOREIGN KEY (`category_id`) REFERENCES `cms_categories` (`id`) ON UPDATE CASCADE ON DELETE NO ACTION,
+    CONSTRAINT `FK_cms_pages_routes` FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`) ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cms_blocks` (
