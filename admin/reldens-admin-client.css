@@ -817,6 +817,17 @@
         }
     }
 
+    .extra-actions {
+        display: block;
+        width: 100%;
+        margin-top: 2rem;
+    }
+
+    .cache-clean-form {
+        display: block;
+        text-align: center;
+    }
+
     & .extra-content-container, .default-room-container {
         display: flex;
         flex-direction: column;
