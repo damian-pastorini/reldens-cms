@@ -1,0 +1,22 @@
+<div class="row paginated-contents">
+    {{&collectionContentForCurrentPage}}
+</div>
+<div class="row pager-container">
+    <div class="pagination col-lg-12 mt-2 mb-2">
+        <ul>
+            {{#prevPageUrl}}
+                <li class="previous previous-page"><a href="{{ prevPageUrl }}">{{&prevPageLabel }}</a></li>
+            {{/prevPageUrl}}
+            {{#prevPages}}
+                <li class="previous previous-pages"><a href="{{ pageUrl }}">{{&pageLabel }}</a></li>
+            {{/prevPages}}
+                <li class="current">{{&currentPage }}</li>
+            {{#nextPages}}
+                <li class="next next-pages"><a href="{{ pageUrl }}">{{&pageLabel }}</a></li>
+            {{/nextPages}}
+            {{#nextPageUrl}}
+                <li class="next next-page"><a href="{{ nextPageUrl }}">{{&nextPageLabel }}</a></li>
+            {{/nextPageUrl}}
+        </ul>
+    </div>
+</div>

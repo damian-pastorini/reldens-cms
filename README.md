@@ -157,18 +157,18 @@ Templates support dynamic content blocks, entity rendering, and collections with
 ```html
 <!-- Loop through records with full template rendering -->
 <collection name="cmsBlocks" filters="{status: 'active'}">
-  <div class="block">
-    <h3>{{row.title}}</h3>
-    <div class="content">{{row.content}}</div>
-  </div>
+    <div class="block">
+        <h3>{{row.title}}</h3>
+        <div class="content">{{row.content}}</div>
+    </div>
 </collection>
 
 <collection name="articles" filters="{category: 'technology'}">
-  <div class="article">
-    <h4>{{row.title}}</h4>
-    <p>{{row.summary}}</p>
-    <img src="{{row.featured_image}}" alt="{{row.title}}">
-  </div>
+    <div class="article">
+        <h4>{{row.title}}</h4>
+        <p>{{row.summary}}</p>
+        <img src="{{row.featured_image}}" alt="{{row.title}}">
+    </div>
 </collection>
 
 <!-- With pagination and sorting -->
@@ -178,7 +178,90 @@ Templates support dynamic content blocks, entity rendering, and collections with
     <p>{{row.summary}}</p>
   </div>
 </collection>
+
+<!-- Paginated collections with navigation -->
+<collection name="articles" 
+    filters="{featured: true}" 
+    data="{limit: 10, sortBy: 'created_at', sortDirection: 'desc'}" 
+    pagination="articles-1" 
+    container="pagedCollection"
+    prevPages="2" 
+    nextPages="2">
+    <div class="article-card">
+        <h4>{{row.title}}</h4>
+        <p>{{row.summary}}</p>
+        <span class="date">{{row.created_at}}</span>
+    </div>
+</collection>
+
+<!-- Multiple paginated collections on the same page -->
+<collection name="news" 
+    filters="{category: 'technology'}" 
+    data="{limit: 5, sortBy: 'published_at'}" 
+    pagination="news-tech" 
+    container="customPager">
+    <article>{{row.title}}</article>
+</collection>
+
+<collection name="events" 
+    filters="{upcoming: true}" 
+    data="{limit: 8}" 
+    pagination="events-upcoming"
+    prevPages="3"
+    nextPages="1">
+    <div class="event">{{row.title}} - {{row.date}}</div>
+</collection>
 ```
+
+**Pagination Attributes:**
+- `pagination="collection-id"` - Enables pagination with unique identifier
+- `container="templateName"` - Custom pagination template (defaults to "pagedCollection")
+- `prevPages="2"` - Number of previous page links to show (default: 2)
+- `nextPages="2"` - Number of next page links to show (default: 2)
+
+**Pagination URL Parameters:**
+Pagination state is managed via URL query parameters:
+```
+/articles?articles-1-key={"page":2,"limit":10,"sortBy":"created_at","sortDirection":"desc"}
+/news?news-tech-key={"page":3,"limit":5,"category":"technology"}
+```
+
+**Custom Pagination Template:**
+Create `templates/partials/pagedCollection.html`:
+```html
+<div class="row paginated-contents">
+    <div class="collection-content col-lg-12 mt-2 mb-2">
+        {{&collectionContentForCurrentPage}}
+    </div>
+    <div class="pagination col-lg-12 mt-2 mb-2">
+        <ul class="pagination-list">
+            {{#prevPageUrl}}
+                <li><a href="{{prevPageUrl}}" class="page-link">{{&prevPageLabel}}</a></li>
+            {{/prevPageUrl}}
+            {{#prevPages}}
+                <li><a href="{{pageUrl}}" class="page-link">{{&pageLabel}}</a></li>
+            {{/prevPages}}
+            <li class="current">{{&currentPage}}</li>
+            {{#nextPages}}
+                <li><a href="{{pageUrl}}" class="page-link">{{&pageLabel}}</a></li>
+            {{/nextPages}}
+            {{#nextPageUrl}}
+                <li><a href="{{nextPageUrl}}" class="page-link">{{&nextPageLabel}}</a></li>
+            {{/nextPageUrl}}
+        </ul>
+    </div>
+</div>
+```
+
+**Available Pagination Template Variables:**
+- `{{&collectionContentForCurrentPage}}` - Rendered collection items for current page
+- `{{currentPage}}` - Current page number
+- `{{totalPages}}` - Total number of pages
+- `{{totalRecords}}` - Total number of records
+- `{{prevPageUrl}}` / `{{nextPageUrl}}` - Previous/next page URLs
+- `{{&prevPageLabel}}` / `{{&nextPageLabel}}` - Previous/next link labels ("Previous"/"Next")
+- `{{#prevPages}}` / `{{#nextPages}}` - Arrays of page objects with `pageUrl` and `pageLabel`
+- `{{hasNextPage}}` / `{{hasPrevPage}}` - Boolean flags for navigation availability
 
 **Custom Partials with Variables:**
 
