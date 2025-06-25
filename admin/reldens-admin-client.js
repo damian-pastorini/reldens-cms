@@ -276,4 +276,28 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // cache clear all functionality:
+    let cacheClearAllButton = document.querySelector('.cache-clear-all-button');
+    let cacheConfirmDialog = document.querySelector('.cache-confirm-dialog');
+    let cacheDialogCancel = document.querySelector('.cache-dialog-cancel');
+    let cacheClearForm = document.querySelector('.cache-clear-form');
+    if(cacheClearAllButton && cacheConfirmDialog){
+        cacheClearAllButton.addEventListener('click', () => {
+            cacheConfirmDialog.showModal();
+        });
+    }
+    if(cacheDialogCancel && cacheConfirmDialog){
+        cacheDialogCancel.addEventListener('click', () => {
+            cacheConfirmDialog.close();
+        });
+    }
+    if(cacheClearForm){
+        cacheClearForm.addEventListener('submit', (event) => {
+            let submitButton = cacheClearForm.querySelector('button[type="submit"]');
+            if(submitButton){
+                submitButton.disabled = true;
+            }
+        });
+    }
+
 });

@@ -818,9 +818,10 @@
     }
 
     .extra-actions {
-        display: block;
+        display: flex;
         width: 100%;
-        margin-top: 2rem;
+        justify-content: end;
+        margin: 1rem 0;
     }
 
     .cache-clean-form {
@@ -845,6 +846,49 @@
         width: 100%;
         max-height: 500px;
         overflow: auto;
+    }
+
+    .cache-confirm-dialog {
+        border: none;
+        border-radius: 8px;
+        padding: 0;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .cache-confirm-dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .cache-dialog-content {
+        padding: 1rem;
+    }
+
+    .cache-dialog-content h5 {
+        margin: 0 0 1rem 0;
+        font-size: 18px;
+        color: var(--darkGrey);
+    }
+
+    .cache-dialog-content p {
+        margin: 0 0 1rem 0;
+        color: var(--darkGrey);
+    }
+
+    .cache-warning {
+        padding: 1rem;
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 4px;
+        color: #856404;
+        margin-bottom: 1rem;
+    }
+
+    .cache-dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
     }
 
 }
