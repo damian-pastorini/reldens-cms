@@ -2,23 +2,40 @@
 <html lang="{{locale}}">
 <head>
     <title>{{meta_title}}</title>
+    <meta name="language" content="{{locale}}"/>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"/>
-    <meta name="description" content="{{meta_description}}">
     <meta name="robots" content="{{meta_robots}}">
     <meta name="theme-color" content="{{meta_theme_color}}"/>
+    {{#meta_description}}
+    <meta name="description" content="{{meta_description}}"/>
+    {{/meta_description}}
     <meta property="og:title" content="{{meta_og_title}}"/>
+    {{#meta_og_description}}
     <meta property="og:description" content="{{meta_og_description}}"/>
+    {{/meta_og_description}}
+    {{#meta_og_image}}
     <meta property="og:image" content="{{meta_og_image}}"/>
+    {{/meta_og_image}}
+    {{#meta_twitter_card_type}}
     <meta name="twitter:card" content="{{meta_twitter_card_type}}"/>
-    <meta name="language" content="{{locale}}"/>
+    {{/meta_twitter_card_type}}
+    {{#publish_date}}
     <meta name="publish-date" content="{{publish_date}}"/>
+    {{/publish_date}}
+    {{#expire_date}}
     <meta name="expire-date" content="{{expire_date}}"/>
+    {{/expire_date}}
+    {{#canonical_url}}
     <link rel="canonical" href="{{canonical_url}}"/>
+    {{/canonical_url}}
+    <!-- CSS and JS -->
     <link href="/css/styles.css" rel="stylesheet"/>
+    <script src="/js/cookie-consent.js"></script>
 </head>
 <body class="{{siteHandle}}">
     {{&content}}
+    {{>cookie-consent}}
     <script type="text/javascript" defer src="/js/scripts.js"></script>
 </body>
 </html>
