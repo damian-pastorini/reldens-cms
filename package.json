@@ -36,7 +36,7 @@
         "@reldens/server-utils": "^0.19.0",
         "@reldens/storage": "^0.59.0",
         "@reldens/utils": "^0.50.0",
-        "dotenv": "^16.5.0",
+        "dotenv": "^17.0.0",
         "mustache": "^4.2.0"
     }
 }
