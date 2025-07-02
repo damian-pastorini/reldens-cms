@@ -2,7 +2,7 @@
 
 # Reldens CMS
 
-A powerful, flexible Content Management System built with Node.js, featuring an admin panel, multi-domain frontend support, enhanced templating with reusable content blocks, and automated installation.
+A powerful, flexible Content Management System built with Node.js, featuring an admin panel, multi-domain frontend support, enhanced templating with reusable content blocks, system variables, internationalization, and automated installation.
 
 ## Features
 
@@ -24,6 +24,10 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Entity access control** for public/private content
 - **Static asset serving** with Express integration as default
 - **Template engine** with Mustache integration as default
+- **System variables** for request, route, and domain context
+- **Enhanced context passing** with currentEntity data in child blocks
+- **Template functions** for URLs, assets, dates, and translations
+- **Event-driven rendering** with hooks for customization
 - **Custom 404 handling**
 
 ### - Admin Panel
@@ -50,6 +54,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Event-driven system** with hooks for customization
 - **Extensible authentication** (database users or custom callbacks)
 - **File security** with path validation and dangerous key filtering
+- **Internationalization support** with translation files
 
 ## Installation
 
@@ -127,6 +132,74 @@ const cms = new Manager({
 ```
 
 ## Enhanced Templating System
+
+### System Variables
+Every template has access to system variables providing context about the current request:
+
+```html
+<!-- Current request information -->
+{{currentRequest.baseUrl}}        <!-- https://example.com -->
+{{currentRequest.protocol}}       <!-- https -->
+{{currentRequest.host}}          <!-- example.com -->
+{{currentRequest.path}}          <!-- /articles/123 -->
+{{currentRequest.method}}        <!-- GET -->
+{{currentRequest.userAgent}}     <!-- Browser information -->
+{{currentRequest.isSecure}}      <!-- true/false -->
+
+<!-- Current route data (if matched) -->
+{{currentRoute.id}}              <!-- Route ID -->
+{{currentRoute.path}}            <!-- Route path pattern -->
+{{currentRoute.title}}           <!-- Route title -->
+{{currentRoute.template}}        <!-- Route template -->
+{{currentRoute.layout}}          <!-- Route layout -->
+
+<!-- Current domain information -->
+{{currentDomain.current}}        <!-- Current domain -->
+{{currentDomain.default}}        <!-- Default domain -->
+{{currentDomain.resolved}}       <!-- Resolved domain -->
+
+<!-- System information -->
+{{systemInfo.environment}}       <!-- development/production -->
+{{systemInfo.nodeVersion}}       <!-- Node.js version -->
+{{systemInfo.timestamp}}         <!-- Current timestamp -->
+```
+
+### Template Functions
+Templates support dynamic functions for common operations:
+
+```html
+<!-- URL generation with current domain -->
+[url(/articles)]                 <!-- https://example.com/articles -->
+[url(/contact#form)]             <!-- https://example.com/contact#form -->
+
+<!-- Asset URLs with domain -->
+[asset(/css/styles.css)]         <!-- https://example.com/css/styles.css -->
+[asset(/images/logo.png)]        <!-- https://example.com/images/logo.png -->
+
+<!-- Date formatting -->
+[date()]                         <!-- Current date with default format -->
+[date(now, Y-m-d)]              <!-- 2024-01-15 -->
+[date(2024-01-01, d/m/Y)]       <!-- 01/01/2024 -->
+
+<!-- Internationalization -->
+[translate(welcome.message)]     <!-- Translated text -->
+[t(hello.world, Hello World!)]  <!-- With fallback -->
+[t(greeting, Hi {name}!, {name: John})] <!-- With interpolation -->
+```
+
+### Enhanced Context Passing
+Child content blocks and partials receive context from parent pages:
+
+```html
+<!-- In a CMS page or layout -->
+<entity name="cmsBlocks" field="name" value="article-sidebar"/>
+
+<!-- Inside the article-sidebar block, you can access: -->
+{{currentEntity.title}}          <!-- Parent page title -->
+{{currentEntity.id}}            <!-- Parent page ID -->
+{{currentEntity.template}}       <!-- Parent page template -->
+<!-- Any other parent page properties -->
+```
 
 ### Template Functions
 Templates support dynamic content blocks, entity rendering, and collections with advanced query options:
@@ -365,6 +438,55 @@ Collections support advanced query parameters for pagination and sorting:
 </collection>
 ```
 
+## Internationalization
+
+### Translation Files
+Create translation files in the `translations` directory:
+
+**translations/en.json:**
+```json
+{
+  "navigation": {
+    "home": "Home",
+    "about": "About Us",
+    "contact": "Contact"
+  },
+  "messages": {
+    "welcome": "Welcome to our site!",
+    "greeting": "Hello {name}!"
+  }
+}
+```
+
+**translations/es.json:**
+```json
+{
+  "navigation": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "contact": "Contacto"
+  },
+  "messages": {
+    "welcome": "¡Bienvenido a nuestro sitio!",
+    "greeting": "¡Hola {name}!"
+  }
+}
+```
+
+### Using Translations in Templates
+```html
+<!-- Simple translation -->
+[translate(navigation.home)]
+
+<!-- With fallback -->
+[t(navigation.home, Home)]
+
+<!-- With interpolation -->
+[t(messages.greeting, Hello!, {name: John})]
+
+<!-- Locale detection from request headers or ?locale=es parameter -->
+```
+
 ### Layout System
 The CMS uses a two-tier layout system:
 
@@ -375,11 +497,11 @@ The CMS uses a two-tier layout system:
 <head>
     <title>{{title}}</title>
     <meta name="description" content="{{description}}"/>
-    <link href="/css/styles.css" rel="stylesheet"/>
+    <link href="[asset(/css/styles.css)]" rel="stylesheet"/>
 </head>
 <body class="{{siteHandle}}">
     {{&content}}
-    <script src="/js/scripts.js"></script>
+    <script src="[asset(/js/scripts.js)]"></script>
 </body>
 </html>
 ```
@@ -415,7 +537,7 @@ Create reusable content blocks in the `cms_blocks` table via the admin panel:
 INSERT INTO cms_blocks (name, title, content) VALUES 
 ('contact-info', 'Contact Information', '<p>Email: info@example.com</p>'),
 ('article-sidebar', 'Article Categories', 
-'<div class="categories"><h3>Categories</h3><ul><li><a href="/articles/technology">Technology</a></li></ul></div>');
+'<div class="categories"><h3>Categories</h3><ul><li><a href="[url(/articles/technology)]">Technology</a></li></ul></div>');
 ```
 
 ### Entity Access Control
@@ -452,11 +574,40 @@ templates/
 ├── partials/
 │   ├── header.html (default)
 │   └── footer.html (default)
+├── translations/
+│   ├── en.json
+│   ├── es.json
+│   └── fr.json
 ├── page.html (base HTML wrapper)
 └── 404.html
 ```
 
 ## Advanced Usage
+
+### Event System
+The CMS provides hooks for customization through event listeners:
+
+```javascript
+// Listen for template variable events
+cms.events.on('reldens.afterVariablesCreated', (eventData) => {
+    // Add custom variables
+    eventData.variables.customData = {
+        timestamp: Date.now(),
+        version: '1.0.0'
+    };
+});
+
+// Listen for content processing events
+cms.events.on('reldens.beforeContentProcess', (eventData) => {
+    // Modify content before processing
+    eventData.content = eventData.content.replace(/\[custom\]/g, 'Custom Value');
+});
+
+cms.events.on('reldens.afterContentProcess', (eventData) => {
+    // Modify processed content
+    eventData.processedContent += '\n<!-- Processed at ' + new Date() + ' -->';
+});
+```
 
 ### Custom Authentication
 ```javascript
@@ -535,13 +686,15 @@ The installer provides checkboxes for:
 - `findEntityByPath(path)` - Entity-based URL handling
 
 ### TemplateEngine Class
-- `render(template, data, partials)` - Main template rendering with enhanced functions
-- `processEntityFunctions(template)` - Process `<entity>` functions
-- `processSingleFieldCollections(template)` - Process single field collections with query options
-- `processLoopCollections(template)` - Process loop collections with query options
-- `processCustomPartials(template)` - Process `<partial>` tags with attribute parsing
-- `fetchEntityForTemplate(tableName, identifier, identifierField)` - Load single entity
-- `fetchCollectionForTemplate(tableName, filtersJson, queryOptionsJson)` - Load entity collections with pagination and sorting
+- `render(template, data, partials, domain, req, route, currentEntityData)` - Main template rendering with enhanced context
+- `processAllTemplateFunctions(template, domain, req, systemVariables)` - Process all template functions
+- `buildEnhancedRenderData(data, systemVariables, currentEntityData)` - Build template context with system variables
+
+### SystemVariablesProvider Class
+- `buildSystemVariables(req, route, domain)` - Create system variables for templates
+- `buildCurrentRequestData(req, domain)` - Build request context
+- `buildCurrentRouteData(route)` - Build route context
+- `buildCurrentDomainData(domain)` - Build domain context
 
 ### AdminManager Class
 - `setupAdmin()` - Initialize admin panel
@@ -566,6 +719,10 @@ project/
 │   ├── partials/           # Shared template partials
 │   ├── page.html           # Base HTML wrapper
 │   └── 404.html            # Error page
+├── translations/
+│   ├── en.json             # English translations
+│   ├── es.json             # Spanish translations
+│   └── fr.json             # French translations
 ├── public/
 │   ├── css/               # Stylesheets
 │   ├── js/                # Client scripts
