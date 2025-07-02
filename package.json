@@ -33,10 +33,10 @@
         "url": "https://github.com/damian-pastorini/reldens-cms/issues"
     },
     "dependencies": {
-        "@reldens/server-utils": "^0.20.0",
+        "@reldens/server-utils": "^0.21.0",
         "@reldens/storage": "^0.60.0",
         "@reldens/utils": "^0.50.0",
-        "dotenv": "^17.0.0",
+        "dotenv": "^17.0.1",
         "mustache": "^4.2.0"
     }
 }
