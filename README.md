@@ -171,10 +171,10 @@ Templates support dynamic functions for common operations:
 <!-- URL generation with current domain -->
 [url(/articles)]                 <!-- https://example.com/articles -->
 [url(/contact#form)]             <!-- https://example.com/contact#form -->
+[url(/css/styles.css)]         <!-- https://example.com/css/styles.css -->
 
 <!-- Asset URLs with domain -->
-[asset(/css/styles.css)]         <!-- https://example.com/css/styles.css -->
-[asset(/images/logo.png)]        <!-- https://example.com/images/logo.png -->
+[asset(/assets/images/logo.png)]        <!-- https://example.com/images/logo.png -->
 
 <!-- Date formatting -->
 [date()]                         <!-- Current date with default format -->
@@ -497,11 +497,11 @@ The CMS uses a two-tier layout system:
 <head>
     <title>{{title}}</title>
     <meta name="description" content="{{description}}"/>
-    <link href="[asset(/css/styles.css)]" rel="stylesheet"/>
+    <link href="[url(/css/styles.css)]" rel="stylesheet"/>
 </head>
 <body class="{{siteHandle}}">
     {{&content}}
-    <script src="[asset(/js/scripts.js)]"></script>
+    <script src="[url(/js/scripts.js)]"></script>
 </body>
 </html>
 ```

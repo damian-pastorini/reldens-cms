@@ -387,7 +387,7 @@
                 .button {
                     margin-bottom: 1rem;
 
-                    &.list-delete-selection {
+                    &.list-select {
                         margin-bottom: 0;
                     }
                 }
@@ -851,7 +851,7 @@
         overflow: auto;
     }
 
-    .cache-confirm-dialog {
+    .confirm-dialog {
         border: none;
         border-radius: 8px;
         padding: 0;
@@ -860,35 +860,26 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .cache-confirm-dialog::backdrop {
+    .confirm-dialog::backdrop {
         background-color: rgba(0, 0, 0, 0.5);
     }
 
-    .cache-dialog-content {
+    .dialog-content {
         padding: 1rem;
     }
 
-    .cache-dialog-content h5 {
+    .dialog-content h5 {
         margin: 0 0 1rem 0;
         font-size: 18px;
         color: var(--darkGrey);
     }
 
-    .cache-dialog-content p {
+    .dialog-content p {
         margin: 0 0 1rem 0;
         color: var(--darkGrey);
     }
 
-    .cache-warning {
-        padding: 1rem;
-        background-color: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 4px;
-        color: #856404;
-        margin-bottom: 1rem;
-    }
-
-    .cache-dialog-actions {
+    .dialog-actions {
         display: flex;
         justify-content: flex-end;
         gap: 1rem;

@@ -48,6 +48,31 @@ window.addEventListener('DOMContentLoaded', () => {
         return element.cloneNode(true);
     }
 
+    function showConfirmDialog(callback)
+    {
+        let dialog = document.querySelector('.confirm-dialog');
+        if(!dialog){
+            return callback(false);
+        }
+        dialog.showModal();
+        let confirmButton = dialog.querySelector('.dialog-confirm');
+        let cancelButton = dialog.querySelector('.dialog-cancel');
+        let onConfirm = () => {
+            dialog.close();
+            callback(true);
+            confirmButton.removeEventListener('click', onConfirm);
+            cancelButton.removeEventListener('click', onCancel);
+        };
+        let onCancel = () => {
+            dialog.close();
+            callback(false);
+            confirmButton.removeEventListener('click', onConfirm);
+            cancelButton.removeEventListener('click', onCancel);
+        };
+        confirmButton.addEventListener('click', onConfirm);
+        cancelButton.addEventListener('click', onCancel);
+    }
+
     // error codes messages map:
     let errorMessages = {
         saveBadPatchData: 'Bad patch data on update.',
@@ -123,18 +148,25 @@ window.addEventListener('DOMContentLoaded', () => {
     if(forms){
         for(let form of forms){
             form.addEventListener('submit', (event) => {
-                let submitButton = document.querySelector('input[type="submit"]');
+                let submitButton = form.querySelector('input[type="submit"], button[type="submit"]');
                 submitButton.disabled = true;
                 let loadingImage = document.querySelector('.submit-container .loading');
                 if(loadingImage){
                     loadingImage.classList.remove('hidden');
                 }
                 if(form.classList.contains('form-delete') || form.classList.contains('confirmation-required')){
-                    if(!confirm('Are you sure?')){
-                        event.preventDefault();
-                        submitButton.disabled = false;
-                        loadingImage.classList.add('hidden');
-                    }
+                    event.preventDefault();
+                    showConfirmDialog((confirmed) => {
+                        if(confirmed){
+                            form.submit();
+                        }
+                        if(!confirmed){
+                            submitButton.disabled = false;
+                            if(loadingImage){
+                                loadingImage.classList.add('hidden');
+                            }
+                        }
+                    });
                 }
             });
         }
@@ -216,19 +248,31 @@ window.addEventListener('DOMContentLoaded', () => {
     let deleteSelectionForm = document.getElementById('delete-selection-form');
     let hiddenInput = document.querySelector('.hidden-ids-input');
     if(listDeleteSelection && deleteSelectionForm && hiddenInput){
-        listDeleteSelection.addEventListener('click', () => {
-            if(!confirm('Are you sure?')){
-                return;
-            }
-            let checkboxes = document.querySelectorAll('.ids-checkbox');
-            let ids = [];
-            for(let checkbox of checkboxes){
-                if(checkbox.checked){
-                    ids.push(checkbox.value);
+        listDeleteSelection.addEventListener('click', (event) => {
+            event.preventDefault();
+            showConfirmDialog((confirmed) => {
+                if(confirmed){
+                    let checkboxes = document.querySelectorAll('.ids-checkbox');
+                    let ids = [];
+                    for(let checkbox of checkboxes){
+                        if(checkbox.checked){
+                            ids.push(parseInt(checkbox.value));
+                        }
+                    }
+                    if(0 === ids.length){
+                        return;
+                    }
+                    deleteSelectionForm.innerHTML = '';
+                    for(let id of ids){
+                        let input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = id;
+                        deleteSelectionForm.appendChild(input);
+                    }
+                    deleteSelectionForm.submit();
                 }
-            }
-            hiddenInput.value = ids.join(',');
-            deleteSelectionForm.submit();
+            });
         });
     }
 
@@ -278,25 +322,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // cache clear all functionality:
     let cacheClearAllButton = document.querySelector('.cache-clear-all-button');
-    let cacheConfirmDialog = document.querySelector('.cache-confirm-dialog');
-    let cacheDialogCancel = document.querySelector('.cache-dialog-cancel');
     let cacheClearForm = document.querySelector('.cache-clear-form');
-    if(cacheClearAllButton && cacheConfirmDialog){
+    if(cacheClearAllButton){
         cacheClearAllButton.addEventListener('click', () => {
-            cacheConfirmDialog.showModal();
-        });
-    }
-    if(cacheDialogCancel && cacheConfirmDialog){
-        cacheDialogCancel.addEventListener('click', () => {
-            cacheConfirmDialog.close();
-        });
-    }
-    if(cacheClearForm){
-        cacheClearForm.addEventListener('submit', (event) => {
-            let submitButton = cacheClearForm.querySelector('button[type="submit"]');
-            if(submitButton){
-                submitButton.disabled = true;
-            }
+            showConfirmDialog((confirmed) => {
+                if(confirmed && cacheClearForm){
+                    let submitButton = cacheClearForm.querySelector('button[type="submit"]');
+                    if(submitButton){
+                        submitButton.disabled = true;
+                    }
+                    cacheClearForm.submit();
+                }
+            });
         });
     }
 

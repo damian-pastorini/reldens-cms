@@ -29,13 +29,18 @@
     {{#canonical_url}}
     <link rel="canonical" href="{{canonical_url}}"/>
     {{/canonical_url}}
+    <!-- favicons -->
+    <meta name="msapplication-config" content="[asset(/favicons/default/browserconfig.xml)]"/>
+    <link rel="icon" href="[asset(/favicons/default/favicon.ico)]" type="image/x-icon"/>
+    <link rel="shortcut icon" href="[asset(/favicons/default/favicon.ico)]" type="image/x-icon">
+    <link rel="manifest" href="[asset(/favicons/default/site.webmanifest)]"/>
     <!-- CSS and JS -->
-    <link href="/css/styles.css" rel="stylesheet"/>
-    <script src="/js/cookie-consent.js"></script>
+    <link rel="stylesheet" href="[url(/css/styles.css)]"/>
+    <script defer src="[url(/js/cookie-consent.js)]"></script>
 </head>
 <body class="{{siteHandle}}">
-    {{&content}}
-    {{>cookie-consent}}
-    <script type="text/javascript" defer src="/js/scripts.js"></script>
+{{&content}}
+{{>cookie-consent}}
+<script defer type="text/javascript" src="[url(/js/scripts.js)]"></script>
 </body>
 </html>
