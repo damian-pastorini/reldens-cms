@@ -2,7 +2,7 @@
 
 # Reldens CMS
 
-A powerful, flexible Content Management System built with Node.js, featuring an admin panel, multi-domain frontend support, enhanced templating with reusable content blocks, system variables, internationalization, and automated installation.
+A powerful, flexible Content Management System built with Node.js, featuring an admin panel, multi-domain frontend support, enhanced templating with reusable content blocks, system variables, internationalization, template reloading, and automated installation.
 
 ## Features
 
@@ -29,6 +29,8 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Template functions** for URLs, assets, dates, and translations
 - **Event-driven rendering** with hooks for customization
 - **Custom 404 handling**
+- **Advanced search functionality** with template data support
+- **Template reloading** for development with configurable reload strategies
 
 ### - Admin Panel
 - **Full CRUD operations** for all entities including content blocks
@@ -50,11 +52,45 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 
 ### - Configuration & Architecture
 - **Environment-based configuration** (.env file)
-- **Modular service architecture** (Frontend, AdminManager, DataServer, TemplateEngine)
+- **Modular service architecture** with specialized classes for better maintainability
 - **Event-driven system** with hooks for customization
 - **Extensible authentication** (database users or custom callbacks)
 - **File security** with path validation and dangerous key filtering
 - **Internationalization support** with translation files
+
+## Architecture
+
+### Core Classes
+The CMS uses a modular architecture with specialized classes:
+
+**Frontend Orchestrator:**
+- `Frontend` - Main orchestrator class that coordinates all frontend operations
+
+**Template Management:**
+- `TemplateResolver` - Template discovery and domain resolution
+- `TemplateCache` - Template and partial caching management
+- `TemplateReloader` - Template reloading with file change detection
+
+**Request Processing:**
+- `RequestProcessor` - HTTP request routing and path handling
+- `SearchRequestHandler` - Dedicated search request processing
+
+**Content Management:**
+- `ContentRenderer` - Content generation and template processing
+- `EntityAccessManager` - Entity access control and loading
+
+**Response Handling:**
+- `ResponseManager` - HTTP response handling and caching logic
+
+**Template Processing:**
+- `TemplateEngine` - Core template rendering with enhanced context
+- `SystemVariablesProvider` - System variables for templates
+
+This architecture follows SOLID principles, providing better:
+- **Testability** - Individual components can be tested in isolation
+- **Maintainability** - Changes to one area don't affect others
+- **Reusability** - Components can be reused in different contexts
+- **Readability** - Smaller, focused classes are easier to understand
 
 ## Installation
 
@@ -102,6 +138,34 @@ RELDENS_DOMAIN_MAPPING={"dev.example.com":"development"}
 RELDENS_SITE_KEY_MAPPING={"example.com":"main"}
 ```
 
+### Template Reloading Configuration
+Configure template reloading for development environments:
+
+```javascript
+const cms = new Manager({
+    // Development: reload templates on every request when changes detected
+    reloadTime: -1,
+    
+    // Production: disable template reloading (default)
+    reloadTime: 0,
+    
+    // Interval-based: reload every 5 seconds when changes detected
+    reloadTime: 5000
+});
+```
+
+**Template Reloading Options:**
+- **`reloadTime: 0`** (default) - Template reloading disabled. Templates load once at startup.
+- **`reloadTime: -1`** - Reload templates on every request when file changes are detected. Best for active development.
+- **`reloadTime: > 0`** - Check for template changes at specified interval (milliseconds) and reload when needed. Good for development with lower overhead.
+
+**How it works:**
+- Tracks file modification times for admin and frontend templates
+- Only reloads templates that have actually changed
+- Automatically updates admin contents and frontend template cache
+- Works with both admin panel templates and frontend templates/partials
+- Zero performance impact when disabled (`reloadTime: 0`)
+
 ### Custom Entity Configuration
 ```javascript
 const entityConfig = {
@@ -128,6 +192,70 @@ const entityConfig = {
 
 const cms = new Manager({
     entitiesConfig: entityConfig
+});
+```
+
+## Search Functionality
+
+### Basic Search
+```bash
+# Simple search
+/search?search=technology
+
+# Entity-specific search with custom limit
+/search?search=javascript&limit=20
+
+# Custom template rendering
+/search?search=news&renderPartial=newsListView&renderLayout=minimal
+```
+
+### Advanced Search with Template Data
+```bash
+# Pass custom template variables
+/search?search=articles&templateData[columnsClass]=col-md-4&templateData[showExcerpt]=true
+
+# Multiple template variables
+/search?search=technology&templateData[columnsClass]=col-lg-6&templateData[cardClass]=shadow-sm&templateData[showAuthor]=false
+```
+
+### Search Template Variables
+Templates receive dynamic data through URL parameters:
+
+**URL:** `/search?search=tech&templateData[columnsClass]=col-md-6&templateData[showDate]=true`
+
+**Template (entriesListView.html):**
+```html
+<div class="{{columnsClass}}">
+    <div class="card">
+        <h3>{{row.title}}</h3>
+        <p>{{row.content}}</p>
+        {{#showDate}}
+        <span class="date">{{row.created_at}}</span>
+        {{/showDate}}
+    </div>
+</div>
+```
+
+**Default Values:**
+- `columnsClass` defaults to `col-lg-6 mt-2 mb-2` if not provided or empty
+- Custom variables can be added via `templateData[variableName]=value`
+
+### Search Configuration
+```javascript
+// Custom search sets in Manager configuration
+const searchSets = {
+    articlesSearch: {
+        entities: [{
+            name: 'articles',
+            fields: ['title', 'content', 'summary'],
+            relations: 'authors'
+        }],
+        pagination: {active: true, limit: 15, sortBy: 'created_at', sortDirection: 'desc'}
+    }
+};
+
+const cms = new Manager({
+    searchSets: searchSets
 });
 ```
 
@@ -584,6 +712,32 @@ templates/
 
 ## Advanced Usage
 
+### Template Reloading for Development
+```javascript
+// Different configurations for development vs production
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+const cms = new Manager({
+    // Enable aggressive template reloading in development
+    reloadTime: isDevelopment ? -1 : 0,
+    
+    // Other development-friendly settings
+    cache: !isDevelopment,
+    
+    entityAccess: {
+        articles: { public: true, operations: ['read'] },
+        cmsPages: { public: true, operations: ['read'] }
+    }
+});
+```
+
+**Development Workflow with Template Reloading:**
+1. Set `reloadTime: -1` for instant template updates
+2. Edit admin templates in `admin/templates/` - changes appear immediately
+3. Edit frontend templates in `templates/` - changes appear on next page load
+4. No server restart needed for template changes
+5. Switch to `reloadTime: 0` in production for optimal performance
+
 ### Event System
 The CMS provides hooks for customization through event listeners:
 
@@ -606,6 +760,11 @@ cms.events.on('reldens.beforeContentProcess', (eventData) => {
 cms.events.on('reldens.afterContentProcess', (eventData) => {
     // Modify processed content
     eventData.processedContent += '\n<!-- Processed at ' + new Date() + ' -->';
+});
+
+// Listen for template reloading events
+cms.events.on('reldens.templateReloader.templatesChanged', (eventData) => {
+    console.log('Templates changed:', eventData.changedFiles);
 });
 ```
 
@@ -679,11 +838,58 @@ The installer provides checkboxes for:
 - `isInstalled()` - Check if CMS is installed
 - `initializeServices()` - Initialize all services
 
-### Frontend Class
+### Frontend Architecture Classes
+
+#### Frontend Class (Orchestrator)
 - `initialize()` - Set up frontend routes and templates
 - `handleRequest(req, res)` - Main request handler
-- `findRouteByPath(path)` - Database route lookup
-- `findEntityByPath(path)` - Entity-based URL handling
+- `renderRoute(route, domain, res, req)` - Route-based rendering
+- `setupStaticAssets()` - Configure static asset serving
+
+#### TemplateResolver Class
+- `findTemplatePath(templateName, domain)` - Template discovery with domain fallback
+- `findLayoutPath(layoutName, domain)` - Layout path resolution
+- `findTemplateByPath(path, domain)` - Template lookup by URL path
+- `resolveDomainToFolder(domain)` - Domain to folder mapping
+- `resolveDomainToSiteKey(domain)` - Domain to site key mapping
+
+#### TemplateCache Class
+- `loadPartials()` - Load and cache template partials
+- `setupDomainTemplates()` - Initialize domain-specific templates
+- `getPartialsForDomain(domain)` - Get domain-specific partials with fallback
+
+#### TemplateReloader Class
+- `checkAndReloadAdminTemplates()` - Check and reload admin templates when changed
+- `checkAndReloadFrontendTemplates()` - Check and reload frontend templates when changed
+- `trackTemplateFiles(templatesPaths)` - Start tracking template files for changes
+- `shouldReloadAdminTemplates(mappedAdminTemplates)` - Check if admin templates need reloading
+- `shouldReloadFrontendTemplates(templatesPath, templateExtensions)` - Check if frontend templates need reloading
+- `handleAdminTemplateReload(adminManager)` - Complete admin template reload process
+- `handleFrontendTemplateReload(templateCache, templateResolver)` - Complete frontend template reload process
+
+#### RequestProcessor Class
+- `findRouteByPath(path, domain)` - Database route lookup
+- `handleRouteRedirect(route, res)` - Handle route redirects
+- `getDomainFromRequest(req)` - Extract domain from request
+- `buildCacheKey(path, req)` - Generate cache keys
+
+#### ContentRenderer Class
+- `renderWithTemplateContent(content, data, domain, req, route)` - Main content rendering
+- `generateRouteContent(route, domain, req)` - Route-based content generation
+- `generateTemplateContent(templatePath, domain, req, data)` - Template-based content generation
+- `fetchMetaFields(data)` - Process meta fields for templates
+
+#### EntityAccessManager Class
+- `loadEntityAccessRules()` - Load entity access configuration
+- `isEntityAccessible(entityName)` - Check entity accessibility
+- `findEntityByPath(path)` - Entity lookup by URL path
+
+#### ResponseManager Class
+- `renderWithCacheHandler(contentGenerator, errorHandler, responseHandler, domain, res, path, req)` - Generic cached response handler
+- `renderNotFound(domain, res, req)` - 404 error handling
+
+#### SearchRequestHandler Class
+- `handleSearchRequest(req, res)` - Process search requests with template data support
 
 ### TemplateEngine Class
 - `render(template, data, partials, domain, req, route, currentEntityData)` - Main template rendering with enhanced context
@@ -695,6 +901,11 @@ The installer provides checkboxes for:
 - `buildCurrentRequestData(req, domain)` - Build request context
 - `buildCurrentRouteData(route)` - Build route context
 - `buildCurrentDomainData(domain)` - Build domain context
+
+### Search Classes
+- `Search.parseSearchParameters(query)` - Parse search query parameters including templateData
+- `Search.executeSearch(config)` - Execute search with configuration
+- `SearchRenderer.renderSearchResults(searchResults, config, domain, req)` - Render search results with template data
 
 ### AdminManager Class
 - `setupAdmin()` - Initialize admin panel
@@ -713,6 +924,20 @@ The installer provides checkboxes for:
 project/
 ├── admin/
 │   └── templates/           # Admin panel templates
+├── lib/
+│   ├── frontend/           # Frontend specialized classes
+│   │   ├── template-resolver.js
+│   │   ├── template-cache.js
+│   │   ├── request-processor.js
+│   │   ├── entity-access-manager.js
+│   │   ├── content-renderer.js
+│   │   └── response-manager.js
+│   ├── frontend.js         # Main Frontend orchestrator
+│   ├── template-reloader.js # Template reloading functionality
+│   ├── search-request-handler.js
+│   ├── search.js           # Search functionality
+│   ├── search-renderer.js  # Search result rendering
+│   └── template-engine.js  # Core template processing
 ├── templates/
 │   ├── layouts/            # Body content layouts
 │   ├── domains/            # Domain-specific templates
