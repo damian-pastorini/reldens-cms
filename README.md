@@ -237,7 +237,7 @@ Templates receive dynamic data through URL parameters:
 ```
 
 **Default Values:**
-- `columnsClass` defaults to `col-lg-6 mt-2 mb-2` if not provided or empty
+- `columnsClass` defaults to `col-lg-6` if not provided or empty
 - Custom variables can be added via `templateData[variableName]=value`
 
 ### Search Configuration
@@ -431,10 +431,10 @@ Pagination state is managed via URL query parameters:
 Create `templates/partials/pagedCollection.html`:
 ```html
 <div class="row paginated-contents">
-    <div class="collection-content col-lg-12 mt-2 mb-2">
+    <div class="collection-content col-lg-12">
         {{&collectionContentForCurrentPage}}
     </div>
-    <div class="pagination col-lg-12 mt-2 mb-2">
+    <div class="pagination col-lg-12">
         <ul class="pagination-list">
             {{#prevPageUrl}}
                 <li><a href="{{prevPageUrl}}" class="page-link">{{&prevPageLabel}}</a></li>
