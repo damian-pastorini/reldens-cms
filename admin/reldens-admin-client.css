@@ -532,8 +532,7 @@
                 flex-direction: row;
                 vertical-align: middle;
                 align-items: center;
-                width: 100%;
-                margin: 0 0 1rem 0;
+                margin: 0 1rem 1rem 0;
                 font-size: 14px;
                 color: var(--darkGrey);
 
@@ -585,6 +584,59 @@
             padding: 1%;
             margin: 1rem 0;
         }
+    }
+
+    .filters-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filters-toggle {
+        cursor: pointer;
+        margin: 0;
+        padding: 0.5rem 0;
+        flex-shrink: 0;
+    }
+
+    .filters-toggle img {
+        width: 34px;
+        height: auto;
+        margin-right: 0.5rem;
+    }
+
+    .search-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        flex: 1;
+        justify-content: flex-end;
+    }
+
+    .search-input-group input[type="text"] {
+        width: calc(100% - 1rem);
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .search-input-group input[type="text"]:focus {
+        outline: none;
+        border-color: var(--lightBlue);
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        flex-shrink: 0;
     }
 
     .maps-wizard {
@@ -787,12 +839,12 @@
                         margin: 0;
                         padding: 0.5rem;
                         border: none;
-                        background: transparent;
+                        background-color: transparent;
 
                         &:not([disabled]) {
                             margin: 0;
                             border: 1px solid #7f8c8d;
-                            background: var(--white);
+                            background-color: var(--white);
 
                             &[type="checkbox"] {
                                 max-width: max-content;
@@ -885,4 +937,15 @@
         gap: 1rem;
     }
 
+}
+
+@media (max-width: 768px) {
+    .reldens-admin-panel .filter-actions {
+        flex-direction: column;
+    }
+
+    .reldens-admin-panel .filter-actions .button {
+        width: 100%;
+        text-align: center;
+    }
 }

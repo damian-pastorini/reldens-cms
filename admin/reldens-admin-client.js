@@ -12,67 +12,6 @@ window.addEventListener('DOMContentLoaded', () => {
     let queryString = location.search;
     let urlParams = new URLSearchParams(queryString);
 
-    function getCookie(name)
-    {
-        let value = `; ${document.cookie}`;
-        let parts = value.split(`; ${name}=`);
-        if(2 === parts.length){
-            return parts.pop().split(';').shift()
-        }
-    }
-
-    function deleteCookie(name)
-    {
-        document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    }
-
-    function escapeHTML(str)
-    {
-        return str.replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    function cloneElement(element)
-    {
-        if(element instanceof HTMLCanvasElement){
-            let clonedCanvas = document.createElement('canvas');
-            clonedCanvas.width = element.width;
-            clonedCanvas.height = element.height;
-            let ctx = clonedCanvas.getContext('2d');
-            ctx.drawImage(element, 0, 0);
-            return clonedCanvas
-        }
-        return element.cloneNode(true);
-    }
-
-    function showConfirmDialog(callback)
-    {
-        let dialog = document.querySelector('.confirm-dialog');
-        if(!dialog){
-            return callback(false);
-        }
-        dialog.showModal();
-        let confirmButton = dialog.querySelector('.dialog-confirm');
-        let cancelButton = dialog.querySelector('.dialog-cancel');
-        let onConfirm = () => {
-            dialog.close();
-            callback(true);
-            confirmButton.removeEventListener('click', onConfirm);
-            cancelButton.removeEventListener('click', onCancel);
-        };
-        let onCancel = () => {
-            dialog.close();
-            callback(false);
-            confirmButton.removeEventListener('click', onConfirm);
-            cancelButton.removeEventListener('click', onCancel);
-        };
-        confirmButton.addEventListener('click', onConfirm);
-        cancelButton.addEventListener('click', onCancel);
-    }
-
     // error codes messages map:
     let errorMessages = {
         saveBadPatchData: 'Bad patch data on update.',
@@ -84,56 +23,9 @@ window.addEventListener('DOMContentLoaded', () => {
         errorId: 'Missing entity ID on POST.'
     };
 
-    // copyright year:
-    let copyRightYear = document.querySelector('.copyright-year');
-    if(copyRightYear){
-        copyRightYear.innerHTML = String((new Date()).getFullYear());
-    }
+    activateExpandCollapse();
 
-    // activate expand/collapse elements
-    let expandCollapseButtons = document.querySelectorAll('[data-expand-collapse]');
-    if(expandCollapseButtons){
-        for(let expandCollapseButton of expandCollapseButtons){
-            expandCollapseButton.addEventListener('click', (event) => {
-                let expandCollapseElement = document.querySelector(event.currentTarget.dataset.expandCollapse);
-                if(expandCollapseElement){
-                    expandCollapseElement.classList.toggle('hidden');
-                }
-            });
-        }
-    }
-
-    // activate modals on click
-    let modalElements = document.querySelectorAll('[data-toggle="modal"]');
-    if(modalElements){
-        for(let modalElement of modalElements){
-            modalElement.addEventListener('click', () => {
-                let overlay = document.createElement('div');
-                overlay.classList.add('modal-overlay');
-                let modal = document.createElement('div');
-                modal.classList.add('modal');
-                modal.classList.add('clickable');
-                let clonedElement = cloneElement(modalElement);
-                clonedElement.classList.add('clickable');
-                modal.appendChild(clonedElement);
-                overlay.appendChild(modal);
-                document.body.appendChild(overlay);
-                clonedElement.addEventListener('click', () => {
-                    document.body.removeChild(overlay);
-                });
-                modal.addEventListener('click', (e) => {
-                    if(e.target === modal){
-                        document.body.removeChild(modal.parentNode);
-                    }
-                });
-                overlay.addEventListener('click', (e) => {
-                    if(e.target === overlay) {
-                        document.body.removeChild(overlay);
-                    }
-                });
-            });
-        }
-    }
+    activateModalElements();
 
     // login errors:
     if('true' === urlParams.get('login-error')){
@@ -141,6 +33,40 @@ window.addEventListener('DOMContentLoaded', () => {
         if(loginErrorBox){
             loginErrorBox.innerHTML = 'Login error, please try again.';
         }
+    }
+
+    // entity search functionality:
+    let entityFilterTerm = document.querySelector('#entityFilterTerm');
+    let filterForm = document.querySelector('#filter-form');
+    let allFilters = document.querySelectorAll('.filters-toggle-content .filter input');
+    if(entityFilterTerm && filterForm){
+        entityFilterTerm.addEventListener('input', () => {
+            if(entityFilterTerm.value){
+                for(let filterInput of allFilters){
+                    filterInput.value = '';
+                }
+            }
+        });
+        entityFilterTerm.addEventListener('keypress', (event) => {
+            if(13 === event.keyCode){
+                event.preventDefault();
+                filterForm.submit();
+            }
+        });
+        for(let filterInput of allFilters){
+            filterInput.addEventListener('input', () => {
+                if(filterInput.value){
+                    entityFilterTerm.value = '';
+                }
+            });
+        }
+        filterForm.addEventListener('submit', () => {
+            if(entityFilterTerm.value && allFilters.some(input => input.value)){
+                for(let filterInput of allFilters){
+                    filterInput.value = '';
+                }
+            }
+        });
     }
 
     // forms behavior:
@@ -212,21 +138,33 @@ window.addEventListener('DOMContentLoaded', () => {
             filtersToggleContent.classList.toggle('hidden');
         });
         let allFilters = document.querySelectorAll('.filters-toggle-content .filter input');
+        let entitySearchInput = document.querySelector('#entityFilterTerm');
+        let hasEntitySearch = entitySearchInput && '' !== entitySearchInput.value;
         let activeFilters = Array.from(allFilters).filter(input => '' !== input.value);
-        if(0 < activeFilters.length){
+        if(0 < activeFilters.length || hasEntitySearch){
             filtersToggleContent.classList.remove('hidden');
-            let paginationLinks = document.querySelectorAll('.pagination a');
-            let filtersForm = document.querySelector('#filter-form');
-            if(paginationLinks && filtersForm){
-                for(let link of paginationLinks){
-                    link.addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        event.preventDefault();
-                        filtersForm.action = link.href;
-                        filtersForm.submit();
-                        return false;
-                    })
-                }
+        }
+        let paginationLinks = document.querySelectorAll('.pagination a');
+        if(paginationLinks && filterForm){
+            for(let link of paginationLinks){
+                link.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    let url = new URL(link.href);
+                    let params = new URLSearchParams(url.search);
+                    if(entitySearchInput && entitySearchInput.value){
+                        params.set('entityFilterTerm', entitySearchInput.value);
+                    }
+                    for(let filterInput of allFilters){
+                        if(filterInput.value){
+                            let filterName = filterInput.name;
+                            params.set(filterName, filterInput.value);
+                        }
+                    }
+                    let newUrl = url.pathname + '?' + params;
+                    window.location.href = newUrl;
+                    return false;
+                })
             }
         }
     }
