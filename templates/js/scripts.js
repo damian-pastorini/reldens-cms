@@ -16,4 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if(copyRightYear){
         copyRightYear.innerHTML = String((new Date()).getFullYear());
     }
+
+    activateExpandCollapse();
+
+    activateModalElements();
+
 });

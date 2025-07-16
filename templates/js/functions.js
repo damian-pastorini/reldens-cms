@@ -81,6 +81,18 @@ function activateExpandCollapse()
     }
 }
 
+function createModalContent(modalElement)
+{
+    if(modalElement.hasAttribute('data-modal-zoom-image')){
+        let modalContent = document.createElement('img');
+        modalContent.src = modalElement.getAttribute('data-modal-zoom-image');
+        modalContent.alt = modalElement.alt || 'Modal Image';
+        modalContent.classList.add('modal-zoom-image');
+        return modalContent;
+    }
+    return cloneElement(modalElement);
+}
+
 function activateModalElements()
 {
     let modalElements = document.querySelectorAll('[data-toggle="modal"]');
@@ -88,27 +100,42 @@ function activateModalElements()
         return;
     }
     for(let modalElement of modalElements){
+        if(!modalElement.id){
+            modalElement.id = 'modal-'+Math.random().toString(36).substr(2, 9);
+        }
         modalElement.addEventListener('click', () => {
+            let overlayId = 'overlay-'+modalElement.id;
+            let existingOverlay = document.querySelector('#'+overlayId);
+            if(existingOverlay){
+                existingOverlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                return;
+            }
             let overlay = document.createElement('div');
+            overlay.id = overlayId;
             overlay.classList.add('modal-overlay');
             let modal = document.createElement('div');
             modal.classList.add('modal');
             modal.classList.add('clickable');
-            let clonedElement = cloneElement(modalElement);
-            clonedElement.classList.add('clickable');
-            modal.appendChild(clonedElement);
+            let modalContent = createModalContent(modalElement);
+            modalContent.classList.add('clickable');
+            modal.appendChild(modalContent);
             overlay.appendChild(modal);
             document.body.appendChild(overlay);
-            clonedElement.addEventListener('click', () => {
+            document.body.style.overflow = 'hidden';
+            modalContent.addEventListener('click', () => {
+                document.body.style.overflow = '';
                 document.body.removeChild(overlay);
             });
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    document.body.removeChild(modal.parentNode);
+                if(modal === e.target){
+                    document.body.style.overflow = '';
+                    document.body.removeChild(overlay);
                 }
             });
             overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
+                if(overlay === e.target){
+                    document.body.style.overflow = '';
                     document.body.removeChild(overlay);
                 }
             });
