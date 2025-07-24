@@ -2,7 +2,7 @@
 
 # Reldens CMS
 
-A powerful, flexible Content Management System built with Node.js, featuring an admin panel, multi-domain frontend support, enhanced templating with reusable content blocks, system variables, internationalization, template reloading, and automated installation.
+A powerful, flexible Content Management System built with Node.js, featuring an admin panel, multi-domain frontend support, enhanced templating with reusable content blocks, system variables, internationalization, template reloading, dynamic forms, and automated installation.
 
 ## Features
 
@@ -30,6 +30,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Event-driven rendering** with hooks for customization
 - **Custom 404 handling**
 - **Advanced search functionality** with template data support
+- **Dynamic forms system** with template transformers and security features
 - **Template reloading** for development with configurable reload strategies
 
 ### - Admin Panel
@@ -49,6 +50,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Translation support** for entity labels and properties
 - **Content blocks management** via cms_blocks table
 - **Entity access control** via entities_access table
+- **Dynamic forms storage** via cms_forms and cms_forms_submitted tables
 
 ### - Configuration & Architecture
 - **Environment-based configuration** (.env file)
@@ -74,6 +76,7 @@ The CMS uses a modular architecture with specialized classes:
 **Request Processing:**
 - `RequestProcessor` - HTTP request routing and path handling
 - `SearchRequestHandler` - Dedicated search request processing
+- `DynamicFormRequestHandler` - Form submission processing
 
 **Content Management:**
 - `ContentRenderer` - Content generation and template processing
@@ -85,6 +88,11 @@ The CMS uses a modular architecture with specialized classes:
 **Template Processing:**
 - `TemplateEngine` - Core template rendering with enhanced context
 - `SystemVariablesProvider` - System variables for templates
+- `FormsTransformer` - Dynamic forms template transformer
+
+**Forms System:**
+- `DynamicForm` - Form validation and data processing
+- `DynamicFormRenderer` - Template-based form rendering
 
 This architecture follows SOLID principles, providing better:
 - **Testability** - Individual components can be tested in isolation
@@ -192,6 +200,349 @@ const entityConfig = {
 
 const cms = new Manager({
     entitiesConfig: entityConfig
+});
+```
+
+## Dynamic Forms System
+
+### Basic Form Usage
+Create forms in your templates using the `<cmsForm>` tag:
+
+```html
+<!-- Render all form fields -->
+<cmsForm key="contactForm"/>
+
+<!-- Render specific fields only -->
+<cmsForm key="contactForm" fields="name,email,subject,message"/>
+
+<!-- Custom form attributes -->
+<cmsForm key="newsletterSignup" 
+    fields="email,name" 
+    submitButtonText="Subscribe Now"
+    cssClass="newsletter-form"
+    successRedirect="/thank-you"
+    errorRedirect="/contact-error"/>
+```
+
+### Form Configuration in Database
+Forms are configured in the `cms_forms` table via the admin panel:
+
+```sql
+-- Example form configuration
+INSERT INTO cms_forms (form_key, fields_schema, enabled) VALUES 
+('contactForm', '[
+    {
+        "name": "name",
+        "type": "text",
+        "label": "Full Name",
+        "required": true,
+        "maxLength": 100,
+        "placeholder": "Enter your full name"
+    },
+    {
+        "name": "email", 
+        "type": "email",
+        "label": "Email Address",
+        "required": true,
+        "placeholder": "your@email.com"
+    },
+    {
+        "name": "subject",
+        "type": "select",
+        "label": "Subject",
+        "required": true,
+        "options": [
+            {"value": "general", "label": "General Inquiry"},
+            {"value": "support", "label": "Technical Support"},
+            {"value": "sales", "label": "Sales Question"}
+        ]
+    },
+    {
+        "name": "message",
+        "type": "textarea", 
+        "label": "Message",
+        "required": true,
+        "maxLength": 1000,
+        "placeholder": "Enter your message here..."
+    }
+]', 1);
+```
+
+### Supported Field Types
+The forms system supports various field types with validation:
+
+- **text** - Basic text input with maxLength, pattern validation
+- **email** - Email input with built-in email validation
+- **number** - Numeric input with min/max validation
+- **textarea** - Multi-line text with maxLength
+- **select** - Dropdown with options array
+- **password** - Password input (masked)
+- **tel** - Phone number input
+- **url** - URL input with validation
+- **date** - Date picker input
+
+### Field Schema Properties
+Each field in the `fields_schema` JSON supports:
+
+```json
+{
+    "name": "fieldName",           // Required: Field identifier
+    "type": "text",                // Required: Field type
+    "label": "Field Label",        // Display label
+    "required": true,              // Validation: required field
+    "placeholder": "Enter text...", // Input placeholder
+    "helpText": "Additional help",  // Help text below field
+    "maxLength": 100,              // String length limit
+    "minLength": 3,                // Minimum string length
+    "pattern": "^[A-Za-z]+$",      // Regex validation pattern
+    "min": 0,                      // Number minimum value
+    "max": 100,                    // Number maximum value
+    "step": 1,                     // Number step increment
+    "defaultValue": "default",     // Default field value
+    "options": [                   // Select/radio options
+        {"value": "val1", "label": "Option 1"},
+        {"value": "val2", "label": "Option 2"}
+    ]
+}
+```
+
+### Security Features
+The form system includes comprehensive security measures:
+
+#### 1. Honeypot Protection
+Automatic bot detection using invisible fields:
+```html
+<!-- Automatically added to all forms -->
+<div class="hidden">
+    <input type="text" name="website_url" value="" />
+</div>
+```
+
+#### 2. Server-Side Validation
+- **SchemaValidator integration** - Uses `@reldens/utils` SchemaValidator
+- **Required field validation** - Ensures all required fields are provided
+- **Type validation** - Email, number, string validation with patterns
+- **Length limits** - Configurable per field via schema
+- **Custom validation** - Extensible validation rules
+
+#### 3. Data Sanitization
+- **XSS protection** - Handled by `@reldens/server-utils` SecurityConfigurer
+- **Input normalization** - Type-specific data processing
+- **Length truncation** - Based on field schema maxLength
+
+#### 4. Rate Limiting
+- **AppServerFactory integration** - Uses existing rate limiting from server-utils
+- **No duplicate implementation** - Leverages proven security measures
+
+### Template Customization
+Forms use a domain-aware template fallback system:
+
+```
+templates/
+├── domains/
+│   └── example.com/
+│       └── cms_forms/
+│           ├── form.html           # Domain-specific form wrapper
+│           ├── field_text.html     # Domain-specific text field
+│           └── field_email.html    # Domain-specific email field
+└── cms_forms/                      # Default templates
+    ├── form.html                   # Main form wrapper
+    ├── field_text.html             # Text input template
+    ├── field_email.html            # Email input template
+    ├── field_textarea.html         # Textarea template
+    ├── field_select.html           # Select dropdown template
+    └── field_number.html           # Number input template
+```
+
+### Custom Field Templates
+Create custom field templates for specific types:
+
+**templates/cms_forms/field_text.html:**
+```html
+<div class="form-field {{errorClass}} {{requiredClass}}">
+    <label for="{{fieldName}}" class="form-label">
+        {{fieldLabel}}{{#isRequired}} <span class="required-indicator">*</span>{{/isRequired}}
+    </label>
+    <input type="{{fieldType}}" 
+           name="submittedValues[{{fieldName}}]" 
+           id="{{fieldName}}" 
+           value="{{fieldValue}}" 
+           class="form-control {{#hasError}}is-invalid{{/hasError}}" 
+           {{#isRequired}}required{{/isRequired}}
+           {{#placeholder}}placeholder="{{placeholder}}"{{/placeholder}}
+           {{#maxLength}}maxlength="{{maxLength}}"{{/maxLength}}
+           {{#pattern}}pattern="{{pattern}}"{{/pattern}} />
+    {{#helpText}}<div class="form-text">{{helpText}}</div>{{/helpText}}
+    {{#hasError}}<div class="invalid-feedback">{{fieldError}}</div>{{/hasError}}
+</div>
+```
+
+**templates/cms_forms/form.html:**
+```html
+<form method="POST" action="{{submitUrl}}" class="{{cssClass}}">
+    <input type="hidden" name="formKey" value="{{formKey}}" />
+    <input type="hidden" name="successRedirect" value="{{successRedirect}}" />
+    <input type="hidden" name="errorRedirect" value="{{errorRedirect}}" />
+    <div class="hidden">
+        <input type="text" name="{{honeypotFieldName}}" value="" />
+    </div>
+    {{&formFields}}
+    <div class="form-submit">
+        <button type="submit" class="btn btn-primary">{{submitButtonText}}</button>
+    </div>
+</form>
+```
+
+### Forms with System Variables
+Forms can access system variables and enhanced data in templates:
+
+```html
+<!-- Form with the current user context -->
+<cmsForm key="userProfile" fields="name,email,bio"/>
+
+<!-- In the form template, access system variables: -->
+<form method="POST" action="{{submitUrl}}" class="{{cssClass}}">
+    <h2>Update Profile for {{currentRequest.host}}</h2>
+    <p>Current time: {{systemInfo.timestamp}}</p>
+    {{&formFields}}
+    <button type="submit">Update Profile</button>
+</form>
+```
+
+### Event System Integration
+The forms system provides comprehensive event hooks:
+
+```javascript
+// Listen for form events
+cms.events.on('reldens.formsTransformer.beforeRender', (eventData) => {
+    console.log('Rendering form:', eventData.formKey);
+    // Modify form attributes or fields before rendering
+    eventData.formAttributes.cssClass += ' custom-form';
+});
+
+cms.events.on('reldens.dynamicForm.beforeValidation', (eventData) => {
+    console.log('Validating form:', eventData.formKey);
+    // Add custom validation logic
+});
+
+cms.events.on('reldens.dynamicForm.afterSave', (eventData) => {
+    console.log('Form saved:', eventData.result.id);
+    // Send notifications, trigger workflows, etc.
+});
+
+cms.events.on('reldens.dynamicFormRequestHandler.beforeSave', (eventData) => {
+    // Modify prepared values before saving
+    eventData.preparedValues.submissionDate = new Date().toISOString();
+});
+```
+
+### Available Form Events
+- `reldens.formsTransformer.beforeRender` - Before form rendering
+- `reldens.formsTransformer.afterRender` - After form rendering
+- `reldens.dynamicForm.beforeValidation` - Before form validation
+- `reldens.dynamicForm.afterValidation` - After form validation
+- `reldens.dynamicForm.beforeSave` - Before saving to the database
+- `reldens.dynamicForm.afterSave` - After successful save
+- `reldens.dynamicFormRenderer.beforeFieldsRender` - Before rendering fields
+- `reldens.dynamicFormRenderer.afterFieldsRender` - After rendering fields
+- `reldens.dynamicFormRequestHandler.beforeValidation` - Before request validation
+- `reldens.dynamicFormRequestHandler.beforeSave` - Before save process
+- `reldens.dynamicFormRequestHandler.afterSave` - After successful save
+
+### Database Tables
+The forms system uses two main tables:
+
+#### cms_forms Table
+Store form configurations:
+```sql
+CREATE TABLE `cms_forms` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `form_key` VARCHAR(255) NOT NULL UNIQUE,
+    `fields_schema` JSON NOT NULL,
+    `enabled` TINYINT UNSIGNED NOT NULL DEFAULT '0',
+    `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
+    `updated_at` TIMESTAMP NOT NULL DEFAULT (NOW()) ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+);
+```
+
+#### cms_forms_submitted Table
+Store form submissions:
+```sql
+CREATE TABLE `cms_forms_submitted` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `form_id` INT UNSIGNED NOT NULL,
+    `submitted_values` JSON NOT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT (NOW()),
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`form_id`) REFERENCES `cms_forms`(`id`)
+);
+```
+
+### Form Processing Flow
+1. **Template Processing** - `FormsTransformer` finds `<cmsForm>` tags
+2. **Form Loading** - Loads form configuration from database
+3. **Field Filtering** - Applies field filter if specified
+4. **Template Rendering** - Renders form using domain-aware templates
+5. **Form Submission** - POST request to `/dynamic-form` endpoint
+6. **Validation** - Honeypot, required fields, and schema validation
+7. **Data Processing** - Input sanitization and normalization
+8. **Database Storage** - Save to `cms_forms_submitted` table
+9. **Response** - Redirect with success/error parameters
+
+### Advanced Form Usage
+
+#### Multi-Step Forms
+```html
+<!-- Step 1: Basic info -->
+<cmsForm key="applicationForm" fields="name,email,phone"/>
+
+<!-- Step 2: Details (separate form) -->
+<cmsForm key="applicationDetails" fields="experience,portfolio"/>
+```
+
+#### Conditional Field Display
+Use JavaScript to show/hide fields based on selections:
+```html
+<cmsForm key="surveyForm" fields="age,experience,expertise"/>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ageField = document.getElementById('age');
+    const experienceField = document.getElementById('experience');
+    
+    ageField.addEventListener('change', function() {
+        if(parseInt(this.value) >= 18) {
+            experienceField.parentElement.style.display = 'block';
+            return;
+        }
+        experienceField.parentElement.style.display = 'none';
+    });
+});
+</script>
+```
+
+#### AJAX Form Submissions
+Enable JSON responses for AJAX handling:
+```javascript
+const cms = new Manager({
+    enableJsonResponse: true  // Enable JSON responses for forms
+});
+```
+
+```javascript
+// Frontend AJAX handling
+document.querySelector('.dynamic-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const response = await fetch('/dynamic-form', {method: 'POST', body: new FormData(this)});
+    
+    const result = await response.json();
+    if(result.success) {
+        alert('Form submitted successfully!');
+        return;
+    }
+    alert('Error: ' + result.error);
 });
 ```
 
@@ -656,7 +1007,7 @@ The CMS uses a two-tier layout system:
 
 Pages can use different layouts by setting the `layout` field in `cms_pages`:
 - `default` - Header, sidebar, main content, footer
-- `full-width` - Full width without sidebars  
+- `full-width` - Full width without sidebars
 - `minimal` - Basic layout with minimal styling
 
 ### Content Blocks
@@ -695,6 +1046,9 @@ templates/
 │   │   ├── partials/
 │   │   │   ├── header.html
 │   │   │   └── footer.html
+│   │   ├── cms_forms/      # Domain-specific form templates
+│   │   │   ├── form.html
+│   │   │   └── field_text.html
 │   │   ├── page.html       # Domain-specific page wrapper
 │   │   └── index.html
 │   └── dev.example.com/
@@ -702,6 +1056,10 @@ templates/
 ├── partials/
 │   ├── header.html (default)
 │   └── footer.html (default)
+├── cms_forms/              # Default form templates
+│   ├── form.html
+│   ├── field_text.html
+│   └── field_email.html
 ├── translations/
 │   ├── en.json
 │   ├── es.json
@@ -766,6 +1124,12 @@ cms.events.on('reldens.afterContentProcess', (eventData) => {
 cms.events.on('reldens.templateReloader.templatesChanged', (eventData) => {
     console.log('Templates changed:', eventData.changedFiles);
 });
+
+// Listen for form events
+cms.events.on('reldens.dynamicForm.afterSave', (eventData) => {
+    // Send email notifications, trigger workflows, etc.
+    console.log('Form submission received:', eventData.result.id);
+});
 ```
 
 ### Custom Authentication
@@ -822,6 +1186,10 @@ cms.events.on('adminEntityExtraData', ({entitySerializedData, entity}) => {
 - `entities_meta` - Generic metadata storage
 - `cms_pages_meta` - Page-specific metadata
 
+### Forms Tables
+- `cms_forms` - Form configurations with JSON schema
+- `cms_forms_submitted` - Form submissions with JSON data
+
 ### Installation Options
 The installer provides checkboxes for:
 - CMS core tables
@@ -830,6 +1198,7 @@ The installer provides checkboxes for:
 - Default homepage
 - Default content blocks
 - Entity access control rules
+- Dynamic forms system
 
 ## API Reference
 
@@ -907,6 +1276,36 @@ The installer provides checkboxes for:
 - `Search.executeSearch(config)` - Execute search with configuration
 - `SearchRenderer.renderSearchResults(searchResults, config, domain, req)` - Render search results with template data
 
+### Forms System Classes
+
+#### DynamicForm Class
+- `validateFormSubmission(formKey, submittedValues, req)` - Validate form submission
+- `getFormConfig(formKey)` - Load form configuration from database
+- `validateHoneypot(submittedValues)` - Check honeypot field for bots
+- `validateFields(fieldsSchema, submittedValues)` - Schema-based field validation
+- `prepareSubmittedValues(submittedValues, fieldsSchema)` - Process and normalize values
+- `saveFormSubmission(formConfig, preparedValues)` - Save to database
+
+#### DynamicFormRenderer Class
+- `renderForm(formConfig, fieldsToRender, domain, req, attributes)` - Render complete form
+- `renderFormFields(fieldsToRender, domain, req)` - Render field set
+- `renderFormField(field, domain, submittedValues, errors)` - Render individual field
+- `loadFormTemplate(templateName, domain)` - Load form template with domain fallback
+- `findFormTemplate(templateName, domain)` - Template discovery for forms
+
+#### DynamicFormRequestHandler Class
+- `handleFormSubmission(req, res)` - Process POST form submissions
+- `handleBadRequest(res, message)` - Handle validation errors
+- `handleSuccessResponse(req, res, formKey, result)` - Handle successful submissions
+- `buildErrorRedirectPath(req, error, formKey)` - Build error redirect URLs
+- `buildSuccessRedirectPath(successRedirect, formKey)` - Build success redirect URLs
+
+#### FormsTransformer Class
+- `transform(template, domain, req, systemVariables, enhancedData)` - Process cmsForm tags
+- `findAllFormTags(template)` - Find cmsForm tags in template
+- `parseFormAttributes(fullTag)` - Parse tag attributes
+- `parseFieldsFilter(attributes, formConfig)` - Filter fields based on attributes
+
 ### AdminManager Class
 - `setupAdmin()` - Initialize admin panel
 - `generateListRouteContent()` - Entity list pages
@@ -932,16 +1331,28 @@ project/
 │   │   ├── entity-access-manager.js
 │   │   ├── content-renderer.js
 │   │   └── response-manager.js
+│   ├── template-engine/    # Template processing classes
+│   │   └── forms-transformer.js
 │   ├── frontend.js         # Main Frontend orchestrator
 │   ├── template-reloader.js # Template reloading functionality
 │   ├── search-request-handler.js
 │   ├── search.js           # Search functionality
 │   ├── search-renderer.js  # Search result rendering
+│   ├── dynamic-form.js     # Forms validation and processing
+│   ├── dynamic-form-renderer.js # Forms template rendering
+│   ├── dynamic-form-request-handler.js # Forms request handling
 │   └── template-engine.js  # Core template processing
 ├── templates/
 │   ├── layouts/            # Body content layouts
 │   ├── domains/            # Domain-specific templates
+│   │   └── example.com/
+│   │       └── cms_forms/  # Domain-specific form templates
 │   ├── partials/           # Shared template partials
+│   ├── cms_forms/          # Default form templates
+│   │   ├── form.html       # Main form wrapper
+│   │   ├── field_text.html # Text field template
+│   │   ├── field_email.html # Email field template
+│   │   └── field_select.html # Select field template
 │   ├── page.html           # Base HTML wrapper
 │   └── 404.html            # Error page
 ├── translations/

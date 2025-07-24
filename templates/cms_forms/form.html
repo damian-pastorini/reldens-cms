@@ -1,0 +1,22 @@
+{{#showSuccessMessage}}
+<div class="form-message form-success">
+    {{successMessage}}
+</div>
+{{/showSuccessMessage}}
+{{#showErrorMessage}}
+<div class="form-message form-error">
+    {{errorMessage}}
+</div>
+{{/showErrorMessage}}
+<form method="POST" action="{{submitUrl}}" class="{{cssClass}}">
+    <input type="hidden" name="formKey" value="{{formKey}}" />
+    <input type="hidden" name="successRedirect" value="{{successRedirect}}"/>
+    <input type="hidden" name="errorRedirect" value="{{errorRedirect}}"/>
+    <div class="hidden">
+        <input type="text" name="{{honeypotFieldName}}" value=""/>
+    </div>
+    {{&formFields}}
+    <div class="form-submit">
+        <button type="submit" class="btn btn-primary">{{submitButtonText}}</button>
+    </div>
+</form>

@@ -1,0 +1,14 @@
+<div class="form-field {{errorClass}} {{requiredClass}}">
+    <label for="{{fieldName}}" class="form-label">
+        {{fieldLabel}}{{#isRequired}} <span class="required-indicator">*</span>{{/isRequired}}
+    </label>
+    <input type="email"
+           name="submittedValues[{{fieldName}}]"
+           id="{{fieldName}}"
+           value="{{fieldValue}}"
+           class="form-control {{#hasError}}is-invalid{{/hasError}}"
+           {{#isRequired}}required{{/isRequired}}
+    {{#placeholder}}placeholder="{{placeholder}}"{{/placeholder}} />
+    {{#helpText}}<div class="form-text">{{helpText}}</div>{{/helpText}}
+    {{#hasError}}<div class="invalid-feedback">{{fieldError}}</div>{{/hasError}}
+</div>
