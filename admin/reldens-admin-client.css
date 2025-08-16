@@ -607,6 +607,7 @@
         width: 34px;
         height: auto;
         margin-right: 0.5rem;
+        opacity: 0.7;
     }
 
     .search-controls {
@@ -637,132 +638,6 @@
         gap: 0.5rem;
         flex-wrap: wrap;
         flex-shrink: 0;
-    }
-
-    .maps-wizard {
-        .main-action-container.maps-selection {
-            width: 100%;
-
-            .wizard-options-container {
-                display: flex;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                width: 100%;
-
-                /* 3 or more items => 4 columns */
-                .wizard-map-option-container {
-                    flex: 0 0 22%;
-                    padding: 1rem 1% 0;
-                    margin: 1.5rem 0 0;
-                    border: 1px solid #ccc;
-                }
-
-                /* 1 child => 1 columns */
-                .wizard-map-option-container:only-child {
-                    flex: 0 0 100%;
-                    padding: 1rem 0 0;
-                    border: none;
-                }
-
-                /* 2 children => 2 columns */
-                .wizard-map-option-container:first-child:nth-last-child(2),
-                .wizard-map-option-container:last-child:nth-child(2) {
-                    flex: 0 0 47%;
-                }
-
-                & input.map-wizard-option {
-                    top: 2px;
-                    margin-right: 0;
-                }
-            }
-        }
-
-        .checkbox-container {
-            display: flex;
-            flex-direction: row;
-            font-weight: var(--bold);
-        }
-
-        .wizard-options-container {
-            padding: 0;
-            margin-bottom: 1rem;
-
-            & input.map-wizard-option {
-                position: relative;
-                top: -2px;
-                margin-right: 6px;
-            }
-
-            .wizard-map-option-container {
-                display: flex;
-                flex-direction: column;
-                list-style: none;
-                padding-top: 1rem;
-                margin-top: 1.5rem;
-                border-top: 1px solid #ccc;
-
-                & label {
-                    cursor: pointer;
-                }
-
-                & canvas {
-                    width: 100%;
-                    margin-top: 1rem;
-                }
-            }
-
-            .wizard-option-container {
-                list-style: none;
-                margin-bottom: 1rem;
-
-                .main-option {
-                    display: inline-block;
-                    cursor: pointer;
-                }
-
-                .maps-wizard-option-content {
-                    display: none;
-                    padding-left: 1.6rem;
-                }
-
-                &.active {
-                    .maps-wizard-option-content {
-                        display: block;
-                    }
-                }
-            }
-        }
-
-        .maps-wizard-form {
-            align-items: flex-start;
-            flex-direction: column;
-            justify-content: flex-start;
-
-            .submit-container {
-                display: flex;
-            }
-        }
-
-        .sub-map-option-description {
-            display: flex;
-            align-items: center;
-
-            & img.icon-sm {
-                margin-right: 1rem;
-            }
-        }
-
-        .sub-maps-container {
-            display: block;
-
-            &.hidden {
-                display: none;
-            }
-
-            & p {
-                margin: 1.5rem 0 0;
-            }
-        }
     }
 
     .loading {
@@ -820,8 +695,15 @@
             }
         }
 
-        .view-field .field-value img {
-            max-width: 200px;
+        .view-field {
+            .field-value img {
+                max-width: 200px;
+            }
+
+            .admin-audio-player {
+                width: 100%;
+                max-width: 400px;
+            }
         }
 
         .edit-field {
