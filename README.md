@@ -2,15 +2,17 @@
 
 # Reldens CMS
 
-A powerful, flexible Content Management System built with Node.js, featuring an admin panel, multi-domain frontend support, enhanced templating with reusable content blocks, system variables, internationalization, template reloading, dynamic forms, and automated installation.
+A powerful, flexible Content Management System built with Node.js, featuring an admin panel, multi-domain frontend support, enhanced templating with reusable content blocks, system variables, internationalization, template reloading, dynamic forms, and automated installation with subprocess handling.
 
 ## Features
 
 ### - Quick Setup
-- **Web-based installer** with a guided setup process
+- **Web-based installer** with guided setup process and subprocess management
+- **Subprocess installation handling** for complex operations with progress tracking
 - **Automatic database schema creation** and seeding
-- **Environment configuration generation**
-- **Directory structure initialization**
+- **Intelligent dependency management** with npm integration
+- **Environment configuration generation** with template validation
+- **Directory structure initialization** with asset copying
 
 ### - Frontend Engine
 - **Multi-domain support** with domain-specific templates and partials
@@ -65,6 +67,11 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 ### Core Classes
 The CMS uses a modular architecture with specialized classes:
 
+**Installation & Management:**
+- `Installer` - Installation orchestrator with subprocess management and progress tracking
+- `Manager` - Main CMS orchestrator with service initialization and configuration management
+- `MySQLInstaller` - Database-specific installation with schema migration support
+
 **Frontend Orchestrator:**
 - `Frontend` - Main orchestrator class that coordinates all frontend operations
 
@@ -102,11 +109,23 @@ This architecture follows SOLID principles, providing better:
 
 ## Installation
 
-### Method 1: Automated Web Installer
+Install the CMS package and its dependencies:
+```bash
+npm install @reldens/cms
+```
+
+Then use the web installer or create the files manually.
+
+### Method 1: Automated Web Installer with Subprocess Handling
 ```bash
 npx reldens-cms
 ```
-Navigate to `http://localhost:8080` and follow the installation wizard.
+Navigate to `http://localhost:8080` and follow the installation wizard with:
+- **Automatic dependency checking** and installation
+- **Subprocess progress tracking** for complex operations
+- **Database connection validation** with real-time feedback
+- **SSL certificate configuration** for production
+- **Post-installation callbacks** for custom initialization
 
 ### Method 2: Manual Setup
 ```javascript
@@ -118,7 +137,12 @@ const cms = new Manager({
         cmsPages: { public: true, operations: ['read'] },
         articles: { public: true, operations: ['read'] },
         users: { public: false }
-    }
+    },
+    // Enhanced manager configuration
+    authenticationMethod: 'db-users', // or 'custom'
+    adminRoleId: 99,
+    cache: true,
+    reloadTime: 0 // Disable template reloading for production
 });
 
 cms.start();
@@ -201,6 +225,71 @@ const entityConfig = {
 const cms = new Manager({
     entitiesConfig: entityConfig
 });
+```
+
+## Advanced Installation Features
+
+### Subprocess Installation Handling
+The installer now supports complex operations through subprocess management:
+
+```javascript
+const { Installer } = require('@reldens/cms');
+
+const installer = new Installer({
+    projectRoot: process.cwd(),
+    subprocessMaxAttempts: 1800, // 3 minutes timeout
+    postInstallCallback: async (props) => {
+        // Custom initialization after installation
+        console.log('Entities loaded:', Object.keys(props.loadedEntities.rawRegisteredEntities));
+        return true;
+    }
+});
+
+// The installer automatically handles:
+// - Package dependency checking and installation
+// - Database schema creation via subprocess
+// - Prisma client generation with progress tracking
+// - Entity generation with validation
+// - Environment file creation
+// - Directory structure setup
+```
+
+### Enhanced Manager Initialization
+The Manager class now provides comprehensive service initialization:
+
+```javascript
+const cms = new Manager({
+    // Server validation - automatically validates provided instances
+    app: customExpressApp,        // Optional: provide your own Express app
+    appServer: customAppServer,   // Optional: provide your own HTTP server
+    dataServer: customDataServer, // Optional: provide your own database driver
+    adminManager: customAdmin,    // Optional: provide your own admin manager
+    frontend: customFrontend,     // Optional: provide your own frontend handler
+    
+    // Configuration validation
+    adminRoleId: 99,             // Admin role ID for authentication
+    authenticationMethod: 'db-users', // or 'custom'
+    authenticationCallback: async (email, password, roleId) => {
+        // Custom authentication logic
+        return await yourAuthService.validate(email, password, roleId);
+    },
+    
+    // Performance configuration  
+    cache: true,                 // Enable caching
+    reloadTime: -1,             // Template reloading for development
+    
+    // Multi-domain configuration
+    defaultDomain: 'example.com',
+    domainMapping: {'dev.example.com': 'development'},
+    siteKeyMapping: {'example.com': 'main'}
+});
+
+// Manager automatically:
+// - Validates all provided instances
+// - Initializes missing services
+// - Sets up entity access control
+// - Generates admin entities
+// - Configures template reloading
 ```
 
 ## Dynamic Forms System
@@ -1206,6 +1295,22 @@ The installer provides checkboxes for:
 - `start()` - Initialize and start the CMS
 - `isInstalled()` - Check if CMS is installed
 - `initializeServices()` - Initialize all services
+- `validateProvidedServer()` - Validate provided server instance
+- `validateProvidedDataServer()` - Validate provided data server
+- `validateProvidedAdminManager()` - Validate provided admin manager
+- `validateProvidedFrontend()` - Validate provided frontend
+- `buildAppServerConfiguration()` - Build server configuration
+- `initializeCmsAfterInstall(props)` - Post-installation callback
+
+### Installer Class
+- `isInstalled()` - Check installation status
+- `configureAppServerRoutes(app, appServer, appServerFactory, renderEngine)` - Setup installer routes
+- `executeInstallProcess(req, res)` - Complete installation process
+- `runSubprocessInstallation(dbConfig, templateVariables)` - Handle subprocess operations
+- `checkAndInstallPackages(requiredPackages)` - Check and install dependencies
+- `generateEntities(server, isOverride, isInstallationMode, isDryPrisma, dbConfig)` - Generate entities
+- `createEnvFile(templateVariables)` - Create environment configuration
+- `copyAdminDirectory()` - Copy admin assets and templates
 
 ### Frontend Architecture Classes
 
@@ -1312,11 +1417,6 @@ The installer provides checkboxes for:
 - `generateEditRouteContent()` - Entity edit forms
 - `processSaveEntity()` - Handle form submissions
 
-### Installer Class
-- `prepareSetup()` - Setup installation routes
-- `executeInstallProcess()` - Run installation
-- `generateEntities()` - Create entity files
-
 ## File Structure
 
 ```
@@ -1341,7 +1441,11 @@ project/
 │   ├── dynamic-form.js     # Forms validation and processing
 │   ├── dynamic-form-renderer.js # Forms template rendering
 │   ├── dynamic-form-request-handler.js # Forms request handling
-│   └── template-engine.js  # Core template processing
+│   ├── template-engine.js  # Core template processing
+│   ├── installer.js        # Installation with subprocess handling
+│   ├── manager.js          # Main CMS orchestrator
+│   ├── mysql-installer.js  # MySQL-specific installation
+│   └── prisma-subprocess-worker.js # Subprocess worker
 ├── templates/
 │   ├── layouts/            # Body content layouts
 │   ├── domains/            # Domain-specific templates

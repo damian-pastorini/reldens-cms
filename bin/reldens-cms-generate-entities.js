@@ -120,7 +120,12 @@ class CmsEntitiesGenerator
         }
         Logger.debug('Reldens CMS Manager instance created for entities generation.');
         await manager.initializeDataServer();
-        let success = await manager.installer.generateEntities(manager.dataServer, this.isOverride, false, this.isDryPrisma);
+        let success = await manager.installer.generateEntities(
+            manager.dataServer,
+            this.isOverride,
+            false,
+            this.isDryPrisma
+        );
         if(!success){
             Logger.error('Entities generation failed.');
             return false;
@@ -135,7 +140,7 @@ class CmsEntitiesGenerator
         if(!clientPath){
             return false;
         }
-        let resolvedPath = clientPath.startsWith('./') 
+        let resolvedPath = clientPath.startsWith('./')
             ? FileHandler.joinPaths(process.cwd(), clientPath.substring(2))
             : clientPath;
         if(!FileHandler.exists(resolvedPath)){
