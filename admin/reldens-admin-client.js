@@ -4,6 +4,10 @@
  *
  */
 
+if(window.trustedTypes?.createPolicy){
+    trustedTypes.createPolicy('default', {createHTML: s => s});
+}
+
 window.addEventListener('DOMContentLoaded', () => {
 
     // helpers:

@@ -292,6 +292,178 @@ const cms = new Manager({
 // - Configures template reloading
 ```
 
+### Development Mode Detection
+
+The CMS automatically detects development environments based on domain patterns. Domain mapping keys are **no longer automatically treated as development domains**.
+
+**Default Development Patterns:**
+```javascript
+const patterns = [
+    'localhost',
+    '127.0.0.1',
+    '.local',    // Domains ending with .local
+    '.test',     // Domains ending with .test
+    '.dev',      // Domains ending with .dev
+    '.acc',      // Domains ending with .acc
+    '.staging',  // Domains ending with .staging
+    'local.',    // Domains starting with local.
+    'test.',     // Domains starting with test.
+    'dev.',      // Domains starting with dev.
+    'acc.',      // Domains starting with acc.
+    'staging.'   // Domains starting with staging.
+];
+```
+
+**Override Development Patterns:**
+```javascript
+const cms = new Manager({
+    // Only these patterns will trigger development mode
+    developmentPatterns: [
+        'localhost',
+        '127.0.0.1',
+        '.local'
+    ],
+    domainMapping: {
+        // These are just aliases - NOT automatically development
+        'www.example.com': 'example.com',
+        'new.example.com': 'example.com'
+    }
+});
+```
+
+**Important Notes:**
+- The bug in pattern matching where domains with common substrings (e.g., "reldens" in both "acc.reldens.com" and "reldens.new") incorrectly triggered development mode has been fixed.
+- Domain patterns now only match at the start or end of domains, not arbitrary positions.
+- Override `developmentPatterns` in production to prevent staging/acc domains from enabling development mode.
+
+### Security Configuration
+
+Configure Content Security Policy and security headers through the app server config:
+
+#### External Domains for CSP
+
+When configuring external domains for CSP directives, keys can be in either kebab-case or camelCase format:
+
+```javascript
+const cms = new Manager({
+    appServerConfig: {
+        developmentExternalDomains: {
+            // Both formats work - choose whichever you prefer
+            'scriptSrc': ['https://cdn.example.com'],           // camelCase
+            'script-src': ['https://analytics.example.com'],    // kebab-case (auto-converted)
+            'styleSrc': ['https://fonts.googleapis.com'],       // camelCase  
+            'font-src': ['https://fonts.gstatic.com']           // kebab-case (auto-converted)
+        }
+    }
+});
+```
+
+The system automatically:
+- Converts kebab-case keys to camelCase (e.g., `'script-src'` → `scriptSrc`)
+- Adds domains to both the base directive and the `-elem` variant (e.g., `scriptSrc` and `scriptSrcElem`)
+
+#### CSP Directive Merging vs Override
+
+By default, custom CSP directives are **merged** with security defaults:
+
+```javascript
+const cms = new Manager({
+    appServerConfig: {
+        helmetConfig: {
+            contentSecurityPolicy: {
+                // Default: merge with base directives
+                directives: {
+                    scriptSrc: ['https://cdn.example.com']
+                }
+            }
+        }
+    }
+});
+
+// Result: default scriptSrc values + 'https://cdn.example.com'
+```
+
+**Default Base Directives:**
+```javascript
+{
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'"],
+    scriptSrcElem: ["'self'"],
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    styleSrcElem: ["'self'", "'unsafe-inline'"],
+    imgSrc: ["'self'", "data:", "https:"],
+    fontSrc: ["'self'"],
+    connectSrc: ["'self'"],
+    frameAncestors: ["'none'"],
+    baseUri: ["'self'"],
+    formAction: ["'self'"]
+}
+```
+
+To **completely replace** the default directives, use `overrideDirectives: true`:
+
+```javascript
+const cms = new Manager({
+    appServerConfig: {
+        helmetConfig: {
+            contentSecurityPolicy: {
+                overrideDirectives: true,  // Replace defaults entirely
+                directives: {
+                    defaultSrc: ["'self'"],
+                    scriptSrc: ["'self'", "https://trusted-cdn.com"],
+                    styleSrc: ["'self'", "'unsafe-inline'"],
+                    imgSrc: ["'self'", "data:", "https:"],
+                    fontSrc: ["'self'"],
+                    connectSrc: ["'self'"],
+                    frameAncestors: ["'none'"],
+                    baseUri: ["'self'"],
+                    formAction: ["'self'"]
+                }
+            }
+        }
+    }
+});
+```
+
+#### Additional Helmet Security Headers
+
+Configure other security headers through `helmetConfig`:
+
+```javascript
+const cms = new Manager({
+    appServerConfig: {
+        helmetConfig: {
+            // HTTP Strict Transport Security
+            hsts: {
+                maxAge: 31536000,        // 1 year in seconds
+                includeSubDomains: true,
+                preload: true
+            },
+            // Cross-Origin-Opener-Policy
+            crossOriginOpenerPolicy: {
+                policy: "same-origin"
+            },
+            // Cross-Origin-Resource-Policy
+            crossOriginResourcePolicy: {
+                policy: "same-origin"
+            },
+            // Cross-Origin-Embedder-Policy
+            crossOriginEmbedderPolicy: {
+                policy: "require-corp"
+            }
+        }
+    }
+});
+```
+
+**Note:** In development mode, CSP and HSTS are automatically disabled to ease development. Security headers are only enforced when the CMS is not in development mode.
+
+**Trusted Types:** To enable Trusted Types for enhanced XSS protection, add to CSP directives:
+```javascript
+requireTrustedTypesFor: ["'script'"]
+```
+However, this requires updating all JavaScript code to use the Trusted Types API.
+
 ## Dynamic Forms System
 
 ### Basic Form Usage
