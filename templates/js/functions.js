@@ -6,25 +6,25 @@
 
 function getCookie(name)
 {
-    let value = `; ${document.cookie}`;
-    let parts = value.split(`; ${name}=`);
+    let value = '; '+document.cookie;
+    let parts = value.split('; '+name+'=');
     if(2 === parts.length){
-        return parts.pop().split(';').shift()
+        return parts.pop().split(';').shift();
     }
 }
 
 function deleteCookie(name)
 {
-    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = name+'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
 function escapeHTML(str)
 {
-    return str.replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return str.replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 function cloneElement(element)
@@ -35,7 +35,7 @@ function cloneElement(element)
         clonedCanvas.height = element.height;
         let ctx = clonedCanvas.getContext('2d');
         ctx.drawImage(element, 0, 0);
-        return clonedCanvas
+        return clonedCanvas;
     }
     return element.cloneNode(true);
 }
@@ -68,7 +68,7 @@ function showConfirmDialog(callback)
 function activateExpandCollapse()
 {
     let expandCollapseButtons = document.querySelectorAll('[data-expand-collapse]');
-    if(expandCollapseButtons){
+    if(!expandCollapseButtons){
         return;
     }
     for(let expandCollapseButton of expandCollapseButtons){

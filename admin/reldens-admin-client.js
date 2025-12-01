@@ -5,7 +5,10 @@
  */
 
 if(window.trustedTypes?.createPolicy){
-    trustedTypes.createPolicy('default', {createHTML: s => s});
+    trustedTypes.createPolicy('default', {
+        createHTML: s => s,
+        createScriptURL: s => s
+    });
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -198,7 +201,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     let ids = [];
                     for(let checkbox of checkboxes){
                         if(checkbox.checked){
-                            ids.push(parseInt(checkbox.value));
+                            ids.push(checkbox.value);
                         }
                     }
                     if(0 === ids.length){
