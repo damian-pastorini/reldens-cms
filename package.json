@@ -1,7 +1,7 @@
 {
     "name": "@reldens/cms",
     "scope": "@reldens",
-    "version": "0.47.0",
+    "version": "0.48.0",
     "description": "Reldens - CMS",
     "author": "Damian A. Pastorini",
     "license": "MIT",
@@ -12,7 +12,8 @@
     },
     "bin": {
         "reldens-cms": "bin/reldens-cms.js",
-        "reldens-cms-generate-entities": "bin/reldens-cms-generate-entities.js"
+        "reldens-cms-generate-entities": "bin/reldens-cms-generate-entities.js",
+        "reldens-cms-update-password": "bin/reldens-cms-update-password.js"
     },
     "repository": {
         "type": "git",

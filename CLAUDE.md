@@ -14,6 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Template reloading for development
 - Caching system for performance
 - Event-driven architecture for extensibility
+- Password encryption and management - Automatic password encryption with PBKDF2
 
 ## Key Commands
 
@@ -24,9 +25,60 @@ npx reldens-cms
 # Generate entities from database
 npx reldens-cms-generate-entities
 
+# Update user password via CLI
+npx reldens-cms-update-password --email=admin@example.com
+
 # Or via npm scripts
 npm run generate-entities
 ```
+
+## Password Management
+
+### CLI Password Update Command
+
+The CMS provides a dedicated CLI command for securely updating user passwords:
+
+```bash
+# Interactive mode (recommended - will prompt for password)
+npx reldens-cms-update-password --email=admin@example.com
+
+# By username
+npx reldens-cms-update-password --username=admin
+
+# With password in command (less secure)
+npx reldens-cms-update-password --email=admin@example.com --password=newPassword123
+```
+
+**Options**:
+- `--email=[email]` - User email address
+- `--username=[username]` - User username
+- `--password=[password]` - New password (prompted if not provided)
+- `--help` or `-h` - Show this help message
+
+**Notes**:
+- Works with any storage driver (prisma, objection-js, mikro-orm)
+- Uses `RELDENS_STORAGE_DRIVER` environment variable to detect the driver
+- Automatically loads entities and Prisma client (if using Prisma)
+
+### Automatic Password Encryption
+
+The CMS automatically encrypts passwords when saving user records through the admin panel using the `PasswordEncryptionHandler`:
+
+- Listens to `reldens.adminBeforeEntitySave` event
+- Detects password field changes in users entity
+- Encrypts passwords using PBKDF2 (100k iterations, SHA-512)
+- Stores passwords in `salt:hash` format
+- **Enabled by default** - can be disabled with `enablePasswordEncryption: false` in Manager config
+
+**Password Encryption Algorithm**:
+- **Method**: PBKDF2 (Password-Based Key Derivation Function 2)
+- **Iterations**: 100,000
+- **Key Length**: 64 bytes
+- **Digest**: SHA-512
+- **Salt Length**: 32 bytes (randomly generated)
+- **Storage Format**: `salt:hash` (192 characters total)
+
+See `.claude/password-management-guide.md` for comprehensive password management documentation.
 
 ## Architecture Overview
 
@@ -39,6 +91,7 @@ The CMS follows a modular architecture with specialized classes following SOLID 
 - Handles configuration and environment variables
 - Manages multi-domain setup and security
 - Coordinates service lifecycle
+- Initializes password encryption handler
 
 **lib/frontend.js** - Frontend orchestrator
 - Coordinates all frontend operations
@@ -51,6 +104,18 @@ The CMS follows a modular architecture with specialized classes following SOLID 
 - Handles entity CRUD operations
 - Processes file uploads
 - Builds admin UI from entity configurations
+
+**lib/password-encryption-handler.js** - Password encryption handler
+- Automatic password encryption for users entity
+- Event-driven architecture
+- PBKDF2 encryption with 100k iterations
+- Detects and skips already-encrypted passwords
+- Configurable entity and field names
+
+**lib/admin-manager/router-contents.js** - Admin routing and form handling
+- Password field handling (type="password", empty on edit)
+- Password updates optional (skip if empty when editing)
+- Configurable password field names via `passwordFieldNames`
 
 ### Installation & Setup
 
@@ -252,7 +317,7 @@ The CMS uses these core tables:
 - **cms_pages_meta** - Page-specific metadata
 
 ### User Management (Optional)
-- **users** - User authentication
+- **users** - User authentication (with encrypted passwords)
 - **roles** - Role definitions
 
 ## Template System
@@ -399,6 +464,9 @@ const cms = new Manager({
     },
     adminRoleId: 99,
 
+    // Password encryption (enabled by default)
+    enablePasswordEncryption: true,  // Set to false to disable
+
     // Performance
     cache: true,
     reloadTime: -1,  // Development: reload on every request
@@ -444,6 +512,7 @@ The CMS provides extensive event hooks for customization:
 - `reldens.setupAdminRouter` - Setup admin routes
 - `reldens.setupAdminRoutes` - After route setup
 - `reldens.setupAdminManagers` - After manager setup
+- `reldens.adminBeforeEntitySave` - Before entity save (used by password encryption handler)
 
 ### Template Reloading Events
 - `reldens.templateReloader.templatesChanged` - Templates changed
@@ -495,6 +564,8 @@ Define custom entity configurations in `entitiesConfig`:
 ## Security Features
 
 - **Authentication** - Role-based admin access
+- **Password Encryption** - PBKDF2 with 100k iterations, SHA-512
+- **Automatic Password Encryption** - Event-driven encryption on save (enabled by default)
 - **CSRF Protection** - Via session tokens
 - **File Upload Validation** - MIME type and extension checking
 - **Entity Access Control** - Public/private entity rules
@@ -518,6 +589,8 @@ Define custom entity configurations in `entitiesConfig`:
 8. **Event hooks are async** - use await when emitting events
 9. **Template reloading is development-only** - disable in production
 10. **Multi-domain requires proper configuration** - set up domain mapping correctly
+11. **Password encryption is automatic** - enabled by default for users entity
+12. **Never store plain text passwords** - always use Encryptor.encryptPassword()
 
 ## Common File Paths
 
@@ -528,6 +601,8 @@ Define custom entity configurations in `entitiesConfig`:
 - **Public assets:** `public/`
 - **Environment:** `.env`
 - **Install lock:** `install.lock`
+- **Password CLI:** `bin/reldens-cms-update-password.js`
+- **Password handler:** `lib/password-encryption-handler.js`
 
 ## Troubleshooting
 
@@ -550,6 +625,12 @@ Define custom entity configurations in `entitiesConfig`:
 - Regenerate entities after schema changes
 - Check entity access configuration
 - Verify relationship mappings
+
+### Password Issues
+- Verify password is encrypted (contains `:` and is 192 chars)
+- Check `enablePasswordEncryption` is `true` in Manager config
+- Use CLI command for password updates: `npx reldens-cms-update-password`
+- For debugging, set `RELDENS_LOG_LEVEL=9` to see password encryption logs
 
 ## Dependencies
 
