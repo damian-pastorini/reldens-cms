@@ -7,19 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"/>
     <meta name="robots" content="{{meta_robots}}">
     <meta name="theme-color" content="{{meta_theme_color}}"/>
+    <meta property="og:title" content="{{meta_og_title}}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:site_name" content="{{siteHandle}}"/>
+    <meta property="og:url" content="{{currentRequest.fullUrl}}"/>
+    <meta property="og:locale" content="{{locale}}"/>
     {{#meta_description}}
     <meta name="description" content="{{meta_description}}"/>
+    <meta property="og:description" content="{{meta_description}}"/>
     {{/meta_description}}
-    <meta property="og:title" content="{{meta_og_title}}"/>
-    {{#meta_og_description}}
-    <meta property="og:description" content="{{meta_og_description}}"/>
-    {{/meta_og_description}}
     {{#meta_og_image}}
     <meta property="og:image" content="{{meta_og_image}}"/>
     {{/meta_og_image}}
     {{#meta_twitter_card_type}}
     <meta name="twitter:card" content="{{meta_twitter_card_type}}"/>
     {{/meta_twitter_card_type}}
+    {{#article_author}}
+    <meta property="article:author" content="{{article_author}}"/>
+    {{/article_author}}
     {{#publish_date}}
     <meta name="publish-date" content="{{publish_date}}"/>
     {{/publish_date}}
@@ -34,14 +39,13 @@
     <link rel="icon" href="[asset(/favicons/default/favicon.ico)]" type="image/x-icon"/>
     <link rel="shortcut icon" href="[asset(/favicons/default/favicon.ico)]" type="image/x-icon">
     <link rel="manifest" href="[asset(/favicons/default/site.webmanifest)]"/>
-    <!-- CSS and JS -->
-    <link rel="stylesheet" href="[url(/css/styles.css)]"/>
-    <script defer src="[url(/js/cookie-consent.js)]"></script>
+    <link rel="stylesheet" href="[cdn(/css/styles.css)]"/>
 </head>
 <body class="{{siteHandle}}">
-{{&content}}
-{{>cookie-consent}}
-<script defer type="text/javascript" src="[url(/js/functions.js)]"></script>
-<script defer type="text/javascript" src="[url(/js/scripts.js)]"></script>
+    {{&content}}
+    {{>cookie-consent}}
+    <script defer type="text/javascript" src="[cdn(/js/functions.js)]"></script>
+    <script defer type="text/javascript" src="[cdn(/js/scripts.js)]"></script>
+    <script defer src="[cdn(/js/cookie-consent.js)]"></script>
 </body>
 </html>

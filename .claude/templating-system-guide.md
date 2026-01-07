@@ -30,7 +30,13 @@ Every template has access to system variables providing context about the curren
 
 ## Template Functions
 
-### URL Generation
+### URL Transformers
+
+The CMS provides three URL transformers with different behaviors for CDN support:
+
+#### [url()] - Public URL (No CDN)
+
+Generates URLs using the **public base URL** without CDN support.
 
 ```html
 [url(/articles)]
@@ -38,11 +44,83 @@ Every template has access to system variables providing context about the curren
 [url(/css/styles.css)]
 ```
 
-### Asset URLs
+**Output:**
+- Without CDN: `https://example.com/css/styles.css`
+- With CDN configured: `https://example.com/css/styles.css` (same, CDN ignored)
+
+**Use for:** Internal application routes, API endpoints, form actions.
+
+#### [cdn()] - CDN or Public URL
+
+Generates URLs using the **CDN URL if configured**, otherwise falls back to public URL.
 
 ```html
-[asset(/assets/images/logo.png)]
+[cdn(/css/styles.css)]
+[cdn(/js/scripts.js)]
+[cdn(/assets/web/logo.png)]
 ```
+
+**Output:**
+- Without CDN: `https://example.com/css/styles.css`
+- With CDN configured: `https://cdn.example.com/css/styles.css`
+
+**Use for:** Static assets outside `/assets` folder (CSS, JS, fonts, etc.).
+
+#### [asset()] - CDN or Public URL + /assets Prefix
+
+Generates URLs using the **CDN URL if configured** and **automatically prepends `/assets`** to the path.
+
+```html
+[asset(/web/logo.png)]
+[asset(/images/hero.jpg)]
+```
+
+**Output:**
+- Without CDN: `https://example.com/assets/web/logo.png`
+- With CDN configured: `https://cdn.example.com/assets/web/logo.png`
+
+**Use for:** Static assets inside `/assets` folder (images, downloads, media files).
+
+---
+
+### URL Transformer Best Practices
+
+**Based on folder structure:**
+
+```
+public/
+  assets/          # Use [asset(/file)] OR [cdn(/assets/file)]
+    web/
+    images/
+    downloads/
+  css/             # Use [cdn(/css/file)]
+  js/              # Use [cdn(/js/file)]
+  fonts/           # Use [cdn(/fonts/file)]
+```
+
+**Examples:**
+
+```html
+<!-- Files in public/assets/ -->
+<meta property="og:image" content="[asset(/web/logo.png)]"/>
+<img src="[asset(/images/hero.jpg)]" alt="Hero"/>
+
+<!-- Files in public/css/, public/js/, etc. -->
+<link rel="stylesheet" href="[cdn(/css/styles.css)]"/>
+<script src="[cdn(/js/scripts.js)]"></script>
+
+<!-- Internal routes -->
+<form action="[url(/api/submit)]" method="post">
+<a href="[url(/articles)]">Articles</a>
+```
+
+**Key Rules:**
+- `[asset(/file)]` adds `/assets` prefix automatically → Use for files in `/assets` folder
+- `[cdn(/assets/file)]` requires full path → Alternative for files in `/assets` folder
+- `[cdn(/css/file)]` requires full path → Use for files outside `/assets` (css, js, fonts)
+- `[url(/path)]` never uses CDN → Use for application routes only
+
+**Recommendation:** Use `[asset()]` for `/assets` files (cleaner syntax), `[cdn()]` for everything else.
 
 ### Date Formatting
 

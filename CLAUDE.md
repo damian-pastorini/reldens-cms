@@ -407,12 +407,20 @@ templates/
 
 **Template Functions:**
 ```html
-[url(/articles)]                    <!-- URL generation -->
-[asset(/img/logo.png)]              <!-- Asset URLs -->
+[url(/articles)]                    <!-- URL generation (no CDN) -->
+[cdn(/css/styles.css)]              <!-- CDN URL (or public URL if no CDN) -->
+[asset(/web/logo.png)]              <!-- Asset URL with /assets prefix (uses CDN if available) -->
 [date(now, Y-m-d)]                  <!-- Date formatting -->
 [translate(welcome.message)]        <!-- i18n -->
 [t(key, Default, {var: value})]     <!-- i18n with interpolation -->
 ```
+
+**URL Transformer Selection:**
+- `[url()]` - Application routes (never uses CDN)
+- `[cdn()]` - Static assets outside `/assets` (CSS, JS, fonts)
+- `[asset()]` - Static assets inside `/assets` folder (images, media)
+
+See `.claude/templating-system-guide.md` for detailed URL transformer documentation.
 
 ## Configuration
 
