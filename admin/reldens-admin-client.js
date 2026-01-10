@@ -242,6 +242,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 ? 'Success!'
                 : 'There was an error: '+escapeHTML(errorMessages[result] || result);
             deleteCookie('result');
+            queryParams.delete('result');
+            let newUrl = location.pathname + (queryParams.toString() ? '?' + queryParams.toString() : '');
+            window.history.replaceState({}, '', newUrl);
         }
     }
 
@@ -280,6 +283,37 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+    }
+
+    // remove upload button functionality:
+    let removeUploadButtons = document.querySelectorAll('.remove-upload-btn');
+    if(removeUploadButtons){
+        for(let button of removeUploadButtons){
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                let fieldName = button.getAttribute('data-field');
+                let fileInput = document.getElementById(fieldName);
+                let currentFileDisplay = document.querySelector('.upload-current-file[data-field="'+fieldName+'"]');
+                if(currentFileDisplay){
+                    currentFileDisplay.style.display = 'none';
+                }
+                if(fileInput){
+                    fileInput.value = '';
+                    let form = fileInput.closest('form');
+                    if(form){
+                        let clearFieldName = 'clear_'+fieldName;
+                        let existingClearInput = form.querySelector('input[name="'+clearFieldName+'"]');
+                        if(!existingClearInput){
+                            let clearInput = document.createElement('input');
+                            clearInput.type = 'hidden';
+                            clearInput.name = clearFieldName;
+                            clearInput.value = '1';
+                            form.appendChild(clearInput);
+                        }
+                    }
+                }
+            });
+        }
     }
 
 });

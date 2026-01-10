@@ -521,9 +521,15 @@ The CMS provides extensive event hooks for customization:
 - `reldens.setupAdminRoutes` - After route setup
 - `reldens.setupAdminManagers` - After manager setup
 - `reldens.adminBeforeEntitySave` - Before entity save (used by password encryption handler)
+- `reldens.adminAfterEntitySave` - After entity save
+- `reldens.adminViewPropertiesPopulation` - Add content to view pages
+- `reldens.adminEditPropertiesPopulation` - Add content to edit pages
+- `reldens.adminListPropertiesPopulation` - Add content to list pages
 
 ### Template Reloading Events
 - `reldens.templateReloader.templatesChanged` - Templates changed
+
+See `.claude/advanced-usage-guide.md` for comprehensive event-driven customization patterns and examples.
 
 ## Development Workflow
 
@@ -568,6 +574,67 @@ Define custom entity configurations in `entitiesConfig`:
     }
 }
 ```
+
+### Entity Config Overrides
+Override generated entity configurations without editing generated files using `entitiesConfigOverride`:
+```javascript
+class CmsPagesOverride
+{
+
+    /**
+     * @param {Object} baseConfig
+     * @param {Object} props
+     * @returns {Object}
+     */
+    static propertiesConfig(baseConfig, props)
+    {
+        baseConfig.properties.meta_og_image = {
+            dbType: 'varchar',
+            isUpload: true,
+            allowedTypes: 'image',
+            bucket: 'public/assets/media',
+            bucketPath: '/assets/media/'
+        };
+        return baseConfig;
+    }
+
+}
+
+const manager = new Manager({
+    entitiesConfigOverride: {
+        'cmsPages': CmsPagesOverride  // Use camelCase key from entities-config.js
+    }
+});
+```
+
+**CRITICAL: Entity keys must match exactly as defined in `generated-entities/entities-config.js`**
+- Use camelCase: `'cmsPages'`, `'cmsBlocks'`, `'cmsForms'`
+- NOT kebab-case: `'cms-pages'`, `'cms-blocks'`, `'cms-forms'`
+
+Supports three override patterns:
+- **Class-based**: Class with static `propertiesConfig(baseConfig, props)` method
+- **Function-based**: Function that receives `(baseConfig, props)` and returns modified config
+- **Object-based**: Plain object that gets deep merged with base config
+
+**Upload Field Configuration:**
+- `allowedTypes`: Must be a STRING ('image', 'audio', 'text'), NOT an array
+- `bucket`: Relative path from projectRoot (e.g., 'public/assets/media')
+- `bucketPath`: URL path for display (e.g., '/assets/media/')
+- Do NOT use spread syntax - replace entire property object
+- Do NOT use FileHandler.joinPaths() - bucket paths are relative to projectRoot
+
+**Upload Field Removal:**
+- Admin edit pages automatically show an "X" button before uploaded filenames
+- Clicking X creates hidden input `clear_fieldname=1` in form
+- Server detects this and sets field to null in database
+- File remains on disk - only database field is cleared
+- Template: `admin/templates/fields/edit/file-claude.html`
+- Client JS: `admin/reldens-admin-client-claude.js` (remove upload functionality)
+- Server handling: `lib/admin-manager/router-contents-claude.js` (clear_ parameter detection)
+
+**Example subscribers**: See `lib/cache/add-cache-button-subscriber.js` and `lib/cache/save-and-clear-cache-subscriber.js` for complete working examples of event-driven UI customizations.
+
+See `.claude/advanced-usage-guide.md` for detailed examples.
 
 ## Security Features
 
