@@ -8,6 +8,7 @@
 
 const { Manager } = require('../index');
 const { EntitiesLoader } = require('../lib/entities-loader');
+const { PrismaClientLoader } = require('@reldens/storage');
 const { Logger, sc } = require('@reldens/utils');
 const { FileHandler, Encryptor } = require('@reldens/server-utils');
 const dotenv = require('dotenv');
@@ -127,7 +128,7 @@ class CmsPasswordUpdater
             entitiesTranslations: loadedEntities.entitiesTranslations
         };
         if('prisma' === storageDriver){
-            let prismaClient = this.loadPrismaClient();
+            let prismaClient = PrismaClientLoader.load(this.projectRoot, null, null);
             if(prismaClient){
                 managerConfig.prismaClient = prismaClient;
                 Logger.debug('Prisma client loaded and configured.');
@@ -152,22 +153,6 @@ class CmsPasswordUpdater
         }
         Logger.info('Password updated successfully!');
         return true;
-    }
-
-    loadPrismaClient()
-    {
-        let clientPath = FileHandler.joinPaths(this.projectRoot, 'prisma', 'client');
-        if(!FileHandler.exists(clientPath)){
-            Logger.debug('Prisma client path not found: '+clientPath);
-            return false;
-        }
-        try {
-            let { PrismaClient } = require(clientPath);
-            return new PrismaClient();
-        } catch(error) {
-            Logger.error('Failed to load Prisma client: '+error.message);
-            return false;
-        }
     }
 
     async promptPassword()

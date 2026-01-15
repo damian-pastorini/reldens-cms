@@ -28,9 +28,15 @@ npx reldens-cms-generate-entities
 # Update user password via CLI
 npx reldens-cms-update-password --email=admin@example.com
 
+# Generate sitemap.xml files from routes
+npx reldens-cms-generate-sitemap
+npx reldens-cms-generate-sitemap --domain=example.com
+
 # Or via npm scripts
 npm run generate-entities
 ```
+
+See `.claude/sitemap-generator-guide.md` for comprehensive sitemap generation documentation.
 
 ## Password Management
 
@@ -719,4 +725,8 @@ See `.claude/advanced-usage-guide.md` for detailed examples.
 
 - Main README.md for user documentation
 - Package.json for dependency versions
+- `.claude/sitemap-generator-guide.md` - Sitemap generation documentation
+- `.claude/password-management-guide.md` - Password management documentation
+- `.claude/templating-system-guide.md` - Template system documentation
+- `.claude/advanced-usage-guide.md` - Advanced customization patterns
 - License: MIT

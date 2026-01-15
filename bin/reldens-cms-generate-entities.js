@@ -7,6 +7,7 @@
  */
 
 const { Manager } = require('../index');
+const { PrismaClientLoader } = require('@reldens/storage');
 const { Logger, sc } = require('@reldens/utils');
 const { FileHandler } = require('@reldens/server-utils');
 const readline = require('readline');
@@ -108,7 +109,7 @@ class CmsEntitiesGenerator
         }
         let managerConfig = {projectRoot: this.projectRoot};
         if('prisma' === this.driver){
-            let prismaClient = await this.loadPrismaClient();
+            let prismaClient = PrismaClientLoader.load(this.projectRoot, this.prismaClientPath, null);
             if(prismaClient){
                 managerConfig.prismaClient = prismaClient;
             }
@@ -132,34 +133,6 @@ class CmsEntitiesGenerator
         }
         Logger.info('Entities generation completed successfully!');
         return true;
-    }
-
-    async loadPrismaClient()
-    {
-        let clientPath = this.prismaClientPath;
-        if(!clientPath){
-            return false;
-        }
-        let resolvedPath = clientPath.startsWith('./')
-            ? FileHandler.joinPaths(process.cwd(), clientPath.substring(2))
-            : clientPath;
-        if(!FileHandler.exists(resolvedPath)){
-            Logger.error('Prisma client not found at: '+resolvedPath);
-            return false;
-        }
-        try {
-            let PrismaClientModule = require(resolvedPath);
-            let PrismaClient = PrismaClientModule.PrismaClient || PrismaClientModule.default?.PrismaClient;
-            if(!PrismaClient){
-                Logger.error('PrismaClient not found in module: '+resolvedPath);
-                return false;
-            }
-            Logger.debug('Prisma client loaded from: '+resolvedPath);
-            return new PrismaClient();
-        } catch (error) {
-            Logger.error('Failed to load Prisma client from '+resolvedPath+': '+error.message);
-            return false;
-        }
     }
 
     async confirmOverride()
