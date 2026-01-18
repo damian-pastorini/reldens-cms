@@ -1,5 +1,5 @@
 
--- Default db-users authentication:
+-- Default db-users authentication
 
 CREATE TABLE IF NOT EXISTS `users` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

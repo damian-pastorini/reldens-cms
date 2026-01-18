@@ -347,3 +347,32 @@ INSERT INTO cms_blocks (name, title, content) VALUES
 ('article-sidebar', 'Article Categories',
 '<div class="categories"><h3>Categories</h3><ul><li><a href="[url(/articles/technology)]">Technology</a></li></ul></div>');
 ```
+
+## Troubleshooting
+
+### Template File Not Found DEBUG Logs
+
+**IMPORTANT:** The "Template file not found" messages logged at DEBUG level are **normal template resolution behavior** and should be ignored.
+
+The `TemplateResolver` uses a fallback system that tries multiple paths in order:
+1. Domain-specific template (e.g., `templates/domains/example.com/sitemap.xml`)
+2. Default domain template (e.g., `templates/domains/default/sitemap.xml`)
+3. Base template (e.g., `templates/sitemap.xml`)
+
+When searching for templates, the resolver logs a DEBUG message for each path that doesn't exist before trying the next fallback. This is expected behavior - **only the final successful path matters**.
+
+**Example logs that are NORMAL (only visible with RELDENS_LOG_LEVEL=9):**
+```
+2026-01-17 07:00:39 - DEBUG - Template file not found: "layouts/raw" in path: "D:/project/templates/domains/example.com/"
+2026-01-17 07:00:39 - DEBUG - Template file not found: "sitemap" in path: "D:/project/templates/domains/example.com/"
+```
+
+These DEBUG logs do NOT indicate a problem if the template is eventually found in the base path.
+
+**When to investigate:**
+- ERROR level log for template not found
+- Template rendering fails completely
+- 404 error when accessing the route
+
+**Never waste time analyzing DEBUG logs for "Template file not found" - they are part of normal template resolution.
+```

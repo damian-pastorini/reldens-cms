@@ -1,5 +1,5 @@
 
--- Default admin user:
+-- Default admin user
 
 REPLACE INTO `users` (`id`, `email`, `username`, `password`, `role_id`, `status`)
 VALUES (

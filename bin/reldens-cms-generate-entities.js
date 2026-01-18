@@ -9,7 +9,6 @@
 const { Manager } = require('../index');
 const { PrismaClientLoader } = require('@reldens/storage');
 const { Logger, sc } = require('@reldens/utils');
-const { FileHandler } = require('@reldens/server-utils');
 const readline = require('readline');
 
 class CmsEntitiesGenerator

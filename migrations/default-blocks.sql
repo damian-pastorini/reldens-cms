@@ -1,5 +1,5 @@
 
--- Default CMS blocks:
+-- Default CMS blocks
 
 REPLACE INTO `cms_blocks` (`name`, `title`, `content`, `enabled`) VALUES
     ('header-main', 'Main Header', '{{>header}}', 1),

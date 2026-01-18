@@ -12,7 +12,6 @@ CREATE TABLE `cms_forms` (
     UNIQUE INDEX `form_key` (`form_key`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 CREATE TABLE `cms_forms_submitted` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `form_id` INT UNSIGNED NOT NULL,
