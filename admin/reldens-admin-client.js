@@ -171,7 +171,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     let newUrl = url.pathname + '?' + params;
                     window.location.href = newUrl;
                     return false;
-                })
+                });
             }
         }
     }
