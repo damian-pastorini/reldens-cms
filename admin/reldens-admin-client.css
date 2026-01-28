@@ -134,6 +134,11 @@
         &:hover {
             background-color: var(--red);
         }
+
+        svg, path {
+            width: 22px;
+            fill: var(--white);
+        }
     }
 
     .icon {
@@ -360,7 +365,7 @@
         }
 
         & th.field {
-            padding: 1.5rem 0;
+            padding: 1rem 0;
 
             & span {
                 color: var(--white);
@@ -383,17 +388,21 @@
 
             .field-actions-container {
                 display: flex;
-                flex-direction: column;
-                justify-content: center;
+                flex-direction: row;
+                justify-content: space-around;
                 align-items: center;
                 margin: 0 1rem;
 
                 .button {
-                    margin-bottom: 1rem;
+                    border: 1px solid var(--white);
 
                     &.list-select {
                         margin-bottom: 0;
                     }
+                }
+
+                .list-delete-selection {
+                    padding: 0.35rem 1rem;
                 }
             }
 
@@ -422,7 +431,7 @@
 
         .field-edit {
             & span {
-                & svg, path {
+                & svg, & path {
                     width: 24px;
                     color: var(--lightBlue);
                 }
@@ -431,9 +440,9 @@
 
         .field-delete {
             & span {
-                & svg, path {
+                & svg, & path {
                     width: 24px;
-                    fill: var(--lightBlue);
+                    fill: var(--red);
                 }
             }
         }

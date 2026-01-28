@@ -4,12 +4,14 @@
  *
  */
 
-if(window.trustedTypes?.createPolicy){
-    trustedTypes.createPolicy('default', {
-        createHTML: s => s,
-        createScriptURL: s => s
+let trustedTypesPolicy = null;
+if(window.trustedTypes && window.trustedTypes.createPolicy){
+    trustedTypesPolicy = window.trustedTypes.createPolicy('default', {
+        createHTML: (s) => s,
+        createScriptURL: (s) => s
     });
 }
+window.trustedTypesPolicy = trustedTypesPolicy;
 
 window.addEventListener('DOMContentLoaded', () => {
 
