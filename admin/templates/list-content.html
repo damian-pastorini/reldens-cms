@@ -15,16 +15,22 @@
         </div>
     </th>
     {{#fieldsHeaders}}
-    <th class="field field-{{&name}}">
-        <span>{{&value}}</span>
+    <th class="field field-{{&name}} sortable{{#isSorted}} sorted sorted-{{&sortDirection}}{{/isSorted}}" data-column="{{&name}}">
+        <div class="header-content">
+            <span class="header-label">{{&value}}</span>
+            <span class="sort-indicators">
+                <svg class="sort-icon sort-asc{{#isSortedAsc}} active{{/isSortedAsc}}" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 6L5 0L10 6Z"/>
+                </svg>
+                <svg class="sort-icon sort-desc{{#isSortedDesc}} active{{/isSortedDesc}}" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0L5 6L10 0Z"/>
+                </svg>
+            </span>
+        </div>
     </th>
     {{/fieldsHeaders}}
-    <th class="field field-edit">
-        <span>Edit</span>
-    </th>
-    <th class="field field-delete">
-        <span>Delete</span>
-    </th>
+    <th class="field field-edit"></th>
+    <th class="field field-delete"></th>
 </tr>
 {{#rows}}
 <tr class="row">

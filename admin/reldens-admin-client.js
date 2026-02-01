@@ -170,11 +170,66 @@ window.addEventListener('DOMContentLoaded', () => {
                             params.set(filterName, filterInput.value);
                         }
                     }
-                    let newUrl = url.pathname + '?' + params;
+                    let sortedHeader = document.querySelector('th.sorted');
+                    if(sortedHeader){
+                        let columnName = sortedHeader.getAttribute('data-column');
+                        let sortDirection = sortedHeader.classList.contains('sorted-asc') ? 'asc' : 'desc';
+                        params.set('sortBy', columnName);
+                        params.set('sortDirection', sortDirection);
+                    }
+                    let newUrl = url.pathname+'?'+params;
                     window.location.href = newUrl;
                     return false;
                 });
             }
+        }
+    }
+
+    // column sorting functionality:
+    let sortableHeaders = document.querySelectorAll('th.sortable');
+    if(sortableHeaders){
+        for(let header of sortableHeaders){
+            header.addEventListener('click', () => {
+                let columnName = header.getAttribute('data-column');
+                let currentSortDirection = header.classList.contains('sorted-asc') ? 'asc' : header.classList.contains('sorted-desc') ? 'desc' : '';
+                let newSortDirection = 'asc';
+                if('asc' === currentSortDirection){
+                    newSortDirection = 'desc';
+                }
+                let sortForm = document.createElement('form');
+                sortForm.method = 'POST';
+                sortForm.action = window.location.pathname;
+                let sortByInput = document.createElement('input');
+                sortByInput.type = 'hidden';
+                sortByInput.name = 'sortBy';
+                sortByInput.value = columnName;
+                sortForm.appendChild(sortByInput);
+                let sortDirectionInput = document.createElement('input');
+                sortDirectionInput.type = 'hidden';
+                sortDirectionInput.name = 'sortDirection';
+                sortDirectionInput.value = newSortDirection;
+                sortForm.appendChild(sortDirectionInput);
+                let entitySearchInput = document.querySelector('#entityFilterTerm');
+                if(entitySearchInput && entitySearchInput.value){
+                    let filterTermInput = document.createElement('input');
+                    filterTermInput.type = 'hidden';
+                    filterTermInput.name = 'entityFilterTerm';
+                    filterTermInput.value = entitySearchInput.value;
+                    sortForm.appendChild(filterTermInput);
+                }
+                let allFilters = document.querySelectorAll('.filters-toggle-content .filter input');
+                for(let filterInput of allFilters){
+                    if(filterInput.value){
+                        let filterFieldInput = document.createElement('input');
+                        filterFieldInput.type = 'hidden';
+                        filterFieldInput.name = filterInput.name;
+                        filterFieldInput.value = filterInput.value;
+                        sortForm.appendChild(filterFieldInput);
+                    }
+                }
+                document.body.appendChild(sortForm);
+                sortForm.submit();
+            });
         }
     }
 
