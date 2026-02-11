@@ -27,6 +27,14 @@
                 </svg>
             </span>
         </div>
+        <form class="sort-form hidden" method="POST" action="{{&listRoute}}">
+            <input type="hidden" name="sortBy" value=""/>
+            <input type="hidden" name="sortDirection" value=""/>
+            <input type="hidden" name="entityFilterTerm" value=""/>
+            {{#filters}}
+            <input type="hidden" name="filters[{{&propertyKey}}]" value="" data-filter-key="{{&propertyKey}}"/>
+            {{/filters}}
+        </form>
     </th>
     {{/fieldsHeaders}}
     <th class="field field-edit"></th>

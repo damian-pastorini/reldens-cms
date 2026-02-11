@@ -177,8 +177,7 @@ window.addEventListener('DOMContentLoaded', () => {
                         params.set('sortBy', columnName);
                         params.set('sortDirection', sortDirection);
                     }
-                    let newUrl = url.pathname+'?'+params;
-                    window.location.href = newUrl;
+                    window.location.href = url.pathname+'?'+params;
                     return false;
                 });
             }
@@ -190,44 +189,35 @@ window.addEventListener('DOMContentLoaded', () => {
     if(sortableHeaders){
         for(let header of sortableHeaders){
             header.addEventListener('click', () => {
+                let sortForm = header.querySelector('.sort-form');
+                if(!sortForm){
+                    return;
+                }
                 let columnName = header.getAttribute('data-column');
-                let currentSortDirection = header.classList.contains('sorted-asc') ? 'asc' : header.classList.contains('sorted-desc') ? 'desc' : '';
+                let currentSortDirection = header.classList.contains('sorted-asc')
+                    ? 'asc'
+                    : header.classList.contains('sorted-desc') ? 'desc' : '';
                 let newSortDirection = 'asc';
                 if('asc' === currentSortDirection){
                     newSortDirection = 'desc';
                 }
-                let sortForm = document.createElement('form');
-                sortForm.method = 'POST';
-                sortForm.action = window.location.pathname;
-                let sortByInput = document.createElement('input');
-                sortByInput.type = 'hidden';
-                sortByInput.name = 'sortBy';
+                let sortByInput = sortForm.querySelector('input[name="sortBy"]');
+                let sortDirectionInput = sortForm.querySelector('input[name="sortDirection"]');
                 sortByInput.value = columnName;
-                sortForm.appendChild(sortByInput);
-                let sortDirectionInput = document.createElement('input');
-                sortDirectionInput.type = 'hidden';
-                sortDirectionInput.name = 'sortDirection';
                 sortDirectionInput.value = newSortDirection;
-                sortForm.appendChild(sortDirectionInput);
                 let entitySearchInput = document.querySelector('#entityFilterTerm');
-                if(entitySearchInput && entitySearchInput.value){
-                    let filterTermInput = document.createElement('input');
-                    filterTermInput.type = 'hidden';
-                    filterTermInput.name = 'entityFilterTerm';
-                    filterTermInput.value = entitySearchInput.value;
-                    sortForm.appendChild(filterTermInput);
+                let entityFilterTermInput = sortForm.querySelector('input[name="entityFilterTerm"]');
+                if(entityFilterTermInput){
+                    entityFilterTermInput.value = entitySearchInput?.value || '';
                 }
                 let allFilters = document.querySelectorAll('.filters-toggle-content .filter input');
                 for(let filterInput of allFilters){
-                    if(filterInput.value){
-                        let filterFieldInput = document.createElement('input');
-                        filterFieldInput.type = 'hidden';
-                        filterFieldInput.name = filterInput.name;
-                        filterFieldInput.value = filterInput.value;
-                        sortForm.appendChild(filterFieldInput);
+                    let filterName = filterInput.name.replace('filters[', '').replace(']', '');
+                    let sortFormFilterInput = sortForm.querySelector('input[data-filter-key="'+filterName+'"]');
+                    if(sortFormFilterInput){
+                        sortFormFilterInput.value = filterInput.value;
                     }
                 }
-                document.body.appendChild(sortForm);
                 sortForm.submit();
             });
         }
