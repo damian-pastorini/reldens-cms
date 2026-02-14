@@ -212,7 +212,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
                 let allFilters = document.querySelectorAll('.filters-toggle-content .filter input');
                 for(let filterInput of allFilters){
-                    let filterName = filterInput.name.replace('filters[', '').replace(']', '');
+                    let filterName = filterInput.name.replace(/^filters\[/, '').replace(/\]$/, '');
                     let sortFormFilterInput = sortForm.querySelector('input[data-filter-key="'+filterName+'"]');
                     if(sortFormFilterInput){
                         sortFormFilterInput.value = filterInput.value;
@@ -339,26 +339,60 @@ window.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (event) => {
                 event.preventDefault();
                 let fieldName = button.getAttribute('data-field');
+                let fileName = button.getAttribute('data-filename');
                 let fileInput = document.getElementById(fieldName);
-                let currentFileDisplay = document.querySelector('.upload-current-file[data-field="'+fieldName+'"]');
-                if(currentFileDisplay){
-                    currentFileDisplay.style.display = 'none';
+                let form = fileInput?.closest('form');
+                if(!fileInput){
+                    return;
                 }
-                if(fileInput){
-                    fileInput.value = '';
-                    let form = fileInput.closest('form');
-                    if(form){
-                        let clearFieldName = 'clear_'+fieldName;
-                        let existingClearInput = form.querySelector('input[name="'+clearFieldName+'"]');
-                        if(!existingClearInput){
-                            let clearInput = document.createElement('input');
-                            clearInput.type = 'hidden';
-                            clearInput.name = clearFieldName;
-                            clearInput.value = '1';
-                            form.appendChild(clearInput);
+                if(!form){
+                    return;
+                }
+                let currentFileDisplay = button.closest('.upload-current-file');
+                let container = button.closest('.upload-files-container');
+                let isRequired = container && 'true' === container.dataset.required;
+                if(isRequired){
+                    let remainingFiles = container.querySelectorAll('.upload-current-file');
+                    if(2 === remainingFiles.length){
+                        let allRemoveButtons = container.querySelectorAll('.remove-upload-btn');
+                        for(let removeBtn of allRemoveButtons){
+                            removeBtn.remove();
                         }
                     }
                 }
+                if(currentFileDisplay){
+                    currentFileDisplay.remove();
+                }
+                if(fileName){
+                    let hiddenFieldName = 'removed_'+fieldName;
+                    let existingHiddenInput = form.querySelector('input[name="'+hiddenFieldName+'"]');
+                    if(existingHiddenInput){
+                        let currentValue = existingHiddenInput.value;
+                        let filesArray = currentValue ? currentValue.split(',') : [];
+                        if(-1 === filesArray.indexOf(fileName)){
+                            filesArray.push(fileName);
+                        }
+                        existingHiddenInput.value = filesArray.join(',');
+                        return;
+                    }
+                    let hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = hiddenFieldName;
+                    hiddenInput.value = fileName;
+                    form.appendChild(hiddenInput);
+                    return;
+                }
+                fileInput.value = '';
+                let clearFieldName = 'clear_'+fieldName;
+                let existingClearInput = form.querySelector('input[name="'+clearFieldName+'"]');
+                if(existingClearInput){
+                    return;
+                }
+                let clearInput = document.createElement('input');
+                clearInput.type = 'hidden';
+                clearInput.name = clearFieldName;
+                clearInput.value = '1';
+                form.appendChild(clearInput);
             });
         }
     }
