@@ -17,6 +17,7 @@ body {
 .header {
     text-align: center;
     margin-bottom: 30px;
+    font-family: "Play", sans-serif;
 }
 
 .title {
@@ -38,6 +39,14 @@ body {
 
 .input-box {
     margin-bottom: 15px;
+}
+
+.input-checkbox {
+    display: flex;
+
+    label {
+        margin-bottom: 0;
+    }
 }
 
 label {

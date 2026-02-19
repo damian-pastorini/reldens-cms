@@ -1,0 +1,14 @@
+<div class="col-lg-6 mt-2 mb-2">
+    <div class="entry-item">
+        <div class="pic use-circle">
+            <img src="{{&row.json_data.image}}" alt="{{row.title}}"/>
+        </div>
+        <div class="entry-info">
+            <a href="{{&row.routes.path}}"{{targetBlank}}>
+                <h4>{{ row.title }}</h4>
+                {{&row.json_data.shortDescription}}
+                <p>{{&row.json_data.date}}</p>
+            </a>
+        </div>
+    </div>
+</div>

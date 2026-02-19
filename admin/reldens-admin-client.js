@@ -4,6 +4,15 @@
  *
  */
 
+let trustedTypesPolicy = null;
+if(window.trustedTypes && window.trustedTypes.createPolicy){
+    trustedTypesPolicy = window.trustedTypes.createPolicy('default', {
+        createHTML: (s) => s,
+        createScriptURL: (s) => s
+    });
+}
+window.trustedTypesPolicy = trustedTypesPolicy;
+
 window.addEventListener('DOMContentLoaded', () => {
 
     // helpers:
@@ -11,42 +20,6 @@ window.addEventListener('DOMContentLoaded', () => {
     let currentPath = location.pathname;
     let queryString = location.search;
     let urlParams = new URLSearchParams(queryString);
-
-    function getCookie(name)
-    {
-        let value = `; ${document.cookie}`;
-        let parts = value.split(`; ${name}=`);
-        if(2 === parts.length){
-            return parts.pop().split(';').shift()
-        }
-    }
-
-    function deleteCookie(name)
-    {
-        document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    }
-
-    function escapeHTML(str)
-    {
-        return str.replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    function cloneElement(element)
-    {
-        if(element instanceof HTMLCanvasElement){
-            let clonedCanvas = document.createElement('canvas');
-            clonedCanvas.width = element.width;
-            clonedCanvas.height = element.height;
-            let ctx = clonedCanvas.getContext('2d');
-            ctx.drawImage(element, 0, 0);
-            return clonedCanvas
-        }
-        return element.cloneNode(true);
-    }
 
     // error codes messages map:
     let errorMessages = {
@@ -59,50 +32,9 @@ window.addEventListener('DOMContentLoaded', () => {
         errorId: 'Missing entity ID on POST.'
     };
 
-    // activate expand/collapse elements
-    let expandCollapseButtons = document.querySelectorAll('[data-expand-collapse]');
-    if(expandCollapseButtons){
-        for(let expandCollapseButton of expandCollapseButtons){
-            expandCollapseButton.addEventListener('click', (event) => {
-                let expandCollapseElement = document.querySelector(event.currentTarget.dataset.expandCollapse);
-                if(expandCollapseElement){
-                    expandCollapseElement.classList.toggle('hidden');
-                }
-            });
-        }
-    }
+    activateExpandCollapse();
 
-    // activate modals on click
-    let modalElements = document.querySelectorAll('[data-toggle="modal"]');
-    if(modalElements){
-        for(let modalElement of modalElements){
-            modalElement.addEventListener('click', () => {
-                let overlay = document.createElement('div');
-                overlay.classList.add('modal-overlay');
-                let modal = document.createElement('div');
-                modal.classList.add('modal');
-                modal.classList.add('clickable');
-                let clonedElement = cloneElement(modalElement);
-                clonedElement.classList.add('clickable');
-                modal.appendChild(clonedElement);
-                overlay.appendChild(modal);
-                document.body.appendChild(overlay);
-                clonedElement.addEventListener('click', () => {
-                    document.body.removeChild(overlay);
-                });
-                modal.addEventListener('click', (e) => {
-                    if(e.target === modal){
-                        document.body.removeChild(modal.parentNode);
-                    }
-                });
-                overlay.addEventListener('click', (e) => {
-                    if(e.target === overlay) {
-                        document.body.removeChild(overlay);
-                    }
-                });
-            });
-        }
-    }
+    activateModalElements();
 
     // login errors:
     if('true' === urlParams.get('login-error')){
@@ -112,23 +44,64 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // entity search functionality:
+    let entityFilterTerm = document.querySelector('#entityFilterTerm');
+    let filterForm = document.querySelector('#filter-form');
+    let allFilters = document.querySelectorAll('.filters-toggle-content .filter input');
+    if(entityFilterTerm && filterForm){
+        entityFilterTerm.addEventListener('input', () => {
+            if(entityFilterTerm.value){
+                for(let filterInput of allFilters){
+                    filterInput.value = '';
+                }
+            }
+        });
+        entityFilterTerm.addEventListener('keypress', (event) => {
+            if(13 === event.keyCode){
+                event.preventDefault();
+                filterForm.submit();
+            }
+        });
+        for(let filterInput of allFilters){
+            filterInput.addEventListener('input', () => {
+                if(filterInput.value){
+                    entityFilterTerm.value = '';
+                }
+            });
+        }
+        filterForm.addEventListener('submit', () => {
+            if(entityFilterTerm.value && allFilters.some(input => input.value)){
+                for(let filterInput of allFilters){
+                    filterInput.value = '';
+                }
+            }
+        });
+    }
+
     // forms behavior:
     let forms = document.querySelectorAll('form');
     if(forms){
         for(let form of forms){
             form.addEventListener('submit', (event) => {
-                let submitButton = document.querySelector('input[type="submit"]');
+                let submitButton = form.querySelector('input[type="submit"], button[type="submit"]');
                 submitButton.disabled = true;
                 let loadingImage = document.querySelector('.submit-container .loading');
                 if(loadingImage){
                     loadingImage.classList.remove('hidden');
                 }
                 if(form.classList.contains('form-delete') || form.classList.contains('confirmation-required')){
-                    if(!confirm('Are you sure?')){
-                        event.preventDefault();
-                        submitButton.disabled = false;
-                        loadingImage.classList.add('hidden');
-                    }
+                    event.preventDefault();
+                    showConfirmDialog((confirmed) => {
+                        if(confirmed){
+                            form.submit();
+                        }
+                        if(!confirmed){
+                            submitButton.disabled = false;
+                            if(loadingImage){
+                                loadingImage.classList.add('hidden');
+                            }
+                        }
+                    });
                 }
             });
         }
@@ -170,25 +143,83 @@ window.addEventListener('DOMContentLoaded', () => {
     let filtersToggleContent = document.querySelector('.filters-toggle-content');
     if(filtersToggle && filtersToggleContent){
         filtersToggle.addEventListener('click', () => {
+            filtersToggle.classList.toggle('active');
             filtersToggleContent.classList.toggle('hidden');
         });
         let allFilters = document.querySelectorAll('.filters-toggle-content .filter input');
+        let entitySearchInput = document.querySelector('#entityFilterTerm');
+        let hasEntitySearch = entitySearchInput && '' !== entitySearchInput.value;
         let activeFilters = Array.from(allFilters).filter(input => '' !== input.value);
-        if(0 < activeFilters.length){
+        if(0 < activeFilters.length || hasEntitySearch){
             filtersToggleContent.classList.remove('hidden');
-            let paginationLinks = document.querySelectorAll('.pagination a');
-            let filtersForm = document.querySelector('#filter-form');
-            if(paginationLinks && filtersForm){
-                for(let link of paginationLinks){
-                    link.addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        event.preventDefault();
-                        filtersForm.action = link.href;
-                        filtersForm.submit();
-                        return false;
-                    })
-                }
+        }
+        let paginationLinks = document.querySelectorAll('.pagination a');
+        if(paginationLinks && filterForm){
+            for(let link of paginationLinks){
+                link.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    let url = new URL(link.href);
+                    let params = new URLSearchParams(url.search);
+                    if(entitySearchInput && entitySearchInput.value){
+                        params.set('entityFilterTerm', entitySearchInput.value);
+                    }
+                    for(let filterInput of allFilters){
+                        if(filterInput.value){
+                            let filterName = filterInput.name;
+                            params.set(filterName, filterInput.value);
+                        }
+                    }
+                    let sortedHeader = document.querySelector('th.sorted');
+                    if(sortedHeader){
+                        let columnName = sortedHeader.getAttribute('data-column');
+                        let sortDirection = sortedHeader.classList.contains('sorted-asc') ? 'asc' : 'desc';
+                        params.set('sortBy', columnName);
+                        params.set('sortDirection', sortDirection);
+                    }
+                    window.location.href = url.pathname+'?'+params;
+                    return false;
+                });
             }
+        }
+    }
+
+    // column sorting functionality:
+    let sortableHeaders = document.querySelectorAll('th.sortable');
+    if(sortableHeaders){
+        for(let header of sortableHeaders){
+            header.addEventListener('click', () => {
+                let sortForm = header.querySelector('.sort-form');
+                if(!sortForm){
+                    return;
+                }
+                let columnName = header.getAttribute('data-column');
+                let currentSortDirection = header.classList.contains('sorted-asc')
+                    ? 'asc'
+                    : header.classList.contains('sorted-desc') ? 'desc' : '';
+                let newSortDirection = 'asc';
+                if('asc' === currentSortDirection){
+                    newSortDirection = 'desc';
+                }
+                let sortByInput = sortForm.querySelector('input[name="sortBy"]');
+                let sortDirectionInput = sortForm.querySelector('input[name="sortDirection"]');
+                sortByInput.value = columnName;
+                sortDirectionInput.value = newSortDirection;
+                let entitySearchInput = document.querySelector('#entityFilterTerm');
+                let entityFilterTermInput = sortForm.querySelector('input[name="entityFilterTerm"]');
+                if(entityFilterTermInput){
+                    entityFilterTermInput.value = entitySearchInput?.value || '';
+                }
+                let allFilters = document.querySelectorAll('.filters-toggle-content .filter input');
+                for(let filterInput of allFilters){
+                    let filterName = filterInput.name.replace(/^filters\[/, '').replace(/\]$/, '');
+                    let sortFormFilterInput = sortForm.querySelector('input[data-filter-key="'+filterName+'"]');
+                    if(sortFormFilterInput){
+                        sortFormFilterInput.value = filterInput.value;
+                    }
+                }
+                sortForm.submit();
+            });
         }
     }
 
@@ -209,19 +240,31 @@ window.addEventListener('DOMContentLoaded', () => {
     let deleteSelectionForm = document.getElementById('delete-selection-form');
     let hiddenInput = document.querySelector('.hidden-ids-input');
     if(listDeleteSelection && deleteSelectionForm && hiddenInput){
-        listDeleteSelection.addEventListener('click', () => {
-            if(!confirm('Are you sure?')){
-                return;
-            }
-            let checkboxes = document.querySelectorAll('.ids-checkbox');
-            let ids = [];
-            for(let checkbox of checkboxes){
-                if(checkbox.checked){
-                    ids.push(checkbox.value);
+        listDeleteSelection.addEventListener('click', (event) => {
+            event.preventDefault();
+            showConfirmDialog((confirmed) => {
+                if(confirmed){
+                    let checkboxes = document.querySelectorAll('.ids-checkbox');
+                    let ids = [];
+                    for(let checkbox of checkboxes){
+                        if(checkbox.checked){
+                            ids.push(checkbox.value);
+                        }
+                    }
+                    if(0 === ids.length){
+                        return;
+                    }
+                    deleteSelectionForm.innerHTML = '';
+                    for(let id of ids){
+                        let input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = id;
+                        deleteSelectionForm.appendChild(input);
+                    }
+                    deleteSelectionForm.submit();
                 }
-            }
-            hiddenInput.value = ids.join(',');
-            deleteSelectionForm.submit();
+            });
         });
     }
 
@@ -246,6 +289,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 ? 'Success!'
                 : 'There was an error: '+escapeHTML(errorMessages[result] || result);
             deleteCookie('result');
+            queryParams.delete('result');
+            let newUrl = location.pathname + (queryParams.toString() ? '?' + queryParams.toString() : '');
+            window.history.replaceState({}, '', newUrl);
         }
     }
 
@@ -266,6 +312,88 @@ window.addEventListener('DOMContentLoaded', () => {
                 },
                 1000
             );
+        }
+    }
+
+    // cache clear all functionality:
+    let cacheClearAllButton = document.querySelector('.cache-clear-all-button');
+    let cacheClearForm = document.querySelector('.cache-clear-form');
+    if(cacheClearAllButton){
+        cacheClearAllButton.addEventListener('click', () => {
+            showConfirmDialog((confirmed) => {
+                if(confirmed && cacheClearForm){
+                    let submitButton = cacheClearForm.querySelector('button[type="submit"]');
+                    if(submitButton){
+                        submitButton.disabled = true;
+                    }
+                    cacheClearForm.submit();
+                }
+            });
+        });
+    }
+
+    // remove upload button functionality:
+    let removeUploadButtons = document.querySelectorAll('.remove-upload-btn');
+    if(removeUploadButtons){
+        for(let button of removeUploadButtons){
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                let fieldName = button.getAttribute('data-field');
+                let fileName = button.getAttribute('data-filename');
+                let fileInput = document.getElementById(fieldName);
+                let form = fileInput?.closest('form');
+                if(!fileInput){
+                    return;
+                }
+                if(!form){
+                    return;
+                }
+                let currentFileDisplay = button.closest('.upload-current-file');
+                let container = button.closest('.upload-files-container');
+                let isRequired = container && 'true' === container.dataset.required;
+                if(isRequired){
+                    let remainingFiles = container.querySelectorAll('.upload-current-file');
+                    if(2 === remainingFiles.length){
+                        let allRemoveButtons = container.querySelectorAll('.remove-upload-btn');
+                        for(let removeBtn of allRemoveButtons){
+                            removeBtn.remove();
+                        }
+                    }
+                }
+                if(currentFileDisplay){
+                    currentFileDisplay.remove();
+                }
+                if(fileName){
+                    let hiddenFieldName = 'removed_'+fieldName;
+                    let existingHiddenInput = form.querySelector('input[name="'+hiddenFieldName+'"]');
+                    if(existingHiddenInput){
+                        let currentValue = existingHiddenInput.value;
+                        let filesArray = currentValue ? currentValue.split(',') : [];
+                        if(-1 === filesArray.indexOf(fileName)){
+                            filesArray.push(fileName);
+                        }
+                        existingHiddenInput.value = filesArray.join(',');
+                        return;
+                    }
+                    let hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = hiddenFieldName;
+                    hiddenInput.value = fileName;
+                    form.appendChild(hiddenInput);
+                    return;
+                }
+                fileInput.value = '';
+                let clearFieldName = 'clear_'+fieldName;
+                let existingClearInput = form.querySelector('input[name="'+clearFieldName+'"]');
+                if(existingClearInput){
+                    return;
+                }
+                let clearInput = document.createElement('input');
+                clearInput.type = 'hidden';
+                clearInput.name = clearFieldName;
+                clearInput.value = '1';
+                form.appendChild(clearInput);
+            });
         }
     }
 

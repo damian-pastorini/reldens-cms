@@ -26,13 +26,17 @@
                         <label for="app-port">Port</label>
                         <input type="text" name="app-port" id="app-port" value="{{app-port}}" class="required" required/>
                     </div>
+                    <div class="input-box app-public-url">
+                        <label for="app-public-url">Public URL (for assets and links)</label>
+                        <input type="text" name="app-public-url" id="app-public-url" value="{{app-public-url}}"/>
+                    </div>
                     <div class="input-box app-admin-path">
                         <label for="app-admin-path">Admin Panel Path</label>
                         <input type="text" name="app-admin-path" id="app-admin-path" value="{{app-admin-path}}"/>
                     </div>
                     <div class="input-box app-admin-secret">
                         <label for="app-admin-secret">Admin Panel Secret</label>
-                        <input type="text" name="app-admin-secret" id="app-admin-secret" value="{{app-admin-secret}}"/>
+                        <input type="text" name="app-admin-secret" id="app-admin-secret" value="{{app-admin-secret}}" required/>
                     </div>
                     <div class="input-box app-error">
                         <p class="error installation-process-failed">There was an error during the installation process.</p>
@@ -77,25 +81,41 @@
                         <p class="error db-installation-process-failed">There was an error during the installation process.</p>
                     </div>
                     <h3 class="form-title">Installation Options</h3>
-                    <div class="input-box install-cms-tables">
+                    <div class="input-box input-checkbox install-cms-tables">
                         <input type="checkbox" name="install-cms-tables" id="install-cms-tables" checked/>
                         <label for="install-cms-tables">Install default CMS pages tables</label>
                     </div>
-                    <div class="input-box install-user-auth">
+                    <div class="input-box input-checkbox install-user-auth">
                         <input type="checkbox" name="install-user-auth" id="install-user-auth" checked/>
                         <label for="install-user-auth">Install users authentication</label>
                     </div>
-                    <div class="input-box install-default-user">
+                    <div class="input-box input-checkbox install-default-user">
                         <input type="checkbox" name="install-default-user" id="install-default-user" checked/>
                         <label for="install-default-user">Install default admin user (root@cms-admin.com / root)</label>
                     </div>
-                    <div class="input-box install-default-homepage">
+                    <div class="input-box input-checkbox install-default-homepage">
                         <input type="checkbox" name="install-default-homepage" id="install-default-homepage" checked/>
                         <label for="install-default-homepage">Install default homepage</label>
                     </div>
+                    <div class="input-box input-checkbox install-default-blocks">
+                        <input type="checkbox" name="install-default-blocks" id="install-default-blocks" checked/>
+                        <label for="install-default-blocks">Install default content blocks</label>
+                    </div>
+                    <div class="input-box input-checkbox install-entity-access">
+                        <input type="checkbox" name="install-entity-access" id="install-entity-access" checked/>
+                        <label for="install-entity-access">Install entity access control rules</label>
+                    </div>
+                    <div class="input-box input-checkbox install-dynamic-forms">
+                        <input type="checkbox" name="install-dynamic-forms" id="install-dynamic-forms" checked/>
+                        <label for="install-dynamic-forms">Install dynamic forms system</label>
+                    </div>
+                    <div class="input-box input-checkbox install-seo-files">
+                        <input type="checkbox" name="install-seo-files" id="install-seo-files" checked/>
+                        <label for="install-seo-files">Install default robots.txt and sitemap.xml</label>
+                    </div>
                     <div class="input-box submit-container">
-                        <img class="install-loading hidden" src="/install-assets/img/loading.gif"/>
                         <input id="install-submit-button" type="submit" value="Install"/>
+                        <img class="install-loading hidden" src="/install-assets/img/loading.gif"/>
                     </div>
                     <div class="input-box response-error"></div>
                 </form>

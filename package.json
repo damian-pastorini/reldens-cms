@@ -1,7 +1,7 @@
 {
     "name": "@reldens/cms",
     "scope": "@reldens",
-    "version": "0.8.0",
+    "version": "0.59.0",
     "description": "Reldens - CMS",
     "author": "Damian A. Pastorini",
     "license": "MIT",
@@ -11,7 +11,9 @@
         "node": ">=20.0.0"
     },
     "bin": {
-        "reldens-cms": "bin/reldens-cms.js"
+        "reldens-cms": "bin/reldens-cms.js",
+        "reldens-cms-generate-entities": "bin/reldens-cms-generate-entities.js",
+        "reldens-cms-update-password": "bin/reldens-cms-update-password.js"
     },
     "repository": {
         "type": "git",
@@ -32,10 +34,10 @@
         "url": "https://github.com/damian-pastorini/reldens-cms/issues"
     },
     "dependencies": {
-        "@reldens/server-utils": "^0.16.0",
-        "@reldens/storage": "^0.45.0",
-        "@reldens/utils": "^0.47.0",
-        "dotenv": "^16.5.0",
-        "mustache": "^4.2.0"
+        "@reldens/server-utils": "^0.46.0",
+        "@reldens/storage": "^0.91.0",
+        "@reldens/utils": "^0.54.0",
+        "dotenv": "17.3.1",
+        "mustache": "4.2.0"
     }
 }

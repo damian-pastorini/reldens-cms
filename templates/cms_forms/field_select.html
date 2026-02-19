@@ -1,0 +1,15 @@
+<div class="form-field {{errorClass}} {{requiredClass}}">
+    <label for="{{fieldName}}" class="form-label">
+        {{fieldLabel}}{{#isRequired}} <span class="required-indicator">*</span>{{/isRequired}}
+    </label>
+    <select name="submittedValues[{{fieldName}}]"
+        id="{{fieldName}}"
+        class="form-select {{#hasError}}is-invalid{{/hasError}}"
+        {{#isRequired}}required{{/isRequired}}>
+        {{#options}}
+        <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+        {{/options}}
+    </select>
+    {{#helpText}}<div class="form-text">{{helpText}}</div>{{/helpText}}
+    {{#hasError}}<div class="invalid-feedback">{{fieldError}}</div>{{/hasError}}
+</div>

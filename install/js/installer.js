@@ -29,4 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
             installButton.disabled = true;
         }
     });
+
+    let copyRightYear = document.querySelector('.copyright-year');
+    if(copyRightYear){
+        copyRightYear.innerHTML = String((new Date()).getFullYear());
+    }
 });

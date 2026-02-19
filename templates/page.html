@@ -1,38 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{locale}}">
 <head>
-    <title>{{title}}</title>
-    <meta name="description" content="{{meta_description}}">
-    <meta property="og:title" content="{{og_title}}">
-    <meta property="og:description" content="{{og_description}}">
-    <meta property="og:image" content="{{og_image}}">
-    <meta name="twitter:card" content="{{twitter_card_type}}">
+    <title>{{meta_title}}</title>
+    <meta name="language" content="{{locale}}"/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover"/>
     <meta name="robots" content="{{meta_robots}}">
-    {{#canonical_url}}<link rel="canonical" href="{{canonical_url}}">{{/canonical_url}}
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="/js/scripts.js"></script>
+    <meta name="theme-color" content="{{meta_theme_color}}"/>
+    <meta property="og:title" content="{{meta_og_title}}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:site_name" content="{{siteHandle}}"/>
+    <meta property="og:url" content="{{currentRequest.fullUrl}}"/>
+    <meta property="og:locale" content="{{locale}}"/>
+    {{#meta_description}}
+    <meta name="description" content="{{meta_description}}"/>
+    <meta property="og:description" content="{{meta_description}}"/>
+    {{/meta_description}}
+    {{#meta_og_image}}
+    <meta property="og:image" content="{{meta_og_image}}"/>
+    {{/meta_og_image}}
+    {{#meta_twitter_card_type}}
+    <meta name="twitter:card" content="{{meta_twitter_card_type}}"/>
+    {{/meta_twitter_card_type}}
+    {{#article_author}}
+    <meta property="article:author" content="{{article_author}}"/>
+    {{/article_author}}
+    {{#publish_date}}
+    <meta name="publish-date" content="{{publish_date}}"/>
+    {{/publish_date}}
+    {{#expire_date}}
+    <meta name="expire-date" content="{{expire_date}}"/>
+    {{/expire_date}}
+    {{#canonical_url}}
+    <link rel="canonical" href="{{canonical_url}}"/>
+    {{/canonical_url}}
+    <!-- favicons -->
+    <meta name="msapplication-config" content="[asset(/favicons/default/browserconfig.xml)]"/>
+    <link rel="icon" href="[asset(/favicons/default/favicon.ico)]" type="image/x-icon"/>
+    <link rel="shortcut icon" href="[asset(/favicons/default/favicon.ico)]" type="image/x-icon">
+    <link rel="manifest" href="[asset(/favicons/default/site.webmanifest)]"/>
+    <link rel="stylesheet" href="[cdn(/css/styles.css)]"/>
 </head>
-<body>
-<header>
-    <div class="container">
-        <h1>Reldens CMS</h1>
-        <nav>
-            <a href="/">Home</a>
-            {{#navigation}}
-            <a href="{{url}}">{{label}}</a>
-            {{/navigation}}
-        </nav>
-    </div>
-</header>
-<div class="container">
-    <main>
-        <h1>{{title}}</h1>
-        {{{content}}}
-    </main>
-</div>
-<footer>
-    <p>&copy; {{current_year}} - Built with Reldens CMS</p>
-</footer>
+<body class="{{siteHandle}}">
+    {{&content}}
+    {{>cookie-consent}}
+    <script defer type="text/javascript" src="[cdn(/js/functions.js)]"></script>
+    <script defer type="text/javascript" src="[cdn(/js/scripts.js)]"></script>
+    <script defer src="[cdn(/js/cookie-consent.js)]"></script>
 </body>
 </html>

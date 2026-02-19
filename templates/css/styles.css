@@ -1,4 +1,7 @@
-/* Frontend styles */
+/**
+ * Reldens - CMS - Styles
+ */
+
 body {
     font-family: 'Open Sans', sans-serif;
     line-height: 1.6;
@@ -99,4 +102,8 @@ a:hover {
 img {
     max-width: 100%;
     height: auto;
+}
+
+.hidden {
+    display: none;
 }
