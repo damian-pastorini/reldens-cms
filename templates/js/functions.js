@@ -117,6 +117,10 @@ function activateModalElements()
             let modal = document.createElement('div');
             modal.classList.add('modal');
             modal.classList.add('clickable');
+            let modalScrolls = modalElement.getAttribute('data-modal-scrolls');
+            if(!modalScrolls || 'false' === modalScrolls){
+                modal.classList.add('modal-fit');
+            }
             let modalContent = createModalContent(modalElement);
             modalContent.classList.add('clickable');
             modal.appendChild(modalContent);

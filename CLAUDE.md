@@ -1,7 +1,3 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Package Overview
 
 **@reldens/cms** is a comprehensive Content Management System package for Reldens. It provides a complete web application framework with:
