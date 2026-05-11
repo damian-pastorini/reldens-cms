@@ -1,1 +1,44 @@
-{}
+{
+    "i468ad": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\manager.js",
+        "snippet": "buildAppServerConfiguration:for(let domain of mappingKeys){",
+        "approved_at": "2026-05-10T17:52:18.873Z"
+    },
+    "xs63zu": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\manager.js",
+        "snippet": "buildAppServerConfiguration:for(let domain of this.domains){",
+        "approved_at": "2026-05-10T17:52:18.874Z"
+    },
+    "inwkd9": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\manager.js",
+        "snippet": "validateCdnMappingsInDevelopment:for(let domain of domainKeys){",
+        "approved_at": "2026-05-10T17:52:18.875Z"
+    },
+    "xd5x1h": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\manager-services-initializer.js",
+        "snippet": "setupEntityAccess:for(let entityName of Object.keys(this.manager.entityAccess)){",
+        "approved_at": "2026-05-10T17:25:22.795Z"
+    },
+    "lspk6n": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\manager.js",
+        "snippet": "isCdnUrlInDirectives:for(let directiveKey of directiveKeys){",
+        "approved_at": "2026-05-10T17:52:18.874Z"
+    },
+    "otqabk": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\bin\\reldens-cms.js",
+        "snippet": "checkRequiredPackages:for(let packageName of requiredPackages){",
+        "approved_at": "2026-05-10T18:40:07.840Z"
+    },
+    "532i4u": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\prisma-subprocess-worker.js",
+        "snippet": "processIncomingMessage:for(let checkboxName of Object.keys(migrationFiles)){",
+        "approved_at": "2026-05-11T04:35:58.282Z"
+    }
+}
