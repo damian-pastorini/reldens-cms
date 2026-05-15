@@ -40,5 +40,89 @@
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\prisma-subprocess-worker.js",
         "snippet": "processIncomingMessage:for(let checkboxName of Object.keys(migrationFiles)){",
         "approved_at": "2026-05-11T04:35:58.282Z"
+    },
+    "z7ods": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "generateListRouteContent:for(let paginationItem of PageRangeProvider.fetch(currentPage, totalPages))",
+        "approved_at": "2026-05-15T06:55:04.011Z"
+    },
+    "hnkqd4": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "generateListRouteContent:for(let filterKey of Object.keys(mergedFilters)){",
+        "approved_at": "2026-05-15T06:55:04.012Z"
+    },
+    "bgyd7b": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "generateViewRouteContent:for(let propertyKey of driverResource.options.showProperties){",
+        "approved_at": "2026-05-15T06:55:04.013Z"
+    },
+    "f7tgl1": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "generateEditRouteContent:for(let propertyKey of Object.keys(driverResource.options.properties)){",
+        "approved_at": "2026-05-15T06:55:04.014Z"
+    },
+    "88i37l": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "processSaveEntity:for(let uploadPropertyKey of Object.keys(uploadProperties)){",
+        "approved_at": "2026-05-15T06:55:04.014Z"
+    },
+    "xkykun": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "validateUploadedFiles:for(let uploadPropertyKey of Object.keys(uploadProperties)){",
+        "approved_at": "2026-05-15T06:55:04.014Z"
+    },
+    "l3wa9x": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "validateUploadedFiles:for(let file of uploadedFiles){",
+        "approved_at": "2026-05-15T06:55:04.015Z"
+    },
+    "q8i4ck": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "loadEntitiesForList:for(let entity of loadedEntities){",
+        "approved_at": "2026-05-15T06:55:04.015Z"
+    },
+    "ux8sz": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "loadEntitiesForList:for(let property of driverResource.options.listProperties){",
+        "approved_at": "2026-05-15T06:55:04.016Z"
+    },
+    "6v19d8": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "deleteEntitiesRelatedFiles:for(let propertyKey of Object.keys(driverResource.options.properties)){",
+        "approved_at": "2026-05-15T06:55:04.016Z"
+    },
+    "irzs9p": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "deleteEntitiesRelatedFiles:for(let entity of entities){",
+        "approved_at": "2026-05-15T06:55:04.017Z"
+    },
+    "fizurc": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "deleteEntitiesRelatedFiles:for(let entityFile of entity[propertyKey].split(property.isArray)){",
+        "approved_at": "2026-05-15T06:55:04.017Z"
+    },
+    "5npo6s": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "preparePatchData:for(let i of Object.keys(resourceProperties)){",
+        "approved_at": "2026-05-15T06:55:04.018Z"
+    },
+    "35ie1w": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
+        "snippet": "prepareUploadPatchData:for(let file of filesData){",
+        "approved_at": "2026-05-15T06:55:04.018Z"
     }
 }
