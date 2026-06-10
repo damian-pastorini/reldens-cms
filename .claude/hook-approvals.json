@@ -124,5 +124,29 @@
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "prepareUploadPatchData:for(let file of filesData){",
         "approved_at": "2026-05-15T06:55:04.018Z"
+    },
+    "utzjl7": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
+        "snippet": "buildSideBar:#0",
+        "approved_at": "2026-06-03T13:30:38.592Z"
+    },
+    "utzjl8": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
+        "snippet": "buildSideBar:#1",
+        "approved_at": "2026-06-03T13:30:38.593Z"
+    },
+    "utzjl9": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
+        "snippet": "buildSideBar:#2",
+        "approved_at": "2026-06-03T13:30:38.593Z"
+    },
+    "w4a5o4": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
+        "snippet": "buildEntitiesContents:#0",
+        "approved_at": "2026-06-03T13:30:38.594Z"
     }
 }
