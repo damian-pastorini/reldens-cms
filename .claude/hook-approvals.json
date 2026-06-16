@@ -129,24 +129,36 @@
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildSideBar:#0",
-        "approved_at": "2026-06-03T13:30:38.592Z"
+        "approved_at": "2026-06-16T15:08:54.130Z"
     },
     "utzjl8": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildSideBar:#1",
-        "approved_at": "2026-06-03T13:30:38.593Z"
+        "approved_at": "2026-06-16T15:08:54.131Z"
     },
     "utzjl9": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildSideBar:#2",
-        "approved_at": "2026-06-03T13:30:38.593Z"
+        "approved_at": "2026-06-16T15:08:54.131Z"
     },
     "w4a5o4": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildEntitiesContents:#0",
-        "approved_at": "2026-06-03T13:30:38.594Z"
+        "approved_at": "2026-06-16T15:08:54.131Z"
+    },
+    "36xme8": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
+        "snippet": "buildReverseRelationsMap:#0",
+        "approved_at": "2026-06-16T15:08:54.132Z"
+    },
+    "3itccx": {
+        "rule": "LOOP",
+        "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
+        "snippet": "addResourceReverseRelations:#0",
+        "approved_at": "2026-06-16T15:08:54.132Z"
     }
 }
