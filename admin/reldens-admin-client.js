@@ -306,10 +306,6 @@ window.addEventListener('DOMContentLoaded', () => {
             if(idValueInput){
                 idValueInput.value = '';
             }
-            let idDisplayInput = editForm.querySelector('.entity-id-display');
-            if(idDisplayInput){
-                idDisplayInput.value = '';
-            }
             let titleElement = document.querySelector('.entity-edit h2');
             if(titleElement){
                 titleElement.textContent = 'Duplicate';
