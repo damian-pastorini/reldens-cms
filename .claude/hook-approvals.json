@@ -81,85 +81,85 @@
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "generateListRouteContent:#0",
-        "approved_at": "2026-07-08T16:27:45.088Z"
+        "approved_at": "2026-07-09T16:43:50.055Z"
     },
     "17id5p": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "generateListRouteContent:#1",
-        "approved_at": "2026-07-08T16:27:45.089Z"
+        "approved_at": "2026-07-09T16:43:50.056Z"
     },
     "hoh3p7": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "generateViewRouteContent:#0",
-        "approved_at": "2026-07-08T16:27:45.090Z"
+        "approved_at": "2026-07-09T16:43:50.057Z"
     },
     "q7xss6": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "generateEditRouteContent:#0",
-        "approved_at": "2026-07-08T16:27:45.090Z"
+        "approved_at": "2026-07-09T16:43:50.057Z"
     },
     "ut8ly2": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "processSaveEntity:#0",
-        "approved_at": "2026-07-08T16:27:45.090Z"
+        "approved_at": "2026-07-09T16:43:50.058Z"
     },
     "urbu94": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "validateUploadedFiles:#0",
-        "approved_at": "2026-07-08T16:27:45.091Z"
+        "approved_at": "2026-07-09T16:43:50.058Z"
     },
     "urbu95": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "validateUploadedFiles:#1",
-        "approved_at": "2026-07-08T16:27:45.091Z"
+        "approved_at": "2026-07-09T16:43:50.059Z"
     },
     "b2wdyv": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "loadEntitiesForList:#0",
-        "approved_at": "2026-07-08T16:27:45.092Z"
+        "approved_at": "2026-07-09T16:43:50.059Z"
     },
     "b2wdyu": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "loadEntitiesForList:#1",
-        "approved_at": "2026-07-08T16:27:45.092Z"
+        "approved_at": "2026-07-09T16:43:50.060Z"
     },
     "4t2pf7": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "deleteEntitiesRelatedFiles:#0",
-        "approved_at": "2026-07-08T16:27:45.093Z"
+        "approved_at": "2026-07-09T16:43:50.060Z"
     },
     "4t2pf6": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "deleteEntitiesRelatedFiles:#1",
-        "approved_at": "2026-07-08T16:27:45.093Z"
+        "approved_at": "2026-07-09T16:43:50.061Z"
     },
     "4t2pf5": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "deleteEntitiesRelatedFiles:#2",
-        "approved_at": "2026-07-08T16:27:45.093Z"
+        "approved_at": "2026-07-09T16:43:50.061Z"
     },
     "kbu0ti": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "preparePatchData:#0",
-        "approved_at": "2026-07-08T16:27:45.094Z"
+        "approved_at": "2026-07-09T16:43:50.061Z"
     },
     "xnwqmd": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "prepareUploadPatchData:#0",
-        "approved_at": "2026-07-08T16:27:45.094Z"
+        "approved_at": "2026-07-09T16:43:50.062Z"
     },
     "xr7t3f": {
         "rule": "LOOP",
