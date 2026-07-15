@@ -304,6 +304,10 @@ window.addEventListener('DOMContentLoaded', () => {
             }
             let idValueInput = editForm.querySelector('.entity-id-value');
             if(idValueInput){
+                let idDisplayInput = editForm.querySelector('[name="disabled-'+idValueInput.name+'"]');
+                if(idDisplayInput){
+                    idDisplayInput.value = '';
+                }
                 idValueInput.value = '';
             }
             let titleElement = document.querySelector('.entity-edit h2');

@@ -81,180 +81,180 @@
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "generateListRouteContent:#0",
-        "approved_at": "2026-07-09T16:43:50.055Z"
+        "approved_at": "2026-07-15T12:32:18.729Z"
     },
     "17id5p": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "generateListRouteContent:#1",
-        "approved_at": "2026-07-09T16:43:50.056Z"
+        "approved_at": "2026-07-15T12:32:18.730Z"
     },
     "hoh3p7": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "generateViewRouteContent:#0",
-        "approved_at": "2026-07-09T16:43:50.057Z"
+        "approved_at": "2026-07-15T12:32:18.730Z"
     },
     "q7xss6": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "generateEditRouteContent:#0",
-        "approved_at": "2026-07-09T16:43:50.057Z"
+        "approved_at": "2026-07-15T12:32:18.731Z"
     },
     "ut8ly2": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "processSaveEntity:#0",
-        "approved_at": "2026-07-09T16:43:50.058Z"
+        "approved_at": "2026-07-15T12:32:18.731Z"
     },
     "urbu94": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "validateUploadedFiles:#0",
-        "approved_at": "2026-07-09T16:43:50.058Z"
+        "approved_at": "2026-07-15T12:32:18.732Z"
     },
     "urbu95": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "validateUploadedFiles:#1",
-        "approved_at": "2026-07-09T16:43:50.059Z"
+        "approved_at": "2026-07-15T12:32:18.732Z"
     },
     "b2wdyv": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "loadEntitiesForList:#0",
-        "approved_at": "2026-07-09T16:43:50.059Z"
+        "approved_at": "2026-07-15T12:32:18.733Z"
     },
     "b2wdyu": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "loadEntitiesForList:#1",
-        "approved_at": "2026-07-09T16:43:50.060Z"
+        "approved_at": "2026-07-15T12:32:18.733Z"
     },
     "4t2pf7": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "deleteEntitiesRelatedFiles:#0",
-        "approved_at": "2026-07-09T16:43:50.060Z"
+        "approved_at": "2026-07-15T12:32:18.734Z"
     },
     "4t2pf6": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "deleteEntitiesRelatedFiles:#1",
-        "approved_at": "2026-07-09T16:43:50.061Z"
+        "approved_at": "2026-07-15T12:32:18.734Z"
     },
     "4t2pf5": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "deleteEntitiesRelatedFiles:#2",
-        "approved_at": "2026-07-09T16:43:50.061Z"
+        "approved_at": "2026-07-15T12:32:18.734Z"
     },
     "kbu0ti": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "preparePatchData:#0",
-        "approved_at": "2026-07-09T16:43:50.061Z"
+        "approved_at": "2026-07-15T12:32:18.735Z"
     },
     "xnwqmd": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\router-contents.js",
         "snippet": "prepareUploadPatchData:#0",
-        "approved_at": "2026-07-09T16:43:50.062Z"
+        "approved_at": "2026-07-15T12:32:18.735Z"
     },
     "xr7t3f": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#0",
-        "approved_at": "2026-07-08T17:53:04.346Z"
+        "approved_at": "2026-07-15T12:33:02.923Z"
     },
     "xr7t3g": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#1",
-        "approved_at": "2026-07-08T17:53:04.347Z"
+        "approved_at": "2026-07-15T12:33:02.924Z"
     },
     "xr7t3h": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#2",
-        "approved_at": "2026-07-08T17:53:04.347Z"
+        "approved_at": "2026-07-15T12:33:02.925Z"
     },
     "xr7t3i": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#3",
-        "approved_at": "2026-07-08T17:53:04.348Z"
+        "approved_at": "2026-07-15T12:33:02.925Z"
     },
     "xr7t3j": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#4",
-        "approved_at": "2026-07-08T17:53:04.348Z"
+        "approved_at": "2026-07-15T12:33:02.926Z"
     },
     "xr7t3k": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#5",
-        "approved_at": "2026-07-08T17:53:04.349Z"
+        "approved_at": "2026-07-15T12:33:02.927Z"
     },
     "xr7t3l": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#6",
-        "approved_at": "2026-07-08T17:53:04.350Z"
+        "approved_at": "2026-07-15T12:33:02.927Z"
     },
     "xr7t3m": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#7",
-        "approved_at": "2026-07-08T17:53:04.350Z"
+        "approved_at": "2026-07-15T12:33:02.928Z"
     },
     "xr7t3n": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#8",
-        "approved_at": "2026-07-08T17:53:04.351Z"
+        "approved_at": "2026-07-15T12:33:02.928Z"
     },
     "xr7t3o": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#9",
-        "approved_at": "2026-07-08T17:53:04.351Z"
+        "approved_at": "2026-07-15T12:33:02.929Z"
     },
     "j0yrmk": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#10",
-        "approved_at": "2026-07-08T17:53:04.352Z"
+        "approved_at": "2026-07-15T12:33:02.929Z"
     },
     "j0yrmj": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#11",
-        "approved_at": "2026-07-08T17:53:04.352Z"
+        "approved_at": "2026-07-15T12:33:02.929Z"
     },
     "c4vxnm": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "showConfirmDialog:#0",
-        "approved_at": "2026-07-08T17:53:04.352Z"
+        "approved_at": "2026-07-15T12:33:02.930Z"
     },
     "c4vxnn": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "showConfirmDialog:#1",
-        "approved_at": "2026-07-08T17:53:04.353Z"
+        "approved_at": "2026-07-15T12:33:02.930Z"
     },
     "j0yrmi": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#12",
-        "approved_at": "2026-07-08T17:53:04.353Z"
+        "approved_at": "2026-07-15T12:33:02.931Z"
     },
     "j0yrmh": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\admin\\reldens-admin-client.js",
         "snippet": "_top:#13",
-        "approved_at": "2026-07-08T17:53:04.353Z"
+        "approved_at": "2026-07-15T12:33:02.931Z"
     }
 }
