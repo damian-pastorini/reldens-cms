@@ -107,3 +107,43 @@ img {
 .hidden {
     display: none;
 }
+
+[data-toggle="modal"], .clickable {
+    cursor: pointer;
+}
+
+.modal-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+    max-width: 92vw;
+    max-height: 92vh;
+    padding: 1rem;
+    overflow: auto;
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.modal.modal-fit {
+    overflow: hidden;
+    padding: 0;
+}
+
+.modal.modal-fit img {
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    display: block;
+}

@@ -6,12 +6,13 @@ The installer supports complex operations through subprocess management:
 
 ```javascript
 const { Installer } = require('@reldens/cms');
+const { Logger } = require('@reldens/utils');
 
-const installer = new Installer({
+let installer = new Installer({
     projectRoot: process.cwd(),
     subprocessMaxAttempts: 1800,
     postInstallCallback: async (props) => {
-        console.log('Entities loaded:', Object.keys(props.loadedEntities.rawRegisteredEntities));
+        Logger.info('Entities loaded: '+Object.keys(props.loadedEntities.rawRegisteredEntities).length);
         return true;
     }
 });
@@ -31,7 +32,7 @@ const installer = new Installer({
 The Manager class provides comprehensive service initialization:
 
 ```javascript
-const cms = new Manager({
+let cms = new Manager({
     app: customExpressApp,
     appServer: customAppServer,
     dataServer: customDataServer,
@@ -54,6 +55,7 @@ const cms = new Manager({
 
 - Validates all provided instances
 - Initializes missing services
+- Auto-creates `PrismaClient` via `PrismaClientLoader` from `@reldens/storage` when `RELDENS_STORAGE_DRIVER=prisma` and no `prismaClient` is passed in — no Prisma imports needed in your entry point
 - Sets up entity access control
 - Generates admin entities
 - Configures template reloading
@@ -65,7 +67,7 @@ The CMS automatically detects development environments based on domain patterns.
 **Default Development Patterns:**
 
 ```javascript
-const patterns = [
+let patterns = [
     'localhost',
     '127.0.0.1',
     '.local',
@@ -84,7 +86,7 @@ const patterns = [
 **Override Development Patterns:**
 
 ```javascript
-const cms = new Manager({
+let cms = new Manager({
     developmentPatterns: [
         'localhost',
         '127.0.0.1',
@@ -109,7 +111,7 @@ const cms = new Manager({
 Configure external domains for CSP directives (kebab-case or camelCase):
 
 ```javascript
-const cms = new Manager({
+let cms = new Manager({
     appServerConfig: {
         developmentExternalDomains: {
             'scriptSrc': ['https://cdn.example.com'],
@@ -131,7 +133,7 @@ const cms = new Manager({
 **Default (merge with base directives):**
 
 ```javascript
-const cms = new Manager({
+let cms = new Manager({
     appServerConfig: {
         helmetConfig: {
             contentSecurityPolicy: {
@@ -165,7 +167,7 @@ const cms = new Manager({
 **Complete Replacement:**
 
 ```javascript
-const cms = new Manager({
+let cms = new Manager({
     appServerConfig: {
         helmetConfig: {
             contentSecurityPolicy: {
@@ -190,7 +192,7 @@ const cms = new Manager({
 ### Additional Helmet Security Headers
 
 ```javascript
-const cms = new Manager({
+let cms = new Manager({
     appServerConfig: {
         helmetConfig: {
             hsts: {

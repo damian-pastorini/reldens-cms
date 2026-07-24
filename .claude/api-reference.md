@@ -4,13 +4,38 @@
 
 - `start()` - Initialize and start the CMS
 - `isInstalled()` - Check if CMS is installed
-- `initializeServices()` - Initialize all services
-- `validateProvidedServer()` - Validate provided server instance
-- `validateProvidedDataServer()` - Validate provided data server
-- `validateProvidedAdminManager()` - Validate provided admin manager
-- `validateProvidedFrontend()` - Validate provided frontend
 - `buildAppServerConfiguration()` - Build server configuration
+- `validateCdnMappingsInDevelopment()` - Warn when CDN domains are missing from CSP directives
+- `isCdnUrlInDirectives(cdnUrlWithProtocol, cdnHostname)` - Check if a CDN URL appears in any CSP directive
 - `initializeCmsAfterInstall(props)` - Post-installation callback
+
+## ManagerComponentValidator Class (lib/manager-component-validator.js)
+
+Static validators called from the Manager constructor:
+
+- `validateProvidedServer(app, appServer)` - Validate provided Express app and server
+- `validateProvidedDataServer(dataServer)` - Validate provided data server
+- `validateProvidedAdminManager(adminManager)` - Validate provided admin manager
+- `validateProvidedFrontend(frontend)` - Validate provided frontend
+
+## ManagerConfigLoader Class (lib/manager-config-loader.js)
+
+- `loadFromEnv()` - Build config object from `RELDENS_*` environment variables
+
+## ManagerServicesInitializer Class (lib/manager-services-initializer.js)
+
+Receives the Manager instance via constructor and handles all service initialization:
+
+- `initializeServices()` - Orchestrate full service initialization sequence
+- `initializeDataServer()` - Create data server; auto-creates PrismaClient via PrismaClientLoader when driver is `prisma` and no client provided
+- `setupEntityAccess()` - Sync entity access rules to database
+- `loadProcessedEntities()` - Apply config overrides and process raw entities
+- `generateAdminEntities()` - Generate admin panel entity definitions
+- `initializeAdminManager()` - Set up admin routes and authentication
+- `initializePasswordEncryptionHandler()` - Register password encryption event listeners
+- `initializeCmsPagesRouteManager()` - Wire CMS page routes to the data server
+- `initializeFrontend()` - Create and initialize Frontend instance
+- `renderCallback(template, params)` - Render a template via the configured render engine
 
 ## Installer Class
 

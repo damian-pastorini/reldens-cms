@@ -295,6 +295,29 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    let duplicateButton = document.querySelector('.button-duplicate');
+    if(duplicateButton){
+        duplicateButton.addEventListener('click', () => {
+            let editForm = document.querySelector('#edit-form');
+            if(!editForm){
+                return;
+            }
+            let idValueInput = editForm.querySelector('.entity-id-value');
+            if(idValueInput){
+                let idDisplayInput = editForm.querySelector('[name="disabled-'+idValueInput.name+'"]');
+                if(idDisplayInput){
+                    idDisplayInput.value = '';
+                }
+                idValueInput.value = '';
+            }
+            let titleElement = document.querySelector('.entity-edit h2');
+            if(titleElement){
+                titleElement.textContent = 'Duplicate';
+            }
+            duplicateButton.classList.add('hidden');
+        });
+    }
+
     // shutdown timer:
     let shuttingDownTimeElement = document.querySelector('.shutting-down .shutting-down-time');
     if(shuttingDownTimeElement){

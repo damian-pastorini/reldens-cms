@@ -9,30 +9,24 @@
 const { Manager } = require('../index');
 const { Logger } = require('@reldens/utils');
 const { FileHandler } = require('@reldens/server-utils');
-const readline = require('readline');
+const { PrismaClientLoader } = require('@reldens/storage');
+const readline = require('readline/promises');
 const dotenv = require('dotenv');
 
 let args = process.argv.slice(2);
 let projectRoot = args[0] || process.cwd();
 let indexPath = FileHandler.joinPaths(projectRoot, 'index.js');
 
-if(FileHandler.exists(indexPath)){
-    require(indexPath);
-    return;
-}
-
 async function checkRequiredPackages(projectRoot)
 {
     let requiredPackages = ['@reldens/cms'];
     let missingPackages = [];
     for(let packageName of requiredPackages){
-        let packagePath = FileHandler.joinPaths(projectRoot, 'node_modules', packageName);
-        if(!FileHandler.exists(packagePath)){
+        if(!FileHandler.exists(FileHandler.joinPaths(projectRoot, 'node_modules', packageName))){
             missingPackages.push(packageName);
         }
     }
-    let packagePath = FileHandler.joinPaths(projectRoot, 'node_modules', '@prisma/client');
-    if(!FileHandler.exists(packagePath)){
+    if(!FileHandler.exists(FileHandler.joinPaths(projectRoot, 'node_modules', '@prisma/client'))){
         missingPackages.push('@prisma/client');
     }
     return missingPackages;
@@ -44,14 +38,11 @@ async function promptUserConfirmation(packages)
         input: process.stdin,
         output: process.stdout
     });
-    return new Promise((resolve) => {
-        Logger.info('Missing required packages: '+packages.join(', '));
-        Logger.info('These packages are required for the CMS to function properly.');
-        rl.question('Would you like to install them automatically? (y/N): ', (answer) => {
-            rl.close();
-            resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
-        });
-    });
+    Logger.info('Missing required packages: '+packages.join(', '));
+    Logger.info('These packages are required for the CMS to function properly.');
+    let answer = await rl.question('Would you like to install them automatically? (y/N): ');
+    rl.close();
+    return 'y' === answer.toLowerCase() || 'yes' === answer.toLowerCase();
 }
 
 async function installPackages(packages, projectRoot)
@@ -59,8 +50,7 @@ async function installPackages(packages, projectRoot)
     try {
         Logger.info('Installing packages: npm install '+packages.join(' '));
         let {execSync} = require('child_process');
-        let installCommand = 'npm install '+packages.join(' ');
-        execSync(installCommand, {stdio: 'inherit', cwd: projectRoot});
+        execSync('npm install '+packages.join(' '), {stdio: 'inherit', cwd: projectRoot});
         Logger.info('Dependencies installed successfully.');
         return true;
     } catch(error) {
@@ -94,42 +84,35 @@ async function createPrismaClientIfNeeded(projectRoot)
     }
     let clientPath = FileHandler.joinPaths(projectRoot, 'prisma', 'client');
     if(!FileHandler.exists(clientPath)){
-        Logger.critical('Prisma client not found at: '+clientPath);
-        Logger.critical('Please run "npx prisma generate" to generate the Prisma client.');
         return false;
     }
-    try {
-        let { PrismaClient } = require(clientPath);
-        return new PrismaClient();
-    } catch(error) {
-        Logger.critical('Failed to initialize Prisma client: '+error.message);
-        return false;
-    }
+    return PrismaClientLoader.load(projectRoot, null, null) || false;
 }
 
-async function startManagerProcess()
+async function main()
 {
+    if(FileHandler.exists(indexPath)){
+        require(indexPath);
+        return;
+    }
     let packageInstallResult = await handlePackageInstallation(projectRoot);
     if(!packageInstallResult){
         process.exit(1);
     }
-
-let managerConfig = {projectRoot};
-let entitiesPath = FileHandler.joinPaths(
-    projectRoot,
-    'generated-entities',
-    'models',
-    'prisma',
-    'registered-models-prisma.js'
-);
-
-if(FileHandler.exists(entitiesPath)){
-    let entitiesModule = require(entitiesPath);
-    managerConfig.rawRegisteredEntities = entitiesModule.rawRegisteredEntities;
-    managerConfig.entitiesConfig = entitiesModule.entitiesConfig;
-    managerConfig.entitiesTranslations = entitiesModule.entitiesTranslations;
-}
-
+    let managerConfig = {projectRoot};
+    let entitiesPath = FileHandler.joinPaths(
+        projectRoot,
+        'generated-entities',
+        'models',
+        'prisma',
+        'registered-models-prisma.js'
+    );
+    if(FileHandler.exists(entitiesPath)){
+        let entitiesModule = require(entitiesPath);
+        managerConfig.rawRegisteredEntities = entitiesModule.rawRegisteredEntities;
+        managerConfig.entitiesConfig = entitiesModule.entitiesConfig;
+        managerConfig.entitiesTranslations = entitiesModule.entitiesTranslations;
+    }
     let prismaClient = await createPrismaClientIfNeeded(projectRoot);
     if(prismaClient){
         managerConfig.prismaClient = prismaClient;
@@ -149,7 +132,7 @@ if(FileHandler.exists(entitiesPath)){
     });
 }
 
-startManagerProcess().catch((error) => {
+main().catch((error) => {
     Logger.critical('Failed to handle package installation:', error);
     process.exit(1);
 });
