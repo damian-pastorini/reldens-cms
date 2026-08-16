@@ -45,37 +45,37 @@
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildSideBar:#0",
-        "approved_at": "2026-07-15T18:07:06.083Z"
+        "approved_at": "2026-08-16T11:37:20.088Z"
     },
     "utzjl8": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildSideBar:#1",
-        "approved_at": "2026-07-15T18:07:06.084Z"
+        "approved_at": "2026-08-16T11:37:20.090Z"
     },
     "utzjl9": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildSideBar:#2",
-        "approved_at": "2026-07-15T18:07:06.085Z"
+        "approved_at": "2026-08-16T11:37:20.090Z"
     },
     "w4a5o4": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildEntitiesContents:#0",
-        "approved_at": "2026-07-15T18:07:06.086Z"
+        "approved_at": "2026-08-16T11:37:20.090Z"
     },
     "36xme8": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildReverseRelationsMap:#0",
-        "approved_at": "2026-07-15T18:07:06.087Z"
+        "approved_at": "2026-08-16T11:37:20.091Z"
     },
     "3itccx": {
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "addResourceReverseRelations:#0",
-        "approved_at": "2026-07-15T18:07:06.088Z"
+        "approved_at": "2026-08-16T11:37:20.092Z"
     },
     "17id5q": {
         "rule": "LOOP",
@@ -261,6 +261,6 @@
         "rule": "LOOP",
         "file": "D:\\dap\\work\\reldens\\npm-packages\\reldens-cms\\lib\\admin-manager\\contents-builder.js",
         "snippet": "buildEditFields:#0",
-        "approved_at": "2026-07-15T18:07:06.086Z"
+        "approved_at": "2026-08-16T11:37:20.091Z"
     }
 }
