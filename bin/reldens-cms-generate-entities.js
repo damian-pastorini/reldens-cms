@@ -7,8 +7,11 @@
  */
 
 const { Manager } = require('../index');
-const { PrismaClientLoader } = require('@reldens/storage');
+const { ManagerConfigLoader } = require('../lib/manager-config-loader');
+const { ManagerServicesInitializer } = require('../lib/manager-services-initializer');
 const { Logger, sc } = require('@reldens/utils');
+const { FileHandler } = require('@reldens/server-utils');
+const dotenv = require('dotenv');
 const readline = require('readline');
 
 class CmsEntitiesGenerator
@@ -58,7 +61,7 @@ class CmsEntitiesGenerator
         Logger.info('');
         Logger.info('Options:');
         Logger.info('  --prisma-client=[path]           Path to Prisma client (e.g., ./prisma/client)');
-        Logger.info('  --driver=[driver]                Storage driver (default: prisma)');
+        Logger.info('  --driver=[driver]                Storage driver (default: mikro-orm)');
         Logger.info('  --override                       Force regeneration and overwrite existing files');
         Logger.info('  --dry-prisma                     Skip Prisma schema generation');
         Logger.info('  --help, -h                       Show this help message');
@@ -87,7 +90,7 @@ class CmsEntitiesGenerator
 
     get driver()
     {
-        return sc.get(this.config, 'driver', process.env.RELDENS_STORAGE_DRIVER || 'prisma');
+        return sc.get(this.config, 'driver', process.env.RELDENS_STORAGE_DRIVER || 'mikro-orm');
     }
 
     async run()
@@ -107,10 +110,18 @@ class CmsEntitiesGenerator
             Logger.info('Running in dry-prisma mode - skipping Prisma schema generation.');
         }
         let managerConfig = {projectRoot: this.projectRoot};
+        dotenv.config({path: FileHandler.joinPaths(this.projectRoot, '.env')});
         if('prisma' === this.driver){
-            let prismaClient = PrismaClientLoader.load(this.projectRoot, this.prismaClientPath, null);
-            if(prismaClient){
-                managerConfig.prismaClient = prismaClient;
+            let databaseConfig = ManagerConfigLoader.loadFromEnv().database;
+            let prismaModules = ManagerServicesInitializer.loadPrismaModules(
+                this.projectRoot,
+                this.prismaClientPath,
+                null,
+                databaseConfig.prismaAdapter,
+                databaseConfig.prismaAdapterClass
+            );
+            if(prismaModules){
+                managerConfig.prismaModules = prismaModules;
             }
         }
         let manager = new Manager(managerConfig);
@@ -119,7 +130,7 @@ class CmsEntitiesGenerator
             return false;
         }
         Logger.debug('Reldens CMS Manager instance created for entities generation.');
-        await manager.initializeDataServer();
+        await manager.servicesInitializer.initializeDataServer();
         let success = await manager.installer.generateEntities(
             manager.dataServer,
             this.isOverride,

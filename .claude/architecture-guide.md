@@ -20,7 +20,7 @@ Responsibilities are split across four files:
 - `lib/manager.js` — orchestration, server config, lifecycle
 - `lib/manager-component-validator.js` — static validation of provided server/dataServer/adminManager/frontend instances
 - `lib/manager-config-loader.js` — static `loadFromEnv()` reading all `RELDENS_*` env vars into a config object
-- `lib/manager-services-initializer.js` — data server, admin, frontend, entity and route manager initialization; auto-creates `PrismaClient` via `PrismaClientLoader` from `@reldens/storage` when driver is `prisma` and no client is provided
+- `lib/manager-services-initializer.js` — data server, admin, frontend, entity and route manager initialization; auto-loads the Prisma modules via `PrismaClientLoader` from `@reldens/storage` when driver is `prisma` and no `prismaModules` is provided
 
 ### Frontend
 

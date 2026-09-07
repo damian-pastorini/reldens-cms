@@ -27,7 +27,8 @@ Static validators called from the Manager constructor:
 Receives the Manager instance via constructor and handles all service initialization:
 
 - `initializeServices()` - Orchestrate full service initialization sequence
-- `initializeDataServer()` - Create data server; auto-creates PrismaClient via PrismaClientLoader when driver is `prisma` and no client provided
+- `loadPrismaModules(projectRoot, clientPath, connectionData, adapterPackage, adapterClass)` - Static; resolves the Prisma adapter from the project and loads the Prisma modules via PrismaClientLoader
+- `initializeDataServer()` - Create data server; auto-loads Prisma modules via `loadPrismaModules()` when driver is `prisma` and no `prismaModules` provided
 - `setupEntityAccess()` - Sync entity access rules to database
 - `loadProcessedEntities()` - Apply config overrides and process raw entities
 - `generateAdminEntities()` - Generate admin panel entity definitions

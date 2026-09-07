@@ -7,9 +7,10 @@
  */
 
 const { Manager } = require('../index');
+const { ManagerConfigLoader } = require('../lib/manager-config-loader');
+const { ManagerServicesInitializer } = require('../lib/manager-services-initializer');
 const { Logger } = require('@reldens/utils');
 const { FileHandler } = require('@reldens/server-utils');
-const { PrismaClientLoader } = require('@reldens/storage');
 const readline = require('readline/promises');
 const dotenv = require('dotenv');
 
@@ -17,17 +18,17 @@ let args = process.argv.slice(2);
 let projectRoot = args[0] || process.cwd();
 let indexPath = FileHandler.joinPaths(projectRoot, 'index.js');
 
-async function checkRequiredPackages(projectRoot)
+async function checkRequiredPackages(projectRoot, databaseConfig)
 {
     let requiredPackages = ['@reldens/cms'];
+    if('prisma' === databaseConfig.driver){
+        requiredPackages.push('prisma', '@prisma/client', databaseConfig.prismaAdapter);
+    }
     let missingPackages = [];
     for(let packageName of requiredPackages){
         if(!FileHandler.exists(FileHandler.joinPaths(projectRoot, 'node_modules', packageName))){
             missingPackages.push(packageName);
         }
-    }
-    if(!FileHandler.exists(FileHandler.joinPaths(projectRoot, 'node_modules', '@prisma/client'))){
-        missingPackages.push('@prisma/client');
     }
     return missingPackages;
 }
@@ -60,9 +61,9 @@ async function installPackages(packages, projectRoot)
     }
 }
 
-async function handlePackageInstallation(projectRoot)
+async function handlePackageInstallation(projectRoot, databaseConfig)
 {
-    let missingPackages = await checkRequiredPackages(projectRoot);
+    let missingPackages = await checkRequiredPackages(projectRoot, databaseConfig);
     if(0 === missingPackages.length){
         return true;
     }
@@ -74,19 +75,22 @@ async function handlePackageInstallation(projectRoot)
     return await installPackages(missingPackages, projectRoot);
 }
 
-async function createPrismaClientIfNeeded(projectRoot)
+async function createPrismaClientIfNeeded(projectRoot, databaseConfig)
 {
-    let envFilePath = FileHandler.joinPaths(projectRoot, '.env');
-    dotenv.config({path: envFilePath});
-    let storageDriver = process.env.RELDENS_STORAGE_DRIVER || 'prisma';
-    if('prisma' !== storageDriver){
+    if('prisma' !== databaseConfig.driver){
         return false;
     }
     let clientPath = FileHandler.joinPaths(projectRoot, 'prisma', 'client');
     if(!FileHandler.exists(clientPath)){
         return false;
     }
-    return PrismaClientLoader.load(projectRoot, null, null) || false;
+    return ManagerServicesInitializer.loadPrismaModules(
+        projectRoot,
+        null,
+        null,
+        databaseConfig.prismaAdapter,
+        databaseConfig.prismaAdapterClass
+    );
 }
 
 async function main()
@@ -95,7 +99,10 @@ async function main()
         require(indexPath);
         return;
     }
-    let packageInstallResult = await handlePackageInstallation(projectRoot);
+    let envFilePath = FileHandler.joinPaths(projectRoot, '.env');
+    dotenv.config({path: envFilePath});
+    let databaseConfig = ManagerConfigLoader.loadFromEnv().database;
+    let packageInstallResult = await handlePackageInstallation(projectRoot, databaseConfig);
     if(!packageInstallResult){
         process.exit(1);
     }
@@ -104,8 +111,8 @@ async function main()
         projectRoot,
         'generated-entities',
         'models',
-        'prisma',
-        'registered-models-prisma.js'
+        databaseConfig.driver,
+        'registered-models-'+databaseConfig.driver+'.js'
     );
     if(FileHandler.exists(entitiesPath)){
         let entitiesModule = require(entitiesPath);
@@ -113,9 +120,9 @@ async function main()
         managerConfig.entitiesConfig = entitiesModule.entitiesConfig;
         managerConfig.entitiesTranslations = entitiesModule.entitiesTranslations;
     }
-    let prismaClient = await createPrismaClientIfNeeded(projectRoot);
-    if(prismaClient){
-        managerConfig.prismaClient = prismaClient;
+    let prismaModules = await createPrismaClientIfNeeded(projectRoot, databaseConfig);
+    if(prismaModules){
+        managerConfig.prismaModules = prismaModules;
     }
     let manager = new Manager(managerConfig);
     Logger.debug('Reldens CMS Manager instance created.', {configuration: manager.config});

@@ -45,7 +45,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Template-driven UI** with customizable admin themes
 
 ### -️ Database & Entities
-- **Multiple database drivers** (Prisma by default, others via DriversMap)
+- **Multiple database drivers** (MikroORM by default, others via DriversMap)
 - **Automatic entity generation** from a database schema
 - **Relationship mapping** and foreign key handling
 - **Custom entity configuration** with validation rules

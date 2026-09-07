@@ -8,7 +8,8 @@
 
 const { Manager } = require('../index');
 const { EntitiesLoader } = require('../lib/entities-loader');
-const { PrismaClientLoader } = require('@reldens/storage');
+const { ManagerConfigLoader } = require('../lib/manager-config-loader');
+const { ManagerServicesInitializer } = require('../lib/manager-services-initializer');
 const { Logger, sc } = require('@reldens/utils');
 const { FileHandler, Encryptor } = require('@reldens/server-utils');
 const dotenv = require('dotenv');
@@ -111,7 +112,8 @@ class CmsPasswordUpdater
         }
         let envFilePath = FileHandler.joinPaths(this.projectRoot, '.env');
         dotenv.config({path: envFilePath});
-        let storageDriver = process.env.RELDENS_STORAGE_DRIVER || 'prisma';
+        let databaseConfig = ManagerConfigLoader.loadFromEnv().database;
+        let storageDriver = databaseConfig.driver;
         Logger.debug('Using storage driver: '+storageDriver);
         let entitiesLoader = new EntitiesLoader({projectRoot: this.projectRoot});
         let loadedEntities = entitiesLoader.loadEntities(storageDriver);
@@ -128,10 +130,16 @@ class CmsPasswordUpdater
             entitiesTranslations: loadedEntities.entitiesTranslations
         };
         if('prisma' === storageDriver){
-            let prismaClient = PrismaClientLoader.load(this.projectRoot, null, null);
-            if(prismaClient){
-                managerConfig.prismaClient = prismaClient;
-                Logger.debug('Prisma client loaded and configured.');
+            let prismaModules = ManagerServicesInitializer.loadPrismaModules(
+                this.projectRoot,
+                null,
+                null,
+                databaseConfig.prismaAdapter,
+                databaseConfig.prismaAdapterClass
+            );
+            if(prismaModules){
+                managerConfig.prismaModules = prismaModules;
+                Logger.debug('Prisma modules loaded and configured.');
             }
         }
         let manager = new Manager(managerConfig);
@@ -140,7 +148,7 @@ class CmsPasswordUpdater
             return false;
         }
         Logger.debug('Reldens CMS Manager instance created for password update.');
-        let initResult = await manager.initializeDataServer();
+        let initResult = await manager.servicesInitializer.initializeDataServer();
         if(!initResult){
             Logger.error('Failed to initialize data server.');
             return false;

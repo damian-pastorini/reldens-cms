@@ -55,7 +55,7 @@ let cms = new Manager({
 
 - Validates all provided instances
 - Initializes missing services
-- Auto-creates `PrismaClient` via `PrismaClientLoader` from `@reldens/storage` when `RELDENS_STORAGE_DRIVER=prisma` and no `prismaClient` is passed in — no Prisma imports needed in your entry point
+- Auto-loads the Prisma modules via `PrismaClientLoader` from `@reldens/storage` when `RELDENS_STORAGE_DRIVER=prisma` and no `prismaModules` is passed in, resolving the adapter from `prismaAdapter` / `prismaAdapterClass` props (defaults from `RELDENS_PRISMA_ADAPTER` / `RELDENS_PRISMA_ADAPTER_CLASS`) — no Prisma imports needed in your entry point
 - Sets up entity access control
 - Generates admin entities
 - Configures template reloading

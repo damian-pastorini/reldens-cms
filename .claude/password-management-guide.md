@@ -102,9 +102,9 @@ npx reldens-cms-update-password --email=admin@example.com --password=newPassword
 #### How It Works
 
 The CLI tool is **driver-agnostic** and works with any storage driver:
-1. Reads `RELDENS_STORAGE_DRIVER` from .env (defaults to 'prisma')
+1. Reads `RELDENS_STORAGE_DRIVER` from .env (defaults to 'mikro-orm')
 2. Uses `EntitiesLoader` to load entities for the detected driver
-3. If driver is 'prisma', automatically loads Prisma client from `./prisma/client`
+3. If driver is 'prisma', automatically loads the Prisma modules from `./prisma/client` using the adapter from `RELDENS_PRISMA_ADAPTER` / `RELDENS_PRISMA_ADAPTER_CLASS`
 4. Initializes Manager and dataServer with the correct driver
 5. Updates password using the driver's entity repository
 
