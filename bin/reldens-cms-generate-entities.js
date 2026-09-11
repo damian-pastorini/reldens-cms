@@ -61,7 +61,7 @@ class CmsEntitiesGenerator
         Logger.info('');
         Logger.info('Options:');
         Logger.info('  --prisma-client=[path]           Path to Prisma client (e.g., ./prisma/client)');
-        Logger.info('  --driver=[driver]                Storage driver (default: mikro-orm)');
+        Logger.info('  --driver=[driver]                Storage driver (default: knex)');
         Logger.info('  --override                       Force regeneration and overwrite existing files');
         Logger.info('  --dry-prisma                     Skip Prisma schema generation');
         Logger.info('  --help, -h                       Show this help message');
@@ -90,7 +90,7 @@ class CmsEntitiesGenerator
 
     get driver()
     {
-        return sc.get(this.config, 'driver', process.env.RELDENS_STORAGE_DRIVER || 'mikro-orm');
+        return sc.get(this.config, 'driver', process.env.RELDENS_STORAGE_DRIVER || 'knex');
     }
 
     async run()

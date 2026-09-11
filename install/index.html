@@ -45,14 +45,12 @@
                     <div class="input-box db-storage-driver">
                         <label for="db-storage-driver">Storage Driver</label>
                         <select name="db-storage-driver" id="db-storage-driver" class="required" required>
-                            <option value="mikro-orm" selected>Mikro ORM</option>
-                            <option value="objection-js">Objection JS</option>
+                            {{#storageDrivers}}
+                            <option value="{{key}}"{{&selected}}>{{label}}</option>
+                            {{/storageDrivers}}
                         </select>
                     </div>
-                    <div class="input-box db-client">
-                        <label for="db-client">Client</label>
-                        <input type="text" name="db-client" id="db-client" value="{{db-client}}" class="required" required/>
-                    </div>
+                    <input type="hidden" name="db-client" id="db-client" value="{{db-client}}"/>
                     <div class="input-box db-host">
                         <label for="db-host">Host</label>
                         <input type="text" name="db-host" id="db-host" value="{{db-host}}" class="required" required/>

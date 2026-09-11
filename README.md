@@ -45,7 +45,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Template-driven UI** with customizable admin themes
 
 ### -️ Database & Entities
-- **Multiple database drivers** (MikroORM by default, others via DriversMap)
+- **Multiple database drivers** (Knex by default; Kysely, Drizzle, Objection JS, MikroORM and Prisma when their packages are installed in the project)
 - **Automatic entity generation** from a database schema
 - **Relationship mapping** and foreign key handling
 - **Custom entity configuration** with validation rules

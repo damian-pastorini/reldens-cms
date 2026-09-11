@@ -122,7 +122,7 @@ Each domain accessing `/sitemap.xml` gets its own filtered results automatically
 
 - Queries `routes` table with `loadWithRelations(filters, 'cms_pages')`
 - Translates to: `WHERE enabled=1 AND redirect_url IS NULL AND redirect_type IS NULL AND (domain IS NULL OR domain = mappedDomain)`
-- Loads associated `cms_pages` in single query using Prisma/ObjectionJS/MikroORM relations
+- Loads associated `cms_pages` in single query using the storage driver relations
 
 ### JavaScript Post-Filter
 
@@ -164,4 +164,4 @@ Each domain accessing `/sitemap.xml` gets its own filtered results automatically
 - JavaScript post-filter for meta_robots
 
 **Cross-driver:**
-- Works with Prisma, ObjectionJS, and MikroORM storage drivers
+- Works with every `@reldens/storage` driver (Knex, Kysely, Drizzle, Objection JS, MikroORM, Prisma)

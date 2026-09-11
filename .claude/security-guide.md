@@ -75,7 +75,7 @@ See `.claude/password-management-guide.md` for comprehensive password management
 
 ## SQL Injection Prevention
 
-**Via Prisma ORM:**
+**Via the `@reldens/storage` drivers (Knex by default):**
 - Parameterized queries
 - No raw SQL execution
 - Type-safe query building

@@ -55,7 +55,8 @@ let cms = new Manager({
 
 - Validates all provided instances
 - Initializes missing services
-- Auto-loads the Prisma modules via `PrismaClientLoader` from `@reldens/storage` when `RELDENS_STORAGE_DRIVER=prisma` and no `prismaModules` is passed in, resolving the adapter from `prismaAdapter` / `prismaAdapterClass` props (defaults from `RELDENS_PRISMA_ADAPTER` / `RELDENS_PRISMA_ADAPTER_CLASS`) — no Prisma imports needed in your entry point
+- Uses `knex` as the default storage driver (`RELDENS_STORAGE_DRIVER`, client `mysql2`); the installer selector only lists the optional drivers (`kysely`, `drizzle`, `objection-js`, `mikro-orm`, `prisma`) whose packages resolve from the project through `StorageDriversResolver`
+- Accepts the driver classes as `knexModules`, `kyselyModules`, `drizzleModules`, `objectionModules`, `mikroOrmModules` or `prismaModules` props; when the prop is missing it loads them from the project with the `@reldens/storage` loaders (`PrismaClientLoader` for prisma, resolving the adapter from `prismaAdapter` / `prismaAdapterClass` props, defaults from `RELDENS_PRISMA_ADAPTER` / `RELDENS_PRISMA_ADAPTER_CLASS`), so no driver imports are needed in your entry point
 - Sets up entity access control
 - Generates admin entities
 - Configures template reloading

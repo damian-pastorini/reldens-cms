@@ -28,7 +28,7 @@ Receives the Manager instance via constructor and handles all service initializa
 
 - `initializeServices()` - Orchestrate full service initialization sequence
 - `loadPrismaModules(projectRoot, clientPath, connectionData, adapterPackage, adapterClass)` - Static; resolves the Prisma adapter from the project and loads the Prisma modules via PrismaClientLoader
-- `initializeDataServer()` - Create data server; auto-loads Prisma modules via `loadPrismaModules()` when driver is `prisma` and no `prismaModules` provided
+- `initializeDataServer()` - Create data server; loads the `[driver]Modules` object through `StorageDriversResolver.loadModules()` (or `loadPrismaModules()` for prisma) when the Manager did not receive it
 - `setupEntityAccess()` - Sync entity access rules to database
 - `loadProcessedEntities()` - Apply config overrides and process raw entities
 - `generateAdminEntities()` - Generate admin panel entity definitions
@@ -38,9 +38,20 @@ Receives the Manager instance via constructor and handles all service initializa
 - `initializeFrontend()` - Create and initialize Frontend instance
 - `renderCallback(template, params)` - Render a template via the configured render engine
 
+## StorageDriversResolver Class (lib/storage-drivers-resolver.js)
+
+Static registry of the `@reldens/storage` drivers, built on the storage `PackageResolver` and `*ModulesLoader` classes:
+
+- `drivers()` - Driver list with `key`, `label`, `modulesProp` and the packages each optional driver needs
+- `modulesProp(driverKey)` - Name of the `[driver]Modules` prop for a driver key
+- `available(projectRoot, prismaAdapter)` - Drivers whose packages resolve from the project (`knex` always)
+- `loadModules(driverKey, projectRoot, client)` - Load the driver modules with the matching storage loader (prisma excluded)
+
 ## Installer Class
 
 - `isInstalled()` - Check installation status
+- `storageDriversOptions(selectedDriver)` - Selector options for the drivers available in the project
+- `appendDriverModules(dbConfig, selectedDriver)` - Load the selected driver modules into the installation data server config
 - `configureAppServerRoutes(app, appServer, appServerFactory, renderEngine)` - Setup installer routes
 - `executeInstallProcess(req, res)` - Complete installation process
 - `runSubprocessInstallation(dbConfig, templateVariables)` - Handle subprocess operations
