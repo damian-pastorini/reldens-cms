@@ -5,6 +5,7 @@
 **Role-based admin access:**
 - Admin panel protected by authentication middleware
 - Session-based authentication
+- Session cookie uses `sameSite: 'lax'` and `secure` when the app server uses HTTPS, `saveUninitialized` is disabled and the session is regenerated on login
 - Configurable admin role ID
 - Custom authentication callbacks supported
 
