@@ -27,10 +27,15 @@ See `.claude/password-management-guide.md` for comprehensive password management
 
 ## CSRF Protection
 
-**Session-based CSRF tokens:**
-- CSRF tokens generated per session
-- Validated on form submissions
-- Integrated with Express session middleware
+**Session-based CSRF tokens:** implemented by `lib/admin-manager/csrf-protection.js`, registered on the
+administration router right after the session middleware.
+
+- One token per session, created on the first request and stored in `req.session.csrfToken`
+- Compared with `crypto.timingSafeEqual` on every state changing request
+- Accepted from the `_csrf` body field or from the `X-CSRF-Token` header
+- Disabled by default, enabled with the `csrfEnabled` prop; `csrfIgnoredPaths` exempts the routes whose client code
+  lives in another package
+- The consuming project must render the token into its forms; only the login page is rendered with it by the router
 
 ## File Upload Validation
 
