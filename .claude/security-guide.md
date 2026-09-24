@@ -6,6 +6,7 @@
 - Admin panel protected by authentication middleware
 - Session-based authentication
 - Session cookie uses `sameSite: 'lax'` and `secure` when the app server uses HTTPS, `saveUninitialized` is disabled and the session is regenerated on login
+- Logout is a POST route (`logoutPath`), the sidebar template submits it with a form and the session is destroyed before the redirect to the login
 - Configurable admin role ID
 - Custom authentication callbacks supported
 
@@ -22,6 +23,9 @@
 - Event-driven encryption on save
 - Enabled by default via `PasswordEncryptionHandler`
 - Can be disabled with `enablePasswordEncryption: false` in Manager config
+- A blank password on an update keeps the stored hash, a blank required password on a create is rejected
+- A failed save logs only the entity key, the id, the patched field names and the storage error code and message, never
+  the submitted values
 
 See `.claude/password-management-guide.md` for comprehensive password management documentation.
 
@@ -31,7 +35,8 @@ See `.claude/password-management-guide.md` for comprehensive password management
 administration router right after the session middleware.
 
 - One token per session, created on the first request and stored in `req.session.csrfToken`
-- Compared with `crypto.timingSafeEqual` on every state changing request
+- Compared with `crypto.timingSafeEqual` on every state changing request, a token with another byte length is
+  rejected before the comparison
 - Accepted from the `_csrf` body field or from the `X-CSRF-Token` header
 - Disabled by default, enabled with the `csrfEnabled` prop; `csrfIgnoredPaths` exempts the routes whose client code
   lives in another package

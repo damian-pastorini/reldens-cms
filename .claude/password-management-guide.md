@@ -28,9 +28,8 @@ The CMS includes a `PasswordEncryptionHandler` that automatically encrypts passw
 1. Listens to the `reldens.adminBeforeEntitySave` event
 2. Detects when the `users` entity is being saved
 3. Checks if the `password` field is being modified
-4. Verifies the password is not already encrypted
-5. Encrypts the password using `Encryptor.encryptPassword()`
-6. Updates the request body with the encrypted password
+4. Encrypts the password using `Encryptor.encryptPassword()`, a value that already looks like a stored hash is hashed too
+5. Updates the request body with the encrypted password
 
 **Enabled by Default**: The password encryption handler is enabled by default in the Manager configuration.
 
@@ -63,8 +62,8 @@ const { Encryptor } = require('@reldens/server-utils');
 
 let plainPassword = 'userProvidedPassword';
 let storedPassword = '64char-salt:128char-hash';
-let isValid = Encryptor.validatePassword(plainPassword, storedPassword);
-// Returns: true or false
+let isValid = await Encryptor.validatePassword(plainPassword, storedPassword);
+// Resolves: true or false
 ```
 
 ## Updating User Passwords
@@ -121,13 +120,14 @@ User passwords can be updated through the admin panel when editing a user record
 - **Field Type**: `type="password"` (hidden input, not plain text)
 - **On Edit**: Password field is empty (does not show encrypted hash)
 - **On Create**: Password field is empty and required
-- **On Update**: Password field is optional - only updates if filled
+- **On Update**: Password field is optional (no `required` attribute) - only updates if filled
 - **Encryption**: Automatic via `PasswordEncryptionHandler` before save
 
 **How It Works**:
-1. When editing a user, the password field is empty (line 605-607 in router-contents.js)
-2. Input type is set to 'password' for security (line 706-708 in router-contents.js)
-3. If password field is left empty, it's skipped during update (line 515-519 in router-contents.js)
+1. When editing a user, the password field is empty (`generatePropertyEditRenderedValue` in router-contents.js)
+2. Input type is set to 'password' for security (`getInputType` in router-contents.js)
+3. If the password field is left empty on an update, it's skipped before the required check, so the stored hash is
+   kept (`preparePatchData` in router-contents.js)
 4. If password is entered, it's encrypted by `PasswordEncryptionHandler` before save
 5. Password is stored as encrypted `salt:hash` in database
 
@@ -203,8 +203,8 @@ async function updateUserPassword(email, newPassword)
    - Avoid logging passwords in application logs
 
 4. **Validate Password Format**
-   - Use `PasswordEncryptionHandler.isAlreadyEncrypted()` to check format
-   - Don't re-encrypt already encrypted passwords
+   - Use `PasswordEncryptionHandler.isAlreadyEncrypted()` to check the format of stored values
+   - Never submit a stored hash through the admin panel, it is hashed again like any other password
 
 5. **Handle Password Changes**
    - Clear user sessions after password changes
@@ -240,7 +240,7 @@ The `PasswordEncryptionHandler` class provides automatic password encryption for
 **Key Methods**:
 - `registerEventListeners()` - Registers event listeners for automatic encryption
 - `handleBeforeEntitySave()` - Processes password encryption before entity save
-- `isAlreadyEncrypted()` - Checks if password is already in encrypted format
+- `isAlreadyEncrypted()` - Checks if a value has the stored `salt:hash` format (not used to skip the encryption)
 
 ### Configuration
 
@@ -287,9 +287,8 @@ The password handler hooks into the admin save process:
 1. Event is emitted before entity save
 2. Handler checks if entity is 'users'
 3. Handler checks if password field is present
-4. Handler verifies password is not already encrypted
-5. Handler encrypts password and updates `req.body.password`
-6. Entity save continues with encrypted password
+4. Handler encrypts password and updates `req.body.password`
+5. Entity save continues with encrypted password
 
 ## Troubleshooting
 
@@ -305,7 +304,7 @@ The password handler hooks into the admin save process:
 **Solution**: Verify `enablePasswordEncryption: true` in Manager config
 
 **Issue**: "Password gets re-encrypted"
-**Solution**: The handler checks for encryption format, but ensure you're not manually encrypting before save
+**Solution**: The handler hashes every submitted value, do not encrypt the password before the admin save
 
 ### Debugging
 
@@ -317,7 +316,6 @@ RELDENS_LOG_LEVEL=9 node .
 
 Look for these debug messages:
 - "Password encrypted successfully for user entity save"
-- "Password field appears to be already encrypted"
 - "PasswordEncryptionHandler registered for event"
 
 ### Verification
@@ -394,7 +392,7 @@ FROM users;
 - **Parameters**:
   - `password` (string) - Plain text password to verify
   - `storedPassword` (string) - Encrypted password from database
-- **Returns**: Boolean - `true` if password matches, `false` otherwise
+- **Returns**: Promise<boolean> - resolves `true` if password matches, `false` otherwise, always await it
 - **Usage**: Validate password during authentication
 
 ### PasswordEncryptionHandler Methods

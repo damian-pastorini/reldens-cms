@@ -56,7 +56,7 @@ Password encryption handler that:
 - Automatic password encryption for users entity
 - Event-driven architecture
 - PBKDF2 encryption with 100k iterations
-- Detects and skips already-encrypted passwords
+- Hashes every submitted password, including values that already look like a stored hash
 - Configurable entity and field names
 
 ### Admin Router Contents
