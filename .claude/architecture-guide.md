@@ -21,7 +21,7 @@ Responsibilities are split across five files:
 - `lib/manager-component-validator.js` — static validation of provided server/dataServer/adminManager/frontend instances
 - `lib/manager-config-loader.js` — static `loadFromEnv()` reading all `RELDENS_*` env vars into a config object
 - `lib/manager-services-initializer.js` — data server, admin, frontend, entity and route manager initialization; loads the `[driver]Modules` object from the project through `StorageDriversResolver` (or `PrismaClientLoader` for prisma) when the Manager did not receive it
-- `lib/storage-drivers-resolver.js` - static driver registry: which `@reldens/storage` drivers are available in the project (via the storage `PackageResolver`) and how to load their modules (via the storage `*ModulesLoader` classes); `knex` is the default and the only bundled driver
+- `lib/storage-drivers-resolver.js` - static driver registry: which `@reldens/storage` drivers are available in the project (via the `@reldens/server-utils` `PackageResolver`) and how to load their modules (via the storage `*ModulesLoader` classes); `knex` is the default and the only bundled driver
 
 ### Frontend
 

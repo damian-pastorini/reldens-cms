@@ -12,7 +12,6 @@ const { ManagerServicesInitializer } = require('../lib/manager-services-initiali
 const { Logger } = require('@reldens/utils');
 const { FileHandler } = require('@reldens/server-utils');
 const readline = require('readline/promises');
-const dotenv = require('dotenv');
 
 let args = process.argv.slice(2);
 let projectRoot = args[0] || process.cwd();
@@ -100,7 +99,9 @@ async function main()
         return;
     }
     let envFilePath = FileHandler.joinPaths(projectRoot, '.env');
-    dotenv.config({path: envFilePath});
+    if(FileHandler.exists(envFilePath)){
+        process.loadEnvFile(envFilePath);
+    }
     let databaseConfig = ManagerConfigLoader.loadFromEnv().database;
     let packageInstallResult = await handlePackageInstallation(projectRoot, databaseConfig);
     if(!packageInstallResult){

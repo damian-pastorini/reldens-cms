@@ -245,7 +245,6 @@ See `.claude/advanced-usage-guide.md` for detailed examples.
 - **@reldens/storage** - Database abstraction layer
 - **@reldens/server-utils** - Server utilities (AppServerFactory, FileHandler, Encryptor)
 - **@reldens/utils** - Common utilities (EventsManager, Logger, SchemaValidator)
-- **dotenv** - Environment variable management
 - **mustache** - Template engine
 
 ## Additional Resources

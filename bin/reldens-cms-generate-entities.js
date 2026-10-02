@@ -11,7 +11,6 @@ const { ManagerConfigLoader } = require('../lib/manager-config-loader');
 const { ManagerServicesInitializer } = require('../lib/manager-services-initializer');
 const { Logger, sc } = require('@reldens/utils');
 const { FileHandler } = require('@reldens/server-utils');
-const dotenv = require('dotenv');
 const readline = require('readline');
 
 class CmsEntitiesGenerator
@@ -110,7 +109,10 @@ class CmsEntitiesGenerator
             Logger.info('Running in dry-prisma mode - skipping Prisma schema generation.');
         }
         let managerConfig = {projectRoot: this.projectRoot};
-        dotenv.config({path: FileHandler.joinPaths(this.projectRoot, '.env')});
+        let envFilePath = FileHandler.joinPaths(this.projectRoot, '.env');
+        if(FileHandler.exists(envFilePath)){
+            process.loadEnvFile(envFilePath);
+        }
         if('prisma' === this.driver){
             let databaseConfig = ManagerConfigLoader.loadFromEnv().database;
             let prismaModules = ManagerServicesInitializer.loadPrismaModules(

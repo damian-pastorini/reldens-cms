@@ -12,7 +12,6 @@ const { ManagerConfigLoader } = require('../lib/manager-config-loader');
 const { ManagerServicesInitializer } = require('../lib/manager-services-initializer');
 const { Logger, sc } = require('@reldens/utils');
 const { FileHandler, Encryptor } = require('@reldens/server-utils');
-const dotenv = require('dotenv');
 const readline = require('readline');
 
 class CmsPasswordUpdater
@@ -111,7 +110,9 @@ class CmsPasswordUpdater
             }
         }
         let envFilePath = FileHandler.joinPaths(this.projectRoot, '.env');
-        dotenv.config({path: envFilePath});
+        if(FileHandler.exists(envFilePath)){
+            process.loadEnvFile(envFilePath);
+        }
         let databaseConfig = ManagerConfigLoader.loadFromEnv().database;
         let storageDriver = databaseConfig.driver;
         Logger.debug('Using storage driver: '+storageDriver);

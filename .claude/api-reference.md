@@ -40,7 +40,7 @@ Receives the Manager instance via constructor and handles all service initializa
 
 ## StorageDriversResolver Class (lib/storage-drivers-resolver.js)
 
-Static registry of the `@reldens/storage` drivers, built on the storage `PackageResolver` and `*ModulesLoader` classes:
+Static registry of the `@reldens/storage` drivers, built on the `@reldens/server-utils` `PackageResolver` and the storage `*ModulesLoader` classes:
 
 - `drivers()` - Driver list with `key`, `label`, `modulesProp` and the packages each optional driver needs
 - `modulesProp(driverKey)` - Name of the `[driver]Modules` prop for a driver key
