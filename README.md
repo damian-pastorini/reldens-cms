@@ -231,7 +231,8 @@ Powerful template engine with Mustache integration, system variables, and dynami
 
 **Core Features:**
 - System variables: `{{currentRequest.host}}`, `{{currentRoute.title}}`, `{{systemInfo.environment}}`
-- Template functions: `[url(/path)]`, `[asset(/img.png)]`, `[date(now, Y-m-d)]`, `[translate(key)]`
+- Template functions: `[url(/path)]`, `[asset(/img.png)]`, `[cdn(/css/styles.css)]`, `[date(now, Y-m-d)]`, `[translate(key)]`
+- Automatic cache busting: `[cdn()]` and `[asset()]` append `?v=<file content hash>` to local public files
 - Entity rendering: `<entity name="cmsBlocks" field="name" value="header"/>`
 - Collections with pagination: `<collection name="articles" filters="{}" data="{limit: 10}">`
 - Custom partials: `<partial name="hero" title="Welcome"/>` or `{{>hero -{data}-}}`

@@ -1,7 +1,7 @@
 {
     "name": "@reldens/cms",
     "scope": "@reldens",
-    "version": "0.102.0",
+    "version": "0.104.0",
     "description": "Reldens - CMS",
     "author": "Damian A. Pastorini",
     "license": "MIT",

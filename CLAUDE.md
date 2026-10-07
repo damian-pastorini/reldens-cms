@@ -88,6 +88,8 @@ Templates use a three-layer rendering system:
 [translate(welcome.message)]
 ```
 
+`[cdn()]` and `[asset()]` append `?v=<md5 of the file contents>` to local public files (cache busting, `AssetVersionResolver`).
+
 See `.claude/templating-system-guide.md` for detailed template documentation.
 
 ### Configuration

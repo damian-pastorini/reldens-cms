@@ -81,6 +81,16 @@ Generates URLs using the **CDN URL if configured** and **automatically prepends 
 
 **Use for:** Static assets inside `/assets` folder (images, downloads, media files).
 
+#### Automatic asset versioning (cache busting)
+
+`[cdn()]` and `[asset()]` append `?v=<md5 of the file contents>` when the path is a file inside the public folder:
+
+- Output: `https://cdn.example.com/css/styles.css?v=9e107d9d372bb6826bd81d3542a419d6`
+- The hash changes only when the file contents change, so the CDN and the browsers can cache the files forever (`immutable`) and still get every new build.
+- `AssetVersionResolver` (`lib/template-engine/asset-version-resolver.js`, singleton) caches each hash with the file modified time, so the file is read and hashed again only after it changes, no server restart is needed.
+- No version is added for full URLs (`http...`), paths that already have a query string, or files not found in the public folder.
+- Pages stored in the full page cache keep the version they were rendered with: clear the cache after deploying new assets.
+
 ---
 
 ### URL Transformer Best Practices
