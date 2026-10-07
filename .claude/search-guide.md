@@ -54,7 +54,7 @@ const searchSets = {
         entities: [{
             name: 'articles',
             fields: ['title', 'content', 'summary'],
-            relations: 'authors'
+            relations: 'related_authors'
         }],
         pagination: {active: true, limit: 15, sortBy: 'created_at', sortDirection: 'desc'}
     }

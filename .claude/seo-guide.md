@@ -120,7 +120,7 @@ Each domain accessing `/sitemap.xml` gets its own filtered results automatically
 
 ### Database Query
 
-- Queries `routes` table with `loadWithRelations(filters, 'cms_pages')`
+- Queries `routes` table with `loadWithRelations(filters, 'related_cms_pages')`
 - Translates to: `WHERE enabled=1 AND redirect_url IS NULL AND redirect_type IS NULL AND (domain IS NULL OR domain = mappedDomain)`
 - Loads associated `cms_pages` in single query using the storage driver relations
 
