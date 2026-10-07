@@ -84,6 +84,12 @@ const cms = new Manager({
 });
 ```
 
+A `reference` property points to the ID of the referenced entity by default. When the foreign key targets another column (for example `items_item.key`), set `referenceKey` with that column: the admin edit form uses it as the select option value and to mark the selected option, so saving keeps the referenced value instead of writing the ID.
+
+```javascript
+item_key: { type: 'reference', reference: 'items_item', alias: 'related_items_item_item_key', referenceKey: 'key' }
+```
+
 ## Manager Configuration Options
 
 ```javascript
