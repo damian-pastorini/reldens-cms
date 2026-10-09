@@ -7,6 +7,7 @@
 const { TestRunner, assert } = require('@reldens/storage/tests/utils/test-runner');
 const { PaginationHandler } = require('../../lib/pagination-handler');
 const { Search } = require('../../lib/search');
+const { SearchFixtures } = require('../fixtures/search-fixtures');
 
 class PaginationHandlerTest
 {
@@ -32,26 +33,6 @@ class PaginationHandlerTest
         await this.testRequestSort();
         await this.testSearchRequestParameters();
         return this.runner.getResults();
-    }
-
-    async runSearchQuery(query)
-    {
-        let loadedQueryOptions = [];
-        let entity = {
-            count: async () => 1,
-            loadEntityData: async (filters, queryOptions) => {
-                loadedQueryOptions.push(queryOptions);
-                return [];
-            },
-            preserveEntityState: () => ({}),
-            restoreEntityState: () => true
-        };
-        let search = new Search({
-            dataServer: {getEntity: () => entity},
-            getAccessRules: this.getAccessRules
-        });
-        await search.executeSearch(search.parseSearchParameters(query));
-        return loadedQueryOptions.shift();
     }
 
     async testRequestFilters()
@@ -101,11 +82,14 @@ class PaginationHandlerTest
         await this.runner.test('should cap the request limit to the entity public max limit', async () => {
             assert.strictEqual(handler.mergeCollectionParameters(this.templateParams, {limit: 5000}, 'cmsPages').limit, 50);
         });
-        await this.runner.test('should cap the request limit to the default public max limit', async () => {
+        await this.runner.test('should cap the request limit to the template limit without a public max limit', async () => {
             assert.strictEqual(
                 handler.mergeCollectionParameters(this.templateParams, {limit: 5000}, 'cmsBlocks').limit,
-                handler.defaultPublicMaxLimit
+                this.templateParams.limit
             );
+        });
+        await this.runner.test('should apply a request limit lower than the template limit', async () => {
+            assert.strictEqual(handler.mergeCollectionParameters(this.templateParams, {limit: 5}, 'cmsBlocks').limit, 5);
         });
         await this.runner.test('should allow any request limit when the entity public max limit is 0', async () => {
             assert.strictEqual(handler.mergeCollectionParameters(this.templateParams, {limit: 5000}, 'routes').limit, 5000);
@@ -134,11 +118,13 @@ class PaginationHandlerTest
     {
         this.runner.group('search request parameters');
         await this.runner.test('should cap the search request limit to the entity public max limit', async () => {
-            assert.strictEqual((await this.runSearchQuery({search: 'reldens', limit: '5000'})).limit, 50);
+            let recordedCalls = await SearchFixtures.runSearch({search: 'reldens', limit: '5000'}, this.getAccessRules);
+            assert.strictEqual(recordedCalls.queryOptions.shift().limit, 50);
         });
         await this.runner.test('should keep the search set sort for a property that is not a public sort', async () => {
+            let recordedCalls = await SearchFixtures.runSearch({search: 'reldens', sortBy: 'category_id'}, this.getAccessRules);
             assert.strictEqual(
-                (await this.runSearchQuery({search: 'reldens', sortBy: 'category_id'})).sortBy,
+                recordedCalls.queryOptions.shift().sortBy,
                 new Search({}).searchSets.cmsPagesSearch.pagination.sortBy
             );
         });

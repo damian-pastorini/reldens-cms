@@ -116,7 +116,7 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 - `resolvePublicAccess(entityName, defaultValue)` - The row `is_public` when the row exists, otherwise the default (used for `searchEnabled`)
 - `isEntityAccessible(entityName)` - Check entity accessibility
 - `findEntityByPath(path)` - Entity lookup by URL path for the public entities
-- `loadPublicEntity(entity, entityName, entityId)` - Load the row by id with the `publicConditions`, with only the `publicRelations` (no relations by default)
+- `loadPublicEntity(entity, entityName, entityId)` - Load the row by id with the `publicConditions` (also applied to the search filters), with only the `publicRelations` (no relations by default)
 
 ### ResponseManager Class
 
@@ -134,7 +134,7 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 - `fetchPublicFields(entityName, rulesKey)` - The `publicFilters` or `publicSort` array of the entity access rules
 - `filterPublicFilters(requestFilters, entityName)` - Keep the request filters of the `publicFilters` properties with scalar values
 - `resolvePublicSort(requestSortBy, templateSortBy, entityName)` - The request sort only for a `publicSort` property, otherwise the template sort, also used by `Search.searchEntity`
-- `resolvePublicLimit(requestLimit, templateLimit, entityName)` - Template limit without a request limit, otherwise the request limit capped to the entity `publicMaxLimit` (default `defaultPublicMaxLimit`, 100), `publicMaxLimit: 0` allows any limit, also used by `Search.searchEntity` (the search `limit` and `sortBy` query values are kept as `requestLimit` and `requestSortBy` in the pagination config)
+- `resolvePublicLimit(requestLimit, templateLimit, entityName)` - Template limit without a request limit, otherwise the request limit capped to the entity `publicMaxLimit` (default the template limit, so a request can only lower it), `publicMaxLimit: 0` allows any limit, also used by `Search.searchEntity` (the search `limit` and `sortBy` query values are kept as `requestLimit` and `requestSortBy` in the pagination config)
 
 ## TemplateEngine Class
 
@@ -155,6 +155,8 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 - `Search.parseSearchParameters(query)` - Parse the search query parameters allowed by the search set `requestOptions` (default only `pagination`), the set `render` config is the default render config and a fresh `templateData` copy is used for each search
 - `Search.applyRenderQuery(query, renderConfig)` / `Search.applyTemplateDataQuery(query, templateData)` - Read the render and templateData URL parameters when their request options are enabled
 - `Search.applySearchAccessRules(searchAccessRules)` - Replace the search sets with the `searchSets` of the `cmsSearch` access rules, called by the Frontend after loading the entities access rows
+- `Search.normalizeSearchTerm(searchTerm)` - Trim the term and cut it to `maximumSearchTermLength` (default 100), an empty string when it is not a string or has less than `minimumSearchTermLength` (default 3) characters other than the LIKE wildcards (`%`, `_`) and spaces, so a term like `%` or `___` can not list every row
+- `Search.buildSearchFilters(entityConfig, config)` - The LIKE `OR` conditions of the searchable fields plus the set entity `filters` and the entity access rules `publicConditions` (the access rules win), the default `cmsPagesSearch` set filters `{enabled: 1}`
 - `Search.executeSearch(config)` - Execute search with configuration
 - `SearchRenderer.renderSearchResults(searchResults, config, domain, req)` - Render search results with template data
 

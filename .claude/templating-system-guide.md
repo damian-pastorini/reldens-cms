@@ -240,8 +240,8 @@ Extract and concatenate a single field from multiple records:
 
 - `publicFilters` (default `[]`) - Properties a request filter can use, with a string, number or boolean value, every other request filter is dropped. The template `filters` always win, a request can never change them.
 - `publicSort` (default `[]`) - Properties a request `sortBy` can use, otherwise the template sort is used.
-- `publicMaxLimit` (default 100, `PaginationHandler.defaultPublicMaxLimit`) - Maximum request `limit`, `0` allows any limit.
-- `publicConditions` (default `{}`) - Fixed conditions of the `/entityName/id` routes, for example `{enabled: 1}`.
+- `publicMaxLimit` (default the template or search set `limit`, so a request can only lower it) - Maximum request `limit`, `0` allows any limit.
+- `publicConditions` (default `{}`) - Fixed conditions of the `/entityName/id` routes and of the search filters, for example `{enabled: 1}`.
 - `publicRelations` (default `[]`) - Relations loaded by the `/entityName/id` routes, none by default.
 - The same rules apply to the search `entity[...]` fields, `limit` and `sortBy` parameters.
 - The rules are passed in the Manager `entityAccess` argument and overridden by the `entities_access.access_rules` JSON column of the same `entity_name` when present (loaded on start):

@@ -82,7 +82,9 @@ const cms = new Manager({
 - `requestOptions` (search set) - What the URL can change, every option is `false` by default except `pagination`:
   - `entities` - `entity[name]=fields`, only the fields in the entity access rules `publicFilters` are kept.
   - `relations` - `relations[name]=...`, only the relations already defined in the set are kept.
-  - `pagination` - `limit`, `pageNumber`, `sortBy`, `sortDirection`, the limit is capped by the entity access rules `publicMaxLimit` and the sort only applies on the `publicSort` properties.
+  - `pagination` - `limit`, `pageNumber`, `sortBy`, `sortDirection`, the limit is capped by the entity access rules `publicMaxLimit` (by default the set `pagination.limit`, so a request can only lower it) and the sort only applies on the `publicSort` properties.
   - `render` - `renderPage`, `renderLayout`, `renderPaginationContainer`, `renderPartial`.
   - `templateData` - `templateData[name]=value`.
 - The URL examples with `renderPartial`, `renderLayout` and `templateData[...]` above require their `requestOptions` enabled.
+- `filters` (search set entity) - Fixed conditions added to every search of the entity, the default `cmsPagesSearch` set uses `{enabled: 1}` so the disabled pages are never listed. The entity access rules `publicConditions` are also added and win over the set `filters`, a project that replaces the default set should keep `enabled: 1` in one of them.
+- Search terms - A term is trimmed and cut to 100 characters, and ignored ("No search term provided.") when it has less than 3 characters other than the LIKE wildcards `%`, `_` and spaces (`Search.minimumSearchTermLength` and `Search.maximumSearchTermLength`).

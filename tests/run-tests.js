@@ -12,6 +12,7 @@ const { PathTraversalTest } = require('./unit/test-path-traversal');
 const { RequestDomainEntriesTest } = require('./unit/test-request-domain-entries');
 const { PaginationHandlerTest } = require('./unit/test-pagination-handler');
 const { EntityAccessManagerTest } = require('./unit/test-entity-access-manager');
+const { SearchTest } = require('./unit/test-search');
 
 class RunTests
 {
@@ -27,7 +28,8 @@ class RunTests
             PathTraversalTest,
             RequestDomainEntriesTest,
             PaginationHandlerTest,
-            EntityAccessManagerTest
+            EntityAccessManagerTest,
+            SearchTest
         ];
     }
 
