@@ -90,6 +90,8 @@ A `reference` property points to the ID of the referenced entity by default. Whe
 item_key: { type: 'reference', reference: 'items_item', alias: 'related_items_item_item_key', referenceKey: 'key' }
 ```
 
+The entity label shown in the admin sidebar, the list and edit titles, and the delete relations warning is resolved by `ResourceLabelResolver.resolve()` (`lib/admin-manager/resource-label-resolver.js`): `translations.labels[entityKey]` first, then `translations.labels[tableName]`, then the table name. A label set on purpose for the entity key overrides the generic one generated for the table name.
+
 ## Manager Configuration Options
 
 ```javascript

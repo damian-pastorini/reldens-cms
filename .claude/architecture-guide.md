@@ -327,6 +327,16 @@ Cache orchestrator that:
 - Cache invalidation
 - Enable/disable functionality
 
+### Cache Keys and the `-key` Query Parameters
+
+The query parameters ending with `-key` are the ones that change the rendered page, the cache key is built from them (`RequestProcessor.buildCacheKey`):
+
+- `<pagination id>-key` - Collection pagination (`templating-system-guide.md`), each collection page is a cached file: the path plus a SHA-256 of the sorted `-key` parameters.
+- `form-key` - Form result page (`forms-system-guide.md`), never cached.
+- `set-key` - Search set (`search-guide.md`), the search uses every query parameter for its key (`RequestProcessor.buildQueryCacheKey`).
+- Any other query parameter is not part of a page cache key: a page without `-key` parameters is cached by its path only.
+- A query variant is not written when its path already has `cacheMaxVariantsPerPath` cached files (default 100), and only the configured domains are cached.
+
 ### Cache Routes Handler
 
 **File:** `lib/cache/cache-routes-handler.js`

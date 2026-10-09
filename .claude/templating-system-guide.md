@@ -231,6 +231,39 @@ Extract and concatenate a single field from multiple records:
 /articles?articles-1-key={"page":2,"limit":10,"sortBy":"created_at","sortDirection":"desc"}
 ```
 
+- The parameter name is the collection `pagination` id plus the `-key` suffix (`articles-1` becomes `articles-1-key`), so each paginated collection on a page has its own parameter.
+- The value is a JSON object with `page` (1 or more), `limit`, `sortBy`, `sortDirection` (`asc` or `desc`) and `filters`, limited by the entity access rules below.
+- The pagination links write only `page` plus the values that differ from the template `data` and `filters`.
+- The `-key` suffix is also what the full page cache uses to store one cached file per collection page (see the cache keys in `architecture-guide.md`).
+
+**Entity Access Rules (request parameters and entity routes):**
+
+- `publicFilters` (default `[]`) - Properties a request filter can use, with a string, number or boolean value, every other request filter is dropped. The template `filters` always win, a request can never change them.
+- `publicSort` (default `[]`) - Properties a request `sortBy` can use, otherwise the template sort is used.
+- `publicMaxLimit` (default 100, `PaginationHandler.defaultPublicMaxLimit`) - Maximum request `limit`, `0` allows any limit.
+- `publicConditions` (default `{}`) - Fixed conditions of the `/entityName/id` routes, for example `{enabled: 1}`.
+- `publicRelations` (default `[]`) - Relations loaded by the `/entityName/id` routes, none by default.
+- The same rules apply to the search `entity[...]` fields, `limit` and `sortBy` parameters.
+- The rules are passed in the Manager `entityAccess` argument and overridden by the `entities_access.access_rules` JSON column of the same `entity_name` when present (loaded on start):
+
+```javascript
+let cms = new Manager({
+    entityAccess: {
+        cmsPages: {
+            public: true,
+            operations: ['read'],
+            accessRules: {
+                publicFilters: ['category_id'],
+                publicSort: ['publish_date'],
+                publicMaxLimit: 50,
+                publicConditions: {enabled: 1},
+                publicRelations: ['related_routes']
+            }
+        }
+    }
+});
+```
+
 **Available Pagination Template Variables:**
 
 - `{{&collectionContentForCurrentPage}}` - Rendered collection items for current page

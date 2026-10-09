@@ -221,7 +221,7 @@ Create database-driven forms with `<cmsForm key="contactForm"/>` tags in templat
 
 Multi-entity search with pagination and template data support.
 
-**Usage:** `/search?search=technology&limit=20&templateData[columnsClass]=col-md-4`
+**Usage:** `/search?search=technology&limit=20` (the `templateData[...]`, render, entities and relations URL parameters are only read when enabled in the search set `requestOptions`, and `searchEnabled: false` disables the search route)
 
 **Full documentation:** See `.claude/search-guide.md`
 

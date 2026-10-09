@@ -27,7 +27,13 @@ npx reldens-cms-update-password --email=admin@example.com
 
 # Or via npm scripts
 npm run generate-entities
+
+# Unit tests (tests/run-tests.js, the Logger prints the results only with RELDENS_LOG_LEVEL=9)
+RELDENS_LOG_LEVEL=9 npm run test
+RELDENS_LOG_LEVEL=9 npm run test -- --filter=RouterContents
 ```
+
+The tests follow the `@reldens/storage` structure: `tests/run-tests.js` (`RunTests`, the test classes list and the totals), `tests/unit/test-*.js` (one class per tested class, with `run()` returning the `TestRunner` results), `tests/fixtures/` (shared fixture builders). The `TestRunner` and `assert` are reused from the `@reldens/storage` dependency (`@reldens/storage/tests/utils/test-runner`).
 
 ## Quick Start
 

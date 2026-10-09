@@ -169,6 +169,14 @@ CREATE TABLE `cms_forms_submitted` (
 8. Database Storage - Save to cms_forms_submitted table
 9. Response - Redirect with success/error parameters
 
+### Result URL Parameters
+
+- Success: `<successRedirect>?form-success=1&form-key=<form key>`.
+- Error: `<Referer or errorRedirect>?form-error=<message>&form-key=<form key>`.
+- The redirect target keeps only the path and query of the value, anything that is not a same site path becomes `/`.
+- `form-key` (the form key with the `-key` suffix) tells the form renderer to show the success or error message, `form-error` is the error message text.
+- A page request with `form-key` is never stored in the full page cache, so the messages are not cached for other visitors.
+
 ## Advanced Usage
 
 ### AJAX Form Submissions

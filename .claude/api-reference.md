@@ -73,7 +73,7 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 
 - `findTemplatePath(templateName, domain)` - Template discovery with domain fallback
 - `findLayoutPath(layoutName, domain)` - Layout path resolution
-- `findTemplateByPath(path, domain)` - Template lookup by URL path
+- `findTemplateByPath(path, domain)` - Template lookup by URL path, a template name that fails `FileHandler.isValidPath` (for example with `../`) is never resolved, so a request path can not reach a file outside the templates folders
 - `resolveDomainToFolder(domain)` - Domain to folder mapping
 - `resolveDomainToSiteKey(domain)` - Domain to site key mapping
 
@@ -97,8 +97,10 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 
 - `findRouteByPath(path, domain)` - Database route lookup
 - `handleRouteRedirect(route, res)` - Handle route redirects
-- `getDomainFromRequest(req)` - Extract domain from request
-- `buildCacheKey(path, req)` - Generate cache keys
+- `buildCacheKey(path, req)` - Cache key of a page request (used for the cache read and write): the path without `-key` query parameters, false (no cache) for a form result page (`form-key`), otherwise the path plus the SHA-256 of the sorted `-key` parameters only
+- `buildQueryCacheKey(path, query, queryKeys)` - Path plus the SHA-256 of the given query values, used by the search with every query parameter
+- `CacheManager.set(domain, path, content, basePath)` - A query variant (path different from `basePath`) is not written when the path already has `maxVariantsPerPath` cached files (Manager `cacheMaxVariantsPerPath`, default 100, `0` without limit)
+- `CacheManager.generateCacheKey(domain, path)` returns false (no cache read or write) when the request domain and path fail `FileHandler.isValidPath`, so the Host header or a `..` path can not leave the cache domain folder, and `CacheManager.generateEnabledCacheKey(domain, path)` (used by `get` and `set`) only caches the configured domains (`defaultDomain`, the `domainMapping` keys and values, the `domainPublicUrlMapping` keys, the `domains` hostnames and aliases and the `RELDENS_APP_HOST` and `RELDENS_PUBLIC_URL` hostnames), any other Host value is rendered without cache
 
 ### ContentRenderer Class
 
@@ -109,9 +111,12 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 
 ### EntityAccessManager Class
 
-- `loadEntityAccessRules()` - Load entity access configuration
+- `loadEntityAccessRules()` - Load the `entities_access` rows (`is_public` and the `access_rules` JSON)
+- `getAccessRules(entityName)` - The Manager `entityAccess[entityName].accessRules` overridden by the row `access_rules` (`publicFilters`, `publicSort`, `publicMaxLimit`, `publicConditions`, `publicRelations`, and `searchSets` for the `cmsSearch` entry)
+- `resolvePublicAccess(entityName, defaultValue)` - The row `is_public` when the row exists, otherwise the default (used for `searchEnabled`)
 - `isEntityAccessible(entityName)` - Check entity accessibility
-- `findEntityByPath(path)` - Entity lookup by URL path
+- `findEntityByPath(path)` - Entity lookup by URL path for the public entities
+- `loadPublicEntity(entity, entityName, entityId)` - Load the row by id with the `publicConditions`, with only the `publicRelations` (no relations by default)
 
 ### ResponseManager Class
 
@@ -122,6 +127,15 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 
 - `handleSearchRequest(req, res)` - Process search requests with template data support
 
+## PaginationHandler Class
+
+- `extractCollectionKeyFromRequest(req, collectionId)` - Parse and sanitize the `<collectionId>-key` request parameter (page, limit, sortBy, sortDirection, filters)
+- `mergeCollectionParameters(templateParams, requestParams, entityName)` - Merge the request parameters into the template ones with the entity access rules (`getAccessRules` prop): the template filters always win, the request filters are kept only for the `publicFilters`, the sort only for the `publicSort` and the limit is capped by `resolvePublicLimit`
+- `fetchPublicFields(entityName, rulesKey)` - The `publicFilters` or `publicSort` array of the entity access rules
+- `filterPublicFilters(requestFilters, entityName)` - Keep the request filters of the `publicFilters` properties with scalar values
+- `resolvePublicSort(requestSortBy, templateSortBy, entityName)` - The request sort only for a `publicSort` property, otherwise the template sort, also used by `Search.searchEntity`
+- `resolvePublicLimit(requestLimit, templateLimit, entityName)` - Template limit without a request limit, otherwise the request limit capped to the entity `publicMaxLimit` (default `defaultPublicMaxLimit`, 100), `publicMaxLimit: 0` allows any limit, also used by `Search.searchEntity` (the search `limit` and `sortBy` query values are kept as `requestLimit` and `requestSortBy` in the pagination config)
+
 ## TemplateEngine Class
 
 - `render(template, data, partials, domain, req, route, currentEntityData)` - Main template rendering with enhanced context
@@ -131,13 +145,16 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 ## SystemVariablesProvider Class
 
 - `buildSystemVariables(req, route, domain)` - Create system variables for templates
-- `buildCurrentRequestData(req, domain)` - Build request context
+- `buildCurrentRequestData(req, domain)` - Build request context, the X-Public-URL header and the X-Forwarded-Host public URL mapping are only used for requests from a trusted proxy
+- `isTrustedProxyRequest(req)` - Check the request peer with the Express `trust proxy fn`, false when the request has no app or socket
 - `buildCurrentRouteData(route)` - Build route context
 - `buildCurrentDomainData(domain)` - Build domain context
 
 ## Search Classes
 
-- `Search.parseSearchParameters(query)` - Parse search query parameters including templateData
+- `Search.parseSearchParameters(query)` - Parse the search query parameters allowed by the search set `requestOptions` (default only `pagination`), the set `render` config is the default render config and a fresh `templateData` copy is used for each search
+- `Search.applyRenderQuery(query, renderConfig)` / `Search.applyTemplateDataQuery(query, templateData)` - Read the render and templateData URL parameters when their request options are enabled
+- `Search.applySearchAccessRules(searchAccessRules)` - Replace the search sets with the `searchSets` of the `cmsSearch` access rules, called by the Frontend after loading the entities access rows
 - `Search.executeSearch(config)` - Execute search with configuration
 - `SearchRenderer.renderSearchResults(searchResults, config, domain, req)` - Render search results with template data
 
@@ -157,7 +174,7 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 - `renderForm(formConfig, fieldsToRender, domain, req, attributes)` - Render complete form
 - `renderFormFields(fieldsToRender, domain, req)` - Render field set
 - `renderFormField(field, domain, submittedValues, errors)` - Render individual field
-- `loadFormTemplate(templateName, domain)` - Load form template with domain fallback
+- `loadFormTemplate(templateName, domain)` - Load form template with domain fallback, the loaded templates are kept by template file path so the request domain values can not grow the memory
 - `findFormTemplate(templateName, domain)` - Template discovery for forms
 
 ### DynamicFormRequestHandler Class
@@ -167,6 +184,7 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 - `handleSuccessResponse(req, res, formKey, result)` - Handle successful submissions
 - `buildErrorRedirectPath(req, error, formKey)` - Build error redirect URLs
 - `buildSuccessRedirectPath(successRedirect, formKey)` - Build success redirect URLs
+- `resolveRedirectPath(redirectValue)` - Keep only the path and query of the redirect target (body `successRedirect` and `errorRedirect`, `Referer` header), a value that is not a same site path becomes `/`
 
 ### FormsTransformer Class
 
