@@ -19,6 +19,16 @@ class SearchTest
         this.withoutAccessRules = () => ({});
         this.accessRules = {cmsPages: {publicConditions: {enabled: 1, locale: 'en'}}};
         this.getAccessRules = (entityName) => Object.assign({}, this.accessRules[entityName]);
+        this.publicFilterField = 'title';
+        this.getPublicFiltersRules = () => ({publicFilters: [this.publicFilterField]});
+        this.requestOptionsSearchSets = {
+            searchSets: {
+                cmsPagesSearch: {
+                    entities: [Object.assign({}, this.defaultEntityConfig)],
+                    requestOptions: {entities: true, relations: true}
+                }
+            }
+        };
     }
 
     async run()
@@ -27,7 +37,54 @@ class SearchTest
         await this.testSearchTerms();
         await this.testSearchFilters();
         await this.testSearchLimit();
+        await this.testFlatQueryKeys();
         return this.runner.getResults();
+    }
+
+    async testFlatQueryKeys()
+    {
+        this.runner.group('flat query keys of the simple query parser');
+        await this.runner.test('should search only the entity[name] fields allowed by the publicFilters', async () => {
+            let recordedCalls = await SearchFixtures.runSearch(
+                {search: 'reldens', 'entity[cmsPages]': this.publicFilterField+',password'},
+                this.getPublicFiltersRules,
+                this.requestOptionsSearchSets
+            );
+            let orConditions = recordedCalls.filters.shift().OR;
+            assert.strictEqual(orConditions.length, 1);
+            assert.deepStrictEqual(Object.keys([...orConditions].shift()), [this.publicFilterField]);
+        });
+        await this.runner.test('should keep the set fields when the entity[name] fields are not public', async () => {
+            let recordedCalls = await SearchFixtures.runSearch(
+                {search: 'reldens', 'entity[cmsPages]': this.publicFilterField},
+                this.withoutAccessRules,
+                this.requestOptionsSearchSets
+            );
+            assert.strictEqual(recordedCalls.filters.shift().OR.length, this.defaultEntityConfig.fields.length);
+        });
+        await this.runner.test('should drop the relations[name] values not configured in the set', async () => {
+            let recordedCalls = await SearchFixtures.runSearch(
+                {search: 'reldens', 'relations[cmsPages]': 'users'},
+                this.withoutAccessRules,
+                this.requestOptionsSearchSets
+            );
+            assert.strictEqual(recordedCalls.relations.shift(), '');
+        });
+        await this.runner.test('should read the templateData[name] keys when the set allows them', async () => {
+            let columnsClass = 'col-md-4';
+            let search = new Search({
+                searchSets: {
+                    cmsPagesSearch: {entities: [this.defaultEntityConfig], requestOptions: {templateData: true}}
+                }
+            });
+            let config = search.parseSearchParameters({search: 'reldens', 'templateData[columnsClass]': columnsClass});
+            assert.strictEqual(config.render.templateData.columnsClass, columnsClass);
+        });
+        await this.runner.test('should apply the search[name] term to the entity', async () => {
+            let recordedCalls = await SearchFixtures.runSearch({'search[cmsPages]': 'reldens'}, this.withoutAccessRules);
+            let firstField = [...this.defaultEntityConfig.fields].shift();
+            assert.strictEqual([...recordedCalls.filters.shift().OR].shift()[firstField].value, '%reldens%');
+        });
     }
 
     async testSearchTerms()

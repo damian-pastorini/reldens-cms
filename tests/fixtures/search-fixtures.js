@@ -12,12 +12,13 @@ class SearchFixtures
     static createRecordingEntity()
     {
         return {
-            recordedCalls: {filters: [], queryOptions: []},
+            recordedCalls: {filters: [], queryOptions: [], relations: []},
             count: async () => 1,
-            async loadEntityData(filters, queryOptions)
+            async loadEntityData(filters, queryOptions, relationsString)
             {
                 this.recordedCalls.filters.push(filters);
                 this.recordedCalls.queryOptions.push(queryOptions);
+                this.recordedCalls.relations.push(relationsString);
                 return [];
             },
             preserveEntityState: () => ({}),

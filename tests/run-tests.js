@@ -13,6 +13,8 @@ const { RequestDomainEntriesTest } = require('./unit/test-request-domain-entries
 const { PaginationHandlerTest } = require('./unit/test-pagination-handler');
 const { EntityAccessManagerTest } = require('./unit/test-entity-access-manager');
 const { SearchTest } = require('./unit/test-search');
+const { AdminFiltersManagerTest } = require('./unit/test-admin-filters-manager');
+const { FrontendRoutesTest } = require('./unit/test-frontend-routes');
 
 class RunTests
 {
@@ -29,7 +31,9 @@ class RunTests
             RequestDomainEntriesTest,
             PaginationHandlerTest,
             EntityAccessManagerTest,
-            SearchTest
+            SearchTest,
+            AdminFiltersManagerTest,
+            FrontendRoutesTest
         ];
     }
 

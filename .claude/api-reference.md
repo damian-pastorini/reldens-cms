@@ -52,8 +52,9 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 - `isInstalled()` - Check installation status
 - `storageDriversOptions(selectedDriver)` - Selector options for the drivers available in the project
 - `appendDriverModules(dbConfig, selectedDriver)` - Load the selected driver modules into the installation data server config
-- `configureAppServerRoutes(app, appServer, appServerFactory, renderEngine)` - Setup installer routes
-- `executeInstallProcess(req, res)` - Complete installation process
+- `configureAppServerRoutes(app, appServer, appServerFactory, renderEngine)` - Setup installer routes, then registers the server-utils error response (`appServerFactory.enableErrorResponse(app)`) after `/install`
+- `executeForEveryRequest(req, res, next)` - Serve the installer page on `/` (read from `req.path`) and redirect every other path but `/install` while the project is not installed
+- `executeInstallProcess(req, res)` - Complete installation process, reads the form through `sc.get(req, 'body', {})` because Express 5 leaves `req.body` undefined when no body was parsed
 - `runSubprocessInstallation(dbConfig, templateVariables)` - Handle subprocess operations
 - `checkAndInstallPackages(requiredPackages)` - Check and install dependencies
 - `generateEntities(server, isOverride, isInstallationMode, isDryPrisma, dbConfig)` - Generate entities
@@ -64,8 +65,9 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 
 ### Frontend Class (Orchestrator)
 
-- `initialize()` - Set up frontend routes and templates
-- `handleRequest(req, res)` - Main request handler
+- `initialize()` - Set up frontend templates, static assets and routes
+- `setupRoutes()` - Register the search route, the dynamic form route and the `/{*splat}` catch-all (Express 5, path-to-regexp 8 throws on a bare `*`, the braced form also matches `/`), then the server-utils error response (`appServerFactory.enableErrorResponse(app)`) as the last app middleware
+- `handleRequest(req, res)` - Main request handler, reads `req.path` (never `req.params`)
 - `renderRoute(route, domain, res, req)` - Route-based rendering
 - `setupStaticAssets()` - Configure static asset serving
 
@@ -201,3 +203,7 @@ Static registry of the `@reldens/storage` drivers, built on the `@reldens/server
 - `generateListRouteContent()` - Entity list pages
 - `generateEditRouteContent()` - Entity edit forms
 - `processSaveEntity()` - Handle form submissions
+
+## AdminFiltersManager Class (lib/admin-manager/admin-filters-manager.js)
+
+- `fetchFiltersFromQuery(query, properties)` - The list filters of the flat `filters[key]` query keys written by the pagination links and the admin client (Express 5 `simple` query parser), only the keys that are resource properties and only string values (a repeated key is ignored); the filters posted by the filter form (`req.body.filters`, nested by the urlencoded `extended` parser) win over them

@@ -88,3 +88,10 @@ const cms = new Manager({
 - The URL examples with `renderPartial`, `renderLayout` and `templateData[...]` above require their `requestOptions` enabled.
 - `filters` (search set entity) - Fixed conditions added to every search of the entity, the default `cmsPagesSearch` set uses `{enabled: 1}` so the disabled pages are never listed. The entity access rules `publicConditions` are also added and win over the set `filters`, a project that replaces the default set should keep `enabled: 1` in one of them.
 - Search terms - A term is trimmed and cut to 100 characters, and ignored ("No search term provided.") when it has less than 3 characters other than the LIKE wildcards `%`, `_` and spaces (`Search.minimumSearchTermLength` and `Search.maximumSearchTermLength`).
+- Entity terms - `search[name]=term` searches the `name` entity of the set with its own term, a global `search` term wins when both are sent.
+
+## Bracket Query Keys
+
+- The CMS app runs on Express 5 (through `@reldens/server-utils`), its default `simple` query parser keeps `entity[name]`, `relations[name]`, `search[name]` and `templateData[name]` as flat query keys, which is how `Search` reads them.
+- On Express 4 the `extended` parser nested those keys (`query.entity.name`), so they were never read: since Express 5 every one of them applies when its `requestOptions` entry is enabled, keep the `publicFilters` of the entity access rules and the set `relations` as the only allow lists.
+- `templateData[name]` values come from the URL as they are, enable `requestOptions.templateData` only with templates that escape them (`{{name}}`, never `{{&name}}`).
