@@ -27,7 +27,8 @@ Static validators called from the Manager constructor:
 Receives the Manager instance via constructor and handles all service initialization:
 
 - `initializeServices()` - Orchestrate full service initialization sequence
-- `initializeDataServer()` - Create data server; auto-creates PrismaClient via PrismaClientLoader when driver is `prisma` and no client provided
+- `loadPrismaModules(projectRoot, clientPath, connectionData, adapterPackage, adapterClass)` - Static; resolves the Prisma adapter from the project and loads the Prisma modules via PrismaClientLoader
+- `initializeDataServer()` - Create data server; loads the `[driver]Modules` object through `StorageDriversResolver.loadModules()` (or `loadPrismaModules()` for prisma) when the Manager did not receive it
 - `setupEntityAccess()` - Sync entity access rules to database
 - `loadProcessedEntities()` - Apply config overrides and process raw entities
 - `generateAdminEntities()` - Generate admin panel entity definitions
@@ -37,11 +38,23 @@ Receives the Manager instance via constructor and handles all service initializa
 - `initializeFrontend()` - Create and initialize Frontend instance
 - `renderCallback(template, params)` - Render a template via the configured render engine
 
+## StorageDriversResolver Class (lib/storage-drivers-resolver.js)
+
+Static registry of the `@reldens/storage` drivers, built on the `@reldens/server-utils` `PackageResolver` and the storage `*ModulesLoader` classes:
+
+- `drivers()` - Driver list with `key`, `label`, `modulesProp` and the packages each optional driver needs
+- `modulesProp(driverKey)` - Name of the `[driver]Modules` prop for a driver key
+- `available(projectRoot, prismaAdapter)` - Drivers whose packages resolve from the project (`knex` always)
+- `loadModules(driverKey, projectRoot, client)` - Load the driver modules with the matching storage loader (prisma excluded)
+
 ## Installer Class
 
 - `isInstalled()` - Check installation status
-- `configureAppServerRoutes(app, appServer, appServerFactory, renderEngine)` - Setup installer routes
-- `executeInstallProcess(req, res)` - Complete installation process
+- `storageDriversOptions(selectedDriver)` - Selector options for the drivers available in the project
+- `appendDriverModules(dbConfig, selectedDriver)` - Load the selected driver modules into the installation data server config
+- `configureAppServerRoutes(app, appServer, appServerFactory, renderEngine)` - Setup installer routes, then registers the server-utils error response (`appServerFactory.enableErrorResponse(app)`) after `/install`
+- `executeForEveryRequest(req, res, next)` - Serve the installer page on `/` (read from `req.path`) and redirect every other path but `/install` while the project is not installed
+- `executeInstallProcess(req, res)` - Complete installation process, reads the form through `sc.get(req, 'body', {})` because Express 5 leaves `req.body` undefined when no body was parsed
 - `runSubprocessInstallation(dbConfig, templateVariables)` - Handle subprocess operations
 - `checkAndInstallPackages(requiredPackages)` - Check and install dependencies
 - `generateEntities(server, isOverride, isInstallationMode, isDryPrisma, dbConfig)` - Generate entities
@@ -52,8 +65,9 @@ Receives the Manager instance via constructor and handles all service initializa
 
 ### Frontend Class (Orchestrator)
 
-- `initialize()` - Set up frontend routes and templates
-- `handleRequest(req, res)` - Main request handler
+- `initialize()` - Set up frontend templates, static assets and routes
+- `setupRoutes()` - Register the search route, the dynamic form route and the `/{*splat}` catch-all (Express 5, path-to-regexp 8 throws on a bare `*`, the braced form also matches `/`), then the server-utils error response (`appServerFactory.enableErrorResponse(app)`) as the last app middleware
+- `handleRequest(req, res)` - Main request handler, reads `req.path` (never `req.params`)
 - `renderRoute(route, domain, res, req)` - Route-based rendering
 - `setupStaticAssets()` - Configure static asset serving
 
@@ -61,7 +75,7 @@ Receives the Manager instance via constructor and handles all service initializa
 
 - `findTemplatePath(templateName, domain)` - Template discovery with domain fallback
 - `findLayoutPath(layoutName, domain)` - Layout path resolution
-- `findTemplateByPath(path, domain)` - Template lookup by URL path
+- `findTemplateByPath(path, domain)` - Template lookup by URL path, a template name that fails `FileHandler.isValidPath` (for example with `../`) is never resolved, so a request path can not reach a file outside the templates folders
 - `resolveDomainToFolder(domain)` - Domain to folder mapping
 - `resolveDomainToSiteKey(domain)` - Domain to site key mapping
 
@@ -85,8 +99,10 @@ Receives the Manager instance via constructor and handles all service initializa
 
 - `findRouteByPath(path, domain)` - Database route lookup
 - `handleRouteRedirect(route, res)` - Handle route redirects
-- `getDomainFromRequest(req)` - Extract domain from request
-- `buildCacheKey(path, req)` - Generate cache keys
+- `buildCacheKey(path, req)` - Cache key of a page request (used for the cache read and write): the path without `-key` query parameters, false (no cache) for a form result page (`form-key`), otherwise the path plus the SHA-256 of the sorted `-key` parameters only
+- `buildQueryCacheKey(path, query, queryKeys)` - Path plus the SHA-256 of the given query values, used by the search with every query parameter
+- `CacheManager.set(domain, path, content, basePath)` - A query variant (path different from `basePath`) is not written when the path already has `maxVariantsPerPath` cached files (Manager `cacheMaxVariantsPerPath`, default 100, `0` without limit)
+- `CacheManager.generateCacheKey(domain, path)` returns false (no cache read or write) when the request domain and path fail `FileHandler.isValidPath`, so the Host header or a `..` path can not leave the cache domain folder, and `CacheManager.generateEnabledCacheKey(domain, path)` (used by `get` and `set`) only caches the configured domains (`defaultDomain`, the `domainMapping` keys and values, the `domainPublicUrlMapping` keys, the `domains` hostnames and aliases and the `RELDENS_APP_HOST` and `RELDENS_PUBLIC_URL` hostnames), any other Host value is rendered without cache
 
 ### ContentRenderer Class
 
@@ -97,9 +113,12 @@ Receives the Manager instance via constructor and handles all service initializa
 
 ### EntityAccessManager Class
 
-- `loadEntityAccessRules()` - Load entity access configuration
+- `loadEntityAccessRules()` - Load the `entities_access` rows (`is_public` and the `access_rules` JSON)
+- `getAccessRules(entityName)` - The Manager `entityAccess[entityName].accessRules` overridden by the row `access_rules` (`publicFilters`, `publicSort`, `publicMaxLimit`, `publicConditions`, `publicRelations`, and `searchSets` for the `cmsSearch` entry)
+- `resolvePublicAccess(entityName, defaultValue)` - The row `is_public` when the row exists, otherwise the default (used for `searchEnabled`)
 - `isEntityAccessible(entityName)` - Check entity accessibility
-- `findEntityByPath(path)` - Entity lookup by URL path
+- `findEntityByPath(path)` - Entity lookup by URL path for the public entities
+- `loadPublicEntity(entity, entityName, entityId)` - Load the row by id with the `publicConditions` (also applied to the search filters), with only the `publicRelations` (no relations by default)
 
 ### ResponseManager Class
 
@@ -110,6 +129,15 @@ Receives the Manager instance via constructor and handles all service initializa
 
 - `handleSearchRequest(req, res)` - Process search requests with template data support
 
+## PaginationHandler Class
+
+- `extractCollectionKeyFromRequest(req, collectionId)` - Parse and sanitize the `<collectionId>-key` request parameter (page, limit, sortBy, sortDirection, filters)
+- `mergeCollectionParameters(templateParams, requestParams, entityName)` - Merge the request parameters into the template ones with the entity access rules (`getAccessRules` prop): the template filters always win, the request filters are kept only for the `publicFilters`, the sort only for the `publicSort` and the limit is capped by `resolvePublicLimit`
+- `fetchPublicFields(entityName, rulesKey)` - The `publicFilters` or `publicSort` array of the entity access rules
+- `filterPublicFilters(requestFilters, entityName)` - Keep the request filters of the `publicFilters` properties with scalar values
+- `resolvePublicSort(requestSortBy, templateSortBy, entityName)` - The request sort only for a `publicSort` property, otherwise the template sort, also used by `Search.searchEntity`
+- `resolvePublicLimit(requestLimit, templateLimit, entityName)` - Template limit without a request limit, otherwise the request limit capped to the entity `publicMaxLimit` (default the template limit, so a request can only lower it), `publicMaxLimit: 0` allows any limit, also used by `Search.searchEntity` (the search `limit` and `sortBy` query values are kept as `requestLimit` and `requestSortBy` in the pagination config)
+
 ## TemplateEngine Class
 
 - `render(template, data, partials, domain, req, route, currentEntityData)` - Main template rendering with enhanced context
@@ -119,13 +147,18 @@ Receives the Manager instance via constructor and handles all service initializa
 ## SystemVariablesProvider Class
 
 - `buildSystemVariables(req, route, domain)` - Create system variables for templates
-- `buildCurrentRequestData(req, domain)` - Build request context
+- `buildCurrentRequestData(req, domain)` - Build request context, the X-Public-URL header and the X-Forwarded-Host public URL mapping are only used for requests from a trusted proxy
+- `isTrustedProxyRequest(req)` - Check the request peer with the Express `trust proxy fn`, false when the request has no app or socket
 - `buildCurrentRouteData(route)` - Build route context
 - `buildCurrentDomainData(domain)` - Build domain context
 
 ## Search Classes
 
-- `Search.parseSearchParameters(query)` - Parse search query parameters including templateData
+- `Search.parseSearchParameters(query)` - Parse the search query parameters allowed by the search set `requestOptions` (default only `pagination`), the set `render` config is the default render config and a fresh `templateData` copy is used for each search
+- `Search.applyRenderQuery(query, renderConfig)` / `Search.applyTemplateDataQuery(query, templateData)` - Read the render and templateData URL parameters when their request options are enabled
+- `Search.applySearchAccessRules(searchAccessRules)` - Replace the search sets with the `searchSets` of the `cmsSearch` access rules, called by the Frontend after loading the entities access rows
+- `Search.normalizeSearchTerm(searchTerm)` - Trim the term and cut it to `maximumSearchTermLength` (default 100), an empty string when it is not a string or has less than `minimumSearchTermLength` (default 3) characters other than the LIKE wildcards (`%`, `_`) and spaces, so a term like `%` or `___` can not list every row
+- `Search.buildSearchFilters(entityConfig, config)` - The LIKE `OR` conditions of the searchable fields plus the set entity `filters` and the entity access rules `publicConditions` (the access rules win), the default `cmsPagesSearch` set filters `{enabled: 1}`
 - `Search.executeSearch(config)` - Execute search with configuration
 - `SearchRenderer.renderSearchResults(searchResults, config, domain, req)` - Render search results with template data
 
@@ -145,7 +178,7 @@ Receives the Manager instance via constructor and handles all service initializa
 - `renderForm(formConfig, fieldsToRender, domain, req, attributes)` - Render complete form
 - `renderFormFields(fieldsToRender, domain, req)` - Render field set
 - `renderFormField(field, domain, submittedValues, errors)` - Render individual field
-- `loadFormTemplate(templateName, domain)` - Load form template with domain fallback
+- `loadFormTemplate(templateName, domain)` - Load form template with domain fallback, the loaded templates are kept by template file path so the request domain values can not grow the memory
 - `findFormTemplate(templateName, domain)` - Template discovery for forms
 
 ### DynamicFormRequestHandler Class
@@ -155,6 +188,7 @@ Receives the Manager instance via constructor and handles all service initializa
 - `handleSuccessResponse(req, res, formKey, result)` - Handle successful submissions
 - `buildErrorRedirectPath(req, error, formKey)` - Build error redirect URLs
 - `buildSuccessRedirectPath(successRedirect, formKey)` - Build success redirect URLs
+- `resolveRedirectPath(redirectValue)` - Keep only the path and query of the redirect target (body `successRedirect` and `errorRedirect`, `Referer` header), a value that is not a same site path becomes `/`
 
 ### FormsTransformer Class
 
@@ -169,3 +203,7 @@ Receives the Manager instance via constructor and handles all service initializa
 - `generateListRouteContent()` - Entity list pages
 - `generateEditRouteContent()` - Entity edit forms
 - `processSaveEntity()` - Handle form submissions
+
+## AdminFiltersManager Class (lib/admin-manager/admin-filters-manager.js)
+
+- `fetchFiltersFromQuery(query, properties)` - The list filters of the flat `filters[key]` query keys written by the pagination links and the admin client (Express 5 `simple` query parser), only the keys that are resource properties and only string values (a repeated key is ignored); the filters posted by the filter form (`req.body.filters`, nested by the urlencoded `extended` parser) win over them

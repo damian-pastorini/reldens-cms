@@ -1,15 +1,12 @@
 {
     "name": "@reldens/cms",
     "scope": "@reldens",
-    "version": "0.79.0",
+    "version": "0.113.0",
     "description": "Reldens - CMS",
     "author": "Damian A. Pastorini",
     "license": "MIT",
     "homepage": "https://github.com/damian-pastorini/reldens-cms",
     "source": false,
-    "engines": {
-        "node": ">=20.0.0"
-    },
     "bin": {
         "reldens-cms": "bin/reldens-cms.js",
         "reldens-cms-generate-entities": "bin/reldens-cms-generate-entities.js",
@@ -33,11 +30,16 @@
     "bugs": {
         "url": "https://github.com/damian-pastorini/reldens-cms/issues"
     },
+    "scripts": {
+        "test": "node tests/run-tests.js",
+        "test:watch": "node --watch tests/run-tests.js",
+        "test:filter": "node tests/run-tests.js --filter=",
+        "test:coverage": "node --test --experimental-test-coverage tests/run-tests.js"
+    },
     "dependencies": {
-        "@reldens/server-utils": "^0.55.0",
-        "@reldens/storage": "^0.108.0",
-        "@reldens/utils": "^0.57.0",
-        "dotenv": "17.4.2",
+        "@reldens/server-utils": "^0.69.0",
+        "@reldens/storage": "^0.134.0",
+        "@reldens/utils": "^0.66.0",
         "mustache": "4.2.0"
     }
 }

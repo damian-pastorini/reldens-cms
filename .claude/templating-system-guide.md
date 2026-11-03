@@ -81,6 +81,16 @@ Generates URLs using the **CDN URL if configured** and **automatically prepends 
 
 **Use for:** Static assets inside `/assets` folder (images, downloads, media files).
 
+#### Automatic asset versioning (cache busting)
+
+`[cdn()]` and `[asset()]` append `?v=<md5 of the file contents>` when the path is a file inside the public folder:
+
+- Output: `https://cdn.example.com/css/styles.css?v=9e107d9d372bb6826bd81d3542a419d6`
+- The hash changes only when the file contents change, so the CDN and the browsers can cache the files forever (`immutable`) and still get every new build.
+- `AssetVersionResolver` (`lib/template-engine/asset-version-resolver.js`, singleton) caches each hash with the file modified time, so the file is read and hashed again only after it changes, no server restart is needed.
+- No version is added for full URLs (`http...`), paths that already have a query string, or files not found in the public folder.
+- Pages stored in the full page cache keep the version they were rendered with: clear the cache after deploying new assets.
+
 ---
 
 ### URL Transformer Best Practices
@@ -219,6 +229,39 @@ Extract and concatenate a single field from multiple records:
 
 ```
 /articles?articles-1-key={"page":2,"limit":10,"sortBy":"created_at","sortDirection":"desc"}
+```
+
+- The parameter name is the collection `pagination` id plus the `-key` suffix (`articles-1` becomes `articles-1-key`), so each paginated collection on a page has its own parameter.
+- The value is a JSON object with `page` (1 or more), `limit`, `sortBy`, `sortDirection` (`asc` or `desc`) and `filters`, limited by the entity access rules below.
+- The pagination links write only `page` plus the values that differ from the template `data` and `filters`.
+- The `-key` suffix is also what the full page cache uses to store one cached file per collection page (see the cache keys in `architecture-guide.md`).
+
+**Entity Access Rules (request parameters and entity routes):**
+
+- `publicFilters` (default `[]`) - Properties a request filter can use, with a string, number or boolean value, every other request filter is dropped. The template `filters` always win, a request can never change them.
+- `publicSort` (default `[]`) - Properties a request `sortBy` can use, otherwise the template sort is used.
+- `publicMaxLimit` (default the template or search set `limit`, so a request can only lower it) - Maximum request `limit`, `0` allows any limit.
+- `publicConditions` (default `{}`) - Fixed conditions of the `/entityName/id` routes and of the search filters, for example `{enabled: 1}`.
+- `publicRelations` (default `[]`) - Relations loaded by the `/entityName/id` routes, none by default.
+- The same rules apply to the search `entity[...]` fields, `limit` and `sortBy` parameters.
+- The rules are passed in the Manager `entityAccess` argument and overridden by the `entities_access.access_rules` JSON column of the same `entity_name` when present (loaded on start):
+
+```javascript
+let cms = new Manager({
+    entityAccess: {
+        cmsPages: {
+            public: true,
+            operations: ['read'],
+            accessRules: {
+                publicFilters: ['category_id'],
+                publicSort: ['publish_date'],
+                publicMaxLimit: 50,
+                publicConditions: {enabled: 1},
+                publicRelations: ['related_routes']
+            }
+        }
+    }
+});
 ```
 
 **Available Pagination Template Variables:**

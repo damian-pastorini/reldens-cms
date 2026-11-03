@@ -54,13 +54,44 @@ const searchSets = {
         entities: [{
             name: 'articles',
             fields: ['title', 'content', 'summary'],
-            relations: 'authors'
+            relations: 'related_authors'
         }],
-        pagination: {active: true, limit: 15, sortBy: 'created_at', sortDirection: 'desc'}
+        pagination: {active: true, limit: 15, sortBy: 'created_at', sortDirection: 'desc'},
+        render: {partial: 'articlesListView', templateData: {columnsClass: 'col-md-4'}},
+        requestOptions: {entities: false, relations: false, pagination: true, render: false, templateData: false}
     }
 };
 
 const cms = new Manager({
+    searchEnabled: true,
     searchSets: searchSets
 });
 ```
+
+## Search Set Selection
+
+- `set-key` (the set name with the `-key` suffix) selects the search set: `/search?search=news&set-key=articlesSearch`.
+- Without `set-key` the `cmsPagesSearch` set is used, an unknown set redirects to `/?error-message=searchInvalidParameters`.
+- The search cache key uses every query parameter of the search, so each search term and set has its own cached file (up to `cacheMaxVariantsPerPath`).
+
+## Search Security Options
+
+- `searchEnabled` (Manager, default `true`) - `false` does not register the search route.
+- `entities_access` row with `entity_name` `cmsSearch` (`searchAccessKey`), when present: `is_public` replaces `searchEnabled` and `access_rules.searchSets` replaces the sets with the same key, loaded on start. The same entry can be passed in the Manager `entityAccess` argument (`entityAccess.cmsSearch.accessRules.searchSets`), its `public` value is written to `is_public` when the row is created.
+- `render` (search set) - Default page, layout, paginationContainer, partial and templateData for the set.
+- `requestOptions` (search set) - What the URL can change, every option is `false` by default except `pagination`:
+  - `entities` - `entity[name]=fields`, only the fields in the entity access rules `publicFilters` are kept.
+  - `relations` - `relations[name]=...`, only the relations already defined in the set are kept.
+  - `pagination` - `limit`, `pageNumber`, `sortBy`, `sortDirection`, the limit is capped by the entity access rules `publicMaxLimit` (by default the set `pagination.limit`, so a request can only lower it) and the sort only applies on the `publicSort` properties.
+  - `render` - `renderPage`, `renderLayout`, `renderPaginationContainer`, `renderPartial`.
+  - `templateData` - `templateData[name]=value`.
+- The URL examples with `renderPartial`, `renderLayout` and `templateData[...]` above require their `requestOptions` enabled.
+- `filters` (search set entity) - Fixed conditions added to every search of the entity, the default `cmsPagesSearch` set uses `{enabled: 1}` so the disabled pages are never listed. The entity access rules `publicConditions` are also added and win over the set `filters`, a project that replaces the default set should keep `enabled: 1` in one of them.
+- Search terms - A term is trimmed and cut to 100 characters, and ignored ("No search term provided.") when it has less than 3 characters other than the LIKE wildcards `%`, `_` and spaces (`Search.minimumSearchTermLength` and `Search.maximumSearchTermLength`).
+- Entity terms - `search[name]=term` searches the `name` entity of the set with its own term, a global `search` term wins when both are sent.
+
+## Bracket Query Keys
+
+- The CMS app runs on Express 5 (through `@reldens/server-utils`), its default `simple` query parser keeps `entity[name]`, `relations[name]`, `search[name]` and `templateData[name]` as flat query keys, which is how `Search` reads them.
+- On Express 4 the `extended` parser nested those keys (`query.entity.name`), so they were never read: since Express 5 every one of them applies when its `requestOptions` entry is enabled, keep the `publicFilters` of the entity access rules and the set `relations` as the only allow lists.
+- `templateData[name]` values come from the URL as they are, enable `requestOptions.templateData` only with templates that escape them (`{{name}}`, never `{{&name}}`).

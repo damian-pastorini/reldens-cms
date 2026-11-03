@@ -8,13 +8,15 @@ RELDENS_APP_PORT=8080
 RELDENS_ADMIN_ROUTE_PATH=/admin
 RELDENS_ADMIN_SECRET=your-secret-key
 
-RELDENS_DB_CLIENT=mysql
+RELDENS_DB_CLIENT=mysql2
 RELDENS_DB_HOST=localhost
 RELDENS_DB_PORT=3306
 RELDENS_DB_NAME=cms_db
 RELDENS_DB_USER=username
 RELDENS_DB_PASSWORD=password
-RELDENS_STORAGE_DRIVER=prisma
+RELDENS_STORAGE_DRIVER=knex
+RELDENS_PRISMA_ADAPTER=@prisma/adapter-mariadb
+RELDENS_PRISMA_ADAPTER_CLASS=PrismaMariaDb
 
 RELDENS_DEFAULT_DOMAIN=example.com
 RELDENS_DOMAIN_MAPPING={"dev.example.com":"development"}
@@ -81,6 +83,14 @@ const cms = new Manager({
     entitiesConfig: entityConfig
 });
 ```
+
+A `reference` property points to the ID of the referenced entity by default. When the foreign key targets another column (for example `items_item.key`), set `referenceKey` with that column: the admin edit form uses it as the select option value and to mark the selected option, so saving keeps the referenced value instead of writing the ID.
+
+```javascript
+item_key: { type: 'reference', reference: 'items_item', alias: 'related_items_item_item_key', referenceKey: 'key' }
+```
+
+The entity label shown in the admin sidebar, the list and edit titles, and the delete relations warning is resolved by `ResourceLabelResolver.resolve()` (`lib/admin-manager/resource-label-resolver.js`): `translations.labels[entityKey]` first, then `translations.labels[tableName]`, then the table name. A label set on purpose for the entity key overrides the generic one generated for the table name.
 
 ## Manager Configuration Options
 

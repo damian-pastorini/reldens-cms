@@ -227,6 +227,26 @@
                     border-left: 3px solid var(--lightBlue);
                 }
             }
+
+            & .logout-button {
+                display: block;
+                width: 100%;
+                color: var(--lightGrey);
+                background-color: transparent;
+                border: none;
+                border-left: 3px solid transparent;
+                font-family: var(--normalFont);
+                font-size: 0.75rem;
+                text-align: left;
+                cursor: pointer;
+                padding: 0.1rem 0.1rem 0.1rem 1rem;
+                margin-top: 0.3rem;
+                margin-bottom: 0.5rem;
+
+                &:hover, &:focus, &:active {
+                    border-left: 3px solid var(--lightBlue);
+                }
+            }
         }
     }
 

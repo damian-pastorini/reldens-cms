@@ -45,7 +45,7 @@ A powerful, flexible Content Management System built with Node.js, featuring an 
 - **Template-driven UI** with customizable admin themes
 
 ### -️ Database & Entities
-- **Multiple database drivers** (Prisma by default, others via DriversMap)
+- **Multiple database drivers** (Knex by default; Kysely, Drizzle, Objection JS, MikroORM and Prisma when their packages are installed in the project)
 - **Automatic entity generation** from a database schema
 - **Relationship mapping** and foreign key handling
 - **Custom entity configuration** with validation rules
@@ -221,7 +221,7 @@ Create database-driven forms with `<cmsForm key="contactForm"/>` tags in templat
 
 Multi-entity search with pagination and template data support.
 
-**Usage:** `/search?search=technology&limit=20&templateData[columnsClass]=col-md-4`
+**Usage:** `/search?search=technology&limit=20` (the `templateData[...]`, render, entities and relations URL parameters are only read when enabled in the search set `requestOptions`, and `searchEnabled: false` disables the search route)
 
 **Full documentation:** See `.claude/search-guide.md`
 
@@ -231,7 +231,8 @@ Powerful template engine with Mustache integration, system variables, and dynami
 
 **Core Features:**
 - System variables: `{{currentRequest.host}}`, `{{currentRoute.title}}`, `{{systemInfo.environment}}`
-- Template functions: `[url(/path)]`, `[asset(/img.png)]`, `[date(now, Y-m-d)]`, `[translate(key)]`
+- Template functions: `[url(/path)]`, `[asset(/img.png)]`, `[cdn(/css/styles.css)]`, `[date(now, Y-m-d)]`, `[translate(key)]`
+- Automatic cache busting: `[cdn()]` and `[asset()]` append `?v=<file content hash>` to local public files
 - Entity rendering: `<entity name="cmsBlocks" field="name" value="header"/>`
 - Collections with pagination: `<collection name="articles" filters="{}" data="{limit: 10}">`
 - Custom partials: `<partial name="hero" title="Welcome"/>` or `{{>hero -{data}-}}`

@@ -27,7 +27,13 @@ npx reldens-cms-update-password --email=admin@example.com
 
 # Or via npm scripts
 npm run generate-entities
+
+# Unit tests (tests/run-tests.js, the Logger prints the results only with RELDENS_LOG_LEVEL=9)
+RELDENS_LOG_LEVEL=9 npm run test
+RELDENS_LOG_LEVEL=9 npm run test -- --filter=RouterContents
 ```
+
+The tests follow the `@reldens/storage` structure: `tests/run-tests.js` (`RunTests`, the test classes list and the totals), `tests/unit/test-*.js` (one class per tested class, with `run()` returning the `TestRunner` results), `tests/fixtures/` (shared fixture builders). The `TestRunner` and `assert` are reused from the `@reldens/storage` dependency (`@reldens/storage/tests/utils/test-runner`).
 
 ## Quick Start
 
@@ -88,6 +94,8 @@ Templates use a three-layer rendering system:
 [translate(welcome.message)]
 ```
 
+`[cdn()]` and `[asset()]` append `?v=<md5 of the file contents>` to local public files (cache busting, `AssetVersionResolver`).
+
 See `.claude/templating-system-guide.md` for detailed template documentation.
 
 ### Configuration
@@ -98,8 +106,8 @@ RELDENS_APP_HOST=http://localhost
 RELDENS_APP_PORT=8080
 RELDENS_ADMIN_ROUTE_PATH=/admin
 RELDENS_ADMIN_SECRET=your-secret-key
-RELDENS_DB_CLIENT=mysql
-RELDENS_STORAGE_DRIVER=prisma
+RELDENS_DB_CLIENT=mysql2
+RELDENS_STORAGE_DRIVER=knex
 ```
 
 **Manager Configuration:**
@@ -245,7 +253,6 @@ See `.claude/advanced-usage-guide.md` for detailed examples.
 - **@reldens/storage** - Database abstraction layer
 - **@reldens/server-utils** - Server utilities (AppServerFactory, FileHandler, Encryptor)
 - **@reldens/utils** - Common utilities (EventsManager, Logger, SchemaValidator)
-- **dotenv** - Environment variable management
 - **mustache** - Template engine
 
 ## Additional Resources
