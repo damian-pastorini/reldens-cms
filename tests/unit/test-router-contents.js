@@ -20,7 +20,81 @@ class RouterContentsTest
     {
         this.runner.suite('RouterContents');
         await this.testGeneratePropertyEditRenderedValue();
+        await this.testGenerateEditRouteContent();
         return this.runner.getResults();
+    }
+
+    createItemsRepository(loadedIds)
+    {
+        return {
+            loadOneByWithRelations: async (idProperty, id) => {
+                loadedIds.push(id);
+                return AdminResourcesFixtures.itemsItemRows().find((row) => String(row[idProperty]) === id) || null;
+            }
+        };
+    }
+
+    createEditRouterContents(editSetup)
+    {
+        return new RouterContents({
+            dataServer: {getEntity: () => this.createItemsRepository(editSetup.loadedIds)},
+            translations: {labels: {}},
+            rootPath: '/admin',
+            viewPath: '/view',
+            adminFilesContents: {fields: {edit: {number: 'number-field', text: 'text-field'}}},
+            emitEvent: async (eventName) => editSetup.emittedEvents.push(eventName),
+            adminContentsRender: async (template, data) => {
+                editSetup.renders.push({template, data});
+                return template;
+            },
+            adminContentsRenderRoute: async (content) => content,
+            adminContentsEntities: () => ({'items-item': {edit: 'edit-template'}}),
+            adminContentsSideBar: () => '',
+            fetchTranslation: (propertyKey) => propertyKey,
+            fetchEntityIdPropertyKey: () => 'id'
+        });
+    }
+
+    async renderEditRoute(idValue)
+    {
+        let editSetup = {loadedIds: [], emittedEvents: [], renders: []};
+        let query = '' === idValue ? {} : {id: idValue};
+        editSetup.result = await this.createEditRouterContents(editSetup).generateEditRouteContent(
+            {query},
+            AdminResourcesFixtures.itemsItemResource(),
+            'items-item'
+        );
+        editSetup.editRender = editSetup.renders.find((render) => 'edit-template' === render.template);
+        return editSetup;
+    }
+
+    async testGenerateEditRouteContent()
+    {
+        this.runner.group('generateEditRouteContent');
+        await this.runner.test('should return empty content for an id that loads no entity', async () => {
+            let editSetup = await this.renderEditRoute('999');
+            assert.strictEqual(editSetup.result, '');
+            assert.deepStrictEqual(editSetup.loadedIds, ['999']);
+            assert.strictEqual(editSetup.emittedEvents.includes('reldens.adminEditPropertiesPopulation'), false);
+            assert.deepStrictEqual(editSetup.renders, []);
+        });
+        await this.runner.test('should render the edit form of an existing entity', async () => {
+            let editSetup = await this.renderEditRoute('4');
+            assert.strictEqual(editSetup.result, 'edit-template');
+            assert.deepStrictEqual(editSetup.loadedIds, ['4']);
+            assert.strictEqual(editSetup.emittedEvents.includes('reldens.adminEditPropertiesPopulation'), true);
+            assert.strictEqual(editSetup.editRender.data.idValue, '4');
+            assert.strictEqual(editSetup.editRender.data.templateTitle.startsWith('Edit '), true);
+            assert.strictEqual(editSetup.editRender.data.entityViewRoute, '/admin/items-item/view?id=4');
+        });
+        await this.runner.test('should render the create form without loading an entity when no id is sent', async () => {
+            let editSetup = await this.renderEditRoute('');
+            assert.strictEqual(editSetup.result, 'edit-template');
+            assert.deepStrictEqual(editSetup.loadedIds, []);
+            assert.strictEqual(editSetup.editRender.data.idValue, '');
+            assert.strictEqual(editSetup.editRender.data.templateTitle.startsWith('Create '), true);
+            assert.strictEqual(editSetup.editRender.data.entityViewRoute, '/admin/items-item');
+        });
     }
 
     createRouterContents()
