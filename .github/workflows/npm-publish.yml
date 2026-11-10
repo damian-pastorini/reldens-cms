@@ -106,6 +106,8 @@ jobs:
         run: npm ci
 
       - name: Run tests
+        env:
+          RELDENS_LOG_LEVEL: '9'
         run: npm test --if-present
 
       - name: Pack only (dry run)
