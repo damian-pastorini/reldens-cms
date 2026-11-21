@@ -84,7 +84,10 @@ class FrontendRoutesTest
     {
         let recordedErrors = [];
         let appServerFactory = new AppServerFactory();
-        appServerFactory.createAppServer({onError: (event) => recordedErrors.push(event)});
+        appServerFactory.createAppServer({
+            onError: (event) => recordedErrors.push(event),
+            processErrorResponse: (statusCode, statusMessage, req, res) => res.status(statusCode).send(statusMessage)
+        });
         return {
             response: await this.localHttpExchange.requestServer(
                 http.createServer(appServerFactory.app),
